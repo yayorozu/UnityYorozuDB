@@ -58,7 +58,7 @@ namespace Yorozu.DB
         internal YorozuDBDataDefineObject Define;
 
         [SerializeField]
-        private List<Field> _groups = new List<Field>();
+        private List<Field> _fields = new List<Field>();
 
         /// <summary>
         /// データ数
@@ -67,10 +67,10 @@ namespace Yorozu.DB
         {
             get
             {
-                if (_groups == null || !_groups.Any())
+                if (_fields == null || !_fields.Any())
                     return 0;
 
-                return _groups[0].Data.Count;
+                return _fields[0].Data.Count;
             }
         }
         
@@ -85,7 +85,7 @@ namespace Yorozu.DB
             if (_fieldIdToIndex == null)
             {
                 _fieldIdToIndex = new Dictionary<int, int>();
-                foreach (var (v, i) in _groups.Select((v, i) => (v, i)))
+                foreach (var (v, i) in _fields.Select((v, i) => (v, i)))
                 {
                     _fieldIdToIndex.Add(v.ID, i);
                 }
@@ -93,12 +93,12 @@ namespace Yorozu.DB
             
             if (_fieldIdToIndex.TryGetValue(fieldId, out var index))
             {
-                if (row >= _groups[index].Data.Count)
+                if (row >= _fields[index].Data.Count)
                 {
-                    throw new Exception($"Data Count is {_groups[index].Data.Count}. Require Index is {row}.");        
+                    throw new Exception($"Data Count is {_fields[index].Data.Count}. Require Index is {row}.");        
                 }
                 
-                return _groups[index].Data[row];
+                return _fields[index].Data[row];
             }
             
             throw new Exception($"Field Id {fieldId}. Is Not Contains");
@@ -109,13 +109,13 @@ namespace Yorozu.DB
         /// </summary>
         internal void AddField(int fieldId)
         {
-            var find = _groups.Any(g => g.ID == fieldId);
+            var find = _fields.Any(g => g.ID == fieldId);
             if (find)
             {
                 Debug.LogError($"Already define field id. {fieldId}");
                 return;
             }
-            _groups.Add(new Field(fieldId));
+            _fields.Add(new Field(fieldId));
             this.Dirty();
         }
         
@@ -124,7 +124,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void RemoveField(int fieldId)
         {
-            _groups.RemoveAll(g => g.ID == fieldId);
+            _fields.RemoveAll(g => g.ID == fieldId);
             this.Dirty();
         }
 
@@ -134,7 +134,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void Add()
         {
-            foreach (var g in _groups)
+            foreach (var g in _fields)
             {
                 g.Data.Add(new DBDataContainer());
             }
@@ -147,7 +147,7 @@ namespace Yorozu.DB
         /// <param name="index"></param>
         internal void RemoveAt(int index)
         {
-            foreach (var g in _groups)
+            foreach (var g in _fields)
             {
                 g.Data.RemoveAt(index);
             }
@@ -159,7 +159,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void ResetAt(int index)
         {
-            foreach (var g in _groups)
+            foreach (var g in _fields)
             {
                 g.Data[index] = new DBDataContainer();
             }
@@ -171,7 +171,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void Insert(int insertIndex, IOrderedEnumerable<int> targetIndexes)
         {
-            foreach (var g in _groups)
+            foreach (var g in _fields)
             {
                 g.Insert(insertIndex, targetIndexes);   
             }

@@ -19,7 +19,4 @@ MonoBehaviour:
   - Name: Value
     DataType: 0
     ID: 2
-  - Name: aaa
-    DataType: 6
-    ID: 3
   _keyID: -1

@@ -32,22 +32,22 @@ namespace Yorozu.DB.TreeView
         protected override TreeViewItem BuildRoot()
         {
 	        var root = _data.CreateTree();
-            return root;
+	        return root;
         }
 
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
         {
             _rows.Clear();
 
-            if (root.hasChildren)
+            if (!root.hasChildren)
+	            return _rows;
+
+            foreach (var child in root.children)
             {
-                foreach (var child in root.children)
-                {
-                    _rows.Add(child);
-                }
+	            _rows.Add(child);
             }
-            
-            SetupParentsAndChildrenFromDepths(root, _rows);
+
+            SetupDepthsFromParentsAndChildren(root);
 
             return _rows;
         }

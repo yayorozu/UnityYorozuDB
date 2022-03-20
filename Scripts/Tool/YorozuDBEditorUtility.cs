@@ -242,6 +242,10 @@ namespace Yorozu.DB
             
             var instance = ScriptableObject.CreateInstance<YorozuDBDataObject>();
             instance.Define = define;
+            foreach (var field in define.Fields)
+            {
+                instance.AddField(field.ID);
+            }
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

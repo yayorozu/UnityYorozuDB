@@ -45,9 +45,29 @@ namespace Yorozu.DB
                 root.AddChild(define);
             }
             
-            SetupDepthsFromParentsAndChildren(root);
-            
             return root;
+        }
+        
+        protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
+        {
+            _rows.Clear();
+            
+            if (!root.hasChildren)
+                return _rows;
+            
+            foreach (var child in root.children)
+            {
+                _rows.Add(child);
+                if (!child.hasChildren) 
+                    continue;
+                
+                foreach (var child2 in child.children)
+                {
+                    _rows.Add(child2);
+                }
+            }
+            
+            return _rows;
         }
 
         protected override void ContextClickedItem(int id)
