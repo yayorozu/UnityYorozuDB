@@ -1,0 +1,145 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.IMGUI.Controls;
+using UnityEngine;
+using Yorozu.DB.TreeView;
+
+namespace Yorozu.DB
+{
+    [Serializable]
+    internal class DataEditModule : YorozuDBEditorModule
+
+    {
+    [SerializeField]
+    private YorozuDBDataObject _data;
+
+    [SerializeField]
+    private MultiColumnHeaderState _columnHeaderState;
+
+    [SerializeField]
+    private TreeViewState _state;
+
+    [NonSerialized]
+    private bool _Initialized;
+
+    private YorozuDBEditorTreeView _treeView;
+
+    internal override bool OnGUI()
+    {
+        if (_data == null)
+            return false;
+
+        InitIfNeeded();
+
+        using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+        {
+            EditorGUILayout.LabelField($"[ {_data.name} ]");
+
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Add Column", EditorStyles.toolbarButton))
+            {
+                _data.Add();
+                Reload();
+                return true;
+            }
+        }
+
+        var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
+        _treeView.OnGUI(rect);
+        
+        return false;
+    }
+
+    private void Reload() => _Initialized = false;
+
+    internal void SetData(object param)
+    {
+        _data = param as YorozuDBDataObject;
+        Reload();
+        InitIfNeeded();
+    }
+
+    void InitIfNeeded()
+    {
+        if (_Initialized)
+            return;
+
+        if (_state == null)
+        {
+            _state = new TreeViewState();
+        }
+
+        var headerState = YorozuDBEditorUtility.CreateMultiColumnHeaderState(_data);
+        if (MultiColumnHeaderState.CanOverwriteSerializedFields(_columnHeaderState, headerState))
+            MultiColumnHeaderState.OverwriteSerializedFields(_columnHeaderState, headerState);
+        _columnHeaderState = headerState;
+
+        var multiColumnHeader = new YorozuDBEditorMultiColumnHeader(_columnHeaderState);
+        multiColumnHeader.DeleteEvent += DeleteColumn;
+        multiColumnHeader.ResizeToFit();
+
+        _treeView = new YorozuDBEditorTreeView(_state, multiColumnHeader, _data);
+        _treeView.DeleteRowEvent += DeleteRow;
+        _treeView.ResetRowEvent += ResetRow;
+        _treeView.SortEvent += InsertItems;
+
+        _Initialized = true;
+    }
+
+    /// <summary>
+    /// 並べ替え
+    /// </summary>
+    private void InsertItems(int insertIndex, IList<int> targetIndexes)
+    {
+        _data.Insert(insertIndex, targetIndexes.OrderByDescending(v => v));
+        Reload();
+    }
+
+    /// <summary>
+    /// Row の値を全部リセット
+    /// </summary>
+    private void ResetRow(IList<int> indexes)
+    {
+        var text = string.Join(',', indexes);
+        if (EditorUtility.DisplayDialog("Warning", $"Can Reset row value [{text}] ?", "YES", "NO"))
+        {
+            foreach (var index in indexes)
+            {
+                _data.ResetAt(index);
+            }
+
+            Reload();
+        }
+    }
+
+    /// <summary>
+    /// 列削除
+    /// </summary>
+    private void DeleteColumn(int fieldId)
+    {
+        _data.Define.RemoveField(fieldId);
+        Reload();
+    }
+
+    /// <summary>
+    /// 行削除
+    /// </summary>
+    private void DeleteRow(IList<int> indexes)
+    {
+        var text = string.Join(',', indexes);
+        if (EditorUtility.DisplayDialog("Warning", $"Can Delete row [{text}]?", "YES", "NO"))
+        {
+            // 降順にして消す
+            foreach (var index in indexes.OrderByDescending(v => v))
+            {
+                _data.RemoveAt(index);
+            }
+
+            Reload();
+        }
+    }
+    }
+}

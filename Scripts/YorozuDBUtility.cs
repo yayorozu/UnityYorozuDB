@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Yorozu.DB
 {
@@ -11,20 +10,18 @@ namespace Yorozu.DB
         /// 参照を隠蔽してあげればいいんじゃないかな
         /// それでいい感じにできそうな気がする
         /// </summary>
-        internal static List<YorozuDBData> Convert<T>(YorozuDBDataObject src) where T : YorozuDBData
+        internal static List<YorozuDBDataAbstract> Convert<T>(YorozuDBDataObject src) where T : YorozuDBDataAbstract
         {
-            var list = new List<YorozuDBData>(src.Groups.Count());
+            var dataCount = src.DataCount;
+            // データ数分確保
+            var list = new List<YorozuDBDataAbstract>();
             var type = typeof(T);
-            if (src.Groups.Count > 0)
+            
+            for (var row = 0; row < dataCount; row++)
             {
-                var count = src.Groups[0].Data.Count;
-                // 要素分データを生成 
-                for (var i = 0; i < count; i++)
-                {
-                    var instance = Activator.CreateInstance(type) as YorozuDBData;
-                    instance.SetUp(src, i);
-                    list.Add(instance as T);
-                }
+                var instance = Activator.CreateInstance(type) as YorozuDBDataAbstract;
+                instance.SetUp(src, row);
+                list.Add(instance as T);
             }
 
             return list;

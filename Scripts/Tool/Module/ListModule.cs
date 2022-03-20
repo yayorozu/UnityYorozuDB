@@ -1,40 +1,58 @@
 using System;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace Yorozu.DB
 {
     [Serializable]
-    internal class ListModule
+    internal class ListModule : YorozuDBEditorModule
     {
         [SerializeField]
-        private YorozuDBDataObject[] _data;
+        private YorozuDBDataDefineObject[] _defines;
 
         [SerializeField]
         private YorozuDBSetting _setting;
 
         private string _saveScriptFolder;
-        private Vector2 _scrollPosition;
 
-        internal event Action<YorozuDBDataObject> SelectEvent;
+        internal event Action<int> SelectEvent;
+
+        [SerializeField]
+        private TreeViewState _state;
+
+        private YorozuDBEditorDataListTreeView _treeView;
 
         internal void Initialize()
         {
-            _setting = YorozuDBSetting.Load();
-            _saveScriptFolder = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
-            _data = YorozuDBEditorUtility.LoadAllDataAsset();
-        }
-
-        internal void OnGUI()
-        {
             if (_setting == null)
             {
-                Initialize();
+                _setting = YorozuDBSetting.Load();
+                _saveScriptFolder = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
+                _defines = YorozuDBEditorUtility.LoadAllDefineAsset();
             }
-            
+
+            if (_state == null)
+                _state = new TreeViewState();
+
+            if (_treeView == null)
+            {
+                _treeView = new YorozuDBEditorDataListTreeView(_state);
+                _treeView.SelectItemEvent += id =>
+                {
+                    SelectEvent?.Invoke(id);
+                };
+            }
+        }
+
+        internal override bool OnGUI()
+        {
+            Initialize();
+
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField("Script Export Folder", _setting.ScriptExportFolder, typeof(DefaultAsset), false);
+                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField("Script Export Folder",
+                    _setting.ScriptExportFolder, typeof(DefaultAsset), false);
                 if (check.changed && newAsset != null)
                 {
                     var path = AssetDatabase.GetAssetPath(newAsset);
@@ -52,17 +70,19 @@ namespace Yorozu.DB
                 EditorGUILayout.TextField($"Script Generate Folder", _saveScriptFolder);
             }
 
-            if (GUILayout.Button("Create Data Asset"))
+            // データ定義を作成
+            if (GUILayout.Button("Create Data Define Asset"))
             {
-                var loadFrom = _data is {Length: > 0} ? AssetDatabase.GetAssetPath(_data[0]) : "Assets/"; 
+                var loadFrom = _defines is {Length: > 0} ? AssetDatabase.GetAssetPath(_defines[0]) : "Assets/";
                 var path = EditorUtility.SaveFilePanelInProject("Select", "Data", "asset", "Select Create Path", loadFrom);
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var instance = ScriptableObject.CreateInstance<YorozuDBDataObject>();
+                    var instance = ScriptableObject.CreateInstance<YorozuDBDataDefineObject>();
                     AssetDatabase.CreateAsset(instance, path);
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
-                    _data = YorozuDBEditorUtility.LoadAllDataAsset();
+                    _defines = YorozuDBEditorUtility.LoadAllDefineAsset();
+                    _treeView.Reload();
                 }
             }
 
@@ -74,28 +94,13 @@ namespace Yorozu.DB
                     YorozuDBEditorUtility.GenerateScript(exportPath);
                 }
             }
-
-
+            
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Data", EditorStyles.boldLabel);
-            
-            if (_data == null || _data.Length <= 0)
-            {
-                EditorGUILayout.HelpBox("Not Found", MessageType.Error);
-                return;
-            }
-            
-            using (var scroll = new EditorGUILayout.ScrollViewScope(_scrollPosition))
-            {
-                _scrollPosition = scroll.scrollPosition;
-                foreach (var data in _data)
-                {
-                    if (GUILayout.Button(data.name))
-                    {
-                        SelectEvent?.Invoke(data);
-                    }
-                }
-            }
+
+            var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
+            _treeView.OnGUI(rect);
+            return false;
         }
     }
 }

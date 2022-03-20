@@ -15,7 +15,7 @@ namespace Yorozu.DB
         /// </summary>
         internal static void GenerateScript(string savePath)
         {
-            var assets = LoadAllDataAsset();
+            var assets = LoadAllDefineAsset();
             foreach (var data in assets)
             {
                 var builder = new StringBuilder();
@@ -24,11 +24,11 @@ namespace Yorozu.DB
                 
                 builder.AppendLine("namespace Yorozu.DB");
                 builder.AppendLine("{");
-                builder.AppendLine($"    public class {data.name} : {nameof(YorozuDBData)}");
+                builder.AppendLine($"    public class {data.name} : {nameof(YorozuDBDataAbstract)}");
                 builder.AppendLine("    {");
-                foreach (var pair in data.Groups.Select((v, i) => new {v, i}))
+                foreach (var field in data.Fields)
                 {
-                    builder.AppendLine($"       public {pair.v.DataType.ConvertString()} {pair.v.Name} => {pair.v.DataType.ToString()}({pair.i});");
+                    builder.AppendLine($"       public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
                     builder.AppendLine("");
                 }
                 builder.AppendLine("    }");
@@ -46,13 +46,36 @@ namespace Yorozu.DB
             AssetDatabase.Refresh();
         }
         
-        internal static YorozuDBDataObject[] LoadAllDataAsset()
+        internal static YorozuDBDataDefineObject[] LoadAllDefineAsset()
         {
-            var findAssets = AssetDatabase.FindAssets($"t:{nameof(YorozuDBDataObject)}");
+            var findAssets = AssetDatabase.FindAssets($"t:{nameof(YorozuDBDataDefineObject)}");
             return findAssets.Select(AssetDatabase.GUIDToAssetPath)
-                    .Select(AssetDatabase.LoadAssetAtPath<YorozuDBDataObject>)
+                    .Select(AssetDatabase.LoadAssetAtPath<YorozuDBDataDefineObject>)
                     .ToArray()
                 ;
+        }
+        
+        internal static YorozuDBDataObject[] LoadAllDataAsset(YorozuDBDataDefineObject searchDefine = null)
+        {
+            var findAssetsGuids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBDataObject)}");
+            return findAssetsGuids.Select(AssetDatabase.GUIDToAssetPath)
+                    .Select(AssetDatabase.LoadAssetAtPath<YorozuDBDataObject>)
+                    // 対象指定されていた場合はそれを全部探す
+                    .Where(v => searchDefine == null || (searchDefine != null && v.Define == searchDefine))
+                    .ToArray()
+                ;
+        }
+
+        internal static void Dirty(this YorozuDBDataDefineObject asset)
+        {
+            EditorUtility.SetDirty(asset);
+            AssetDatabase.SaveAssets();
+        }
+        
+        internal static void Dirty(this YorozuDBDataObject asset)
+        {
+            EditorUtility.SetDirty(asset);
+            AssetDatabase.SaveAssets();
         }
 
         /// <summary>
@@ -65,6 +88,7 @@ namespace Yorozu.DB
                 DataType.String => "string",
                 DataType.Float => "float",
                 DataType.Int => "int",
+                DataType.Bool => "bool",
                 DataType.Sprite => "Sprite",
                 DataType.GameObject => "GameObject",
                 DataType.ScriptableObject => "ScriptableObject",
@@ -77,33 +101,36 @@ namespace Yorozu.DB
             };
         }
         
-        internal static void DrawDataField(Rect rect, DataType type, DBData data)
+        internal static void DrawDataField(Rect rect, DataType type, DBDataContainer data, GUIContent content)
         {
             switch (type)
             {
                 case DataType.String:
-                    data.String = EditorGUI.TextField(rect, GUIContent.none, data.String);
+                    data.String = EditorGUI.TextField(rect, content, data.String);
                     break;
                 case DataType.Float:
-                    data.Float = EditorGUI.FloatField(rect, GUIContent.none, data.Float);
+                    data.Float = EditorGUI.FloatField(rect, content, data.Float);
                     break;
                 case DataType.Int:
-                    data.Int = EditorGUI.IntField(rect, GUIContent.none, data.Int);
+                    data.Int = EditorGUI.IntField(rect, content, data.Int);
+                    break;
+                case DataType.Bool:
+                    data.Bool = EditorGUI.Toggle(rect, content, data.Bool);
                     break;
                 case DataType.Sprite:
-                    data.UnityObject = EditorGUI.ObjectField(rect, GUIContent.none, data.UnityObject, typeof(Sprite), false);
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(Sprite), false);
                     break;
                 case DataType.GameObject:
-                    data.UnityObject = EditorGUI.ObjectField(rect, GUIContent.none, data.UnityObject, typeof(GameObject), false);
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(GameObject), false);
                     break;
                 case DataType.UnityObject:
-                    data.UnityObject = EditorGUI.ObjectField(rect, GUIContent.none, data.UnityObject, typeof(UnityEngine.Object), false);
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(UnityEngine.Object), false);
                     break;
                 case DataType.Vector2:
                     var vector2 = data.GetFromString<Vector2>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector2 = EditorGUI.Vector2Field(rect, GUIContent.none, vector2);
+                        vector2 = EditorGUI.Vector2Field(rect, content, vector2);
                         if (check.changed)
                         {
                             data.SetToString(vector2);
@@ -114,19 +141,19 @@ namespace Yorozu.DB
                     var vector3 = data.GetFromString<Vector3>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector3 = EditorGUI.Vector3Field(rect, GUIContent.none, vector3);
+                        vector3 = EditorGUI.Vector3Field(rect, content, vector3);
                         if (check.changed)
                             data.SetToString(vector3);
                     }
                     break;
                 case DataType.ScriptableObject:
-                    data.UnityObject = EditorGUI.ObjectField(rect, GUIContent.none, data.UnityObject, typeof(UnityEngine.ScriptableObject), false);
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(UnityEngine.ScriptableObject), false);
                     break;
                 case DataType.Vector2Int:
                     var vector2Int = data.GetFromString<Vector2Int>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector2Int = EditorGUI.Vector2IntField(rect, GUIContent.none, vector2Int);
+                        vector2Int = EditorGUI.Vector2IntField(rect, content, vector2Int);
                         if (check.changed)
                         {
                             data.SetToString(vector2Int);
@@ -137,7 +164,7 @@ namespace Yorozu.DB
                     var vector3Int = data.GetFromString<Vector3Int>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector3Int = EditorGUI.Vector3IntField(rect, GUIContent.none, vector3Int);
+                        vector3Int = EditorGUI.Vector3IntField(rect, content, vector3Int);
                         if (check.changed)
                         {
                             data.SetToString(vector3Int);
@@ -149,9 +176,15 @@ namespace Yorozu.DB
             }
         }
 
+        /// <summary>
+        /// TreeView の Header情報を取得
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         internal static MultiColumnHeaderState CreateMultiColumnHeaderState(YorozuDBDataObject data)
         {
-            var columns = new MultiColumnHeaderState.Column[data.Groups.Count() + 1];
+            var fields = data.Define.Fields;
+            var columns = new MultiColumnHeaderState.Column[fields.Count() + 1];
             // 制御用に1フィールド用意する
             columns[0] = new MultiColumnHeaderState.Column()
             {
@@ -161,13 +194,13 @@ namespace Yorozu.DB
                 maxWidth = 28,
             };
             
-            foreach (var pair in data.Groups.Select((v, i) => new {v, i}))
+            foreach (var (v, i) in fields.Select((v, i) => (v, i)))
             {
-                columns[pair.i + 1] = new MultiColumnHeaderState.Column()
+                columns[i + 1] = new MultiColumnHeaderState.Column()
                 {
-                    headerContent = new GUIContent($"    {pair.v.Name}"),
+                    headerContent = new GUIContent($"    {v.Name}"),
                     headerTextAlignment = TextAlignment.Left,
-                    contextMenuText = pair.v.DataType.ToString(),
+                    contextMenuText = v.DataType.ToString(),
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Right,
                     width = 150,
@@ -175,7 +208,7 @@ namespace Yorozu.DB
                     maxWidth = 200,
                     autoResize = false,
                     allowToggleVisibility = false,
-                    userData = data.IsPrimaryGroup(pair.v) ? 1 : 0,
+                    userData = v.ID,
                 };
             }
             

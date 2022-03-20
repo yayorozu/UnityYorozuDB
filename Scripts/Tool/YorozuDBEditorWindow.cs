@@ -7,7 +7,6 @@ namespace Yorozu.DB
 {
     internal class YorozuDBEditorWindow : EditorWindow
     {
-
         [MenuItem("Tools/YorozuDB")]
         private static void ShowWindow()
         {
@@ -15,47 +14,61 @@ namespace Yorozu.DB
             window.Show();
         }
 
-        [SerializeReference]
-        private List<YorozuDBEditorModule> _modules;
-        private YorozuDBEditorModule current => _modules[_moduleIndex];
+        private static readonly Color SPLITTER_COLOR = new Color(0.2f, 0.2f, 0.2f);
+        
+        [SerializeField]
+        private ListModule _list;
+        [SerializeField]
+        private DefineEditModule _editDefine;
+        [SerializeField]
+        private DataEditModule _editData;
+
+        private enum Mode
+        {
+            None,
+            Define,
+            Data
+        }
 
         [SerializeField]
-        private int _moduleIndex;
-
-        [SerializeField]
-        private ListModule _left;
-        [SerializeField]
-        private TreeViewModule _right;
+        private Mode _mode;
 
         private void OnEnable()
         {
-            if (_left == null)
+            if (_list == null)
             {
-                _left = new ListModule();
-                _left.SelectEvent += SelectDataEvent;
+                _list = new ListModule();
             }
-
-            if (_right == null)
+            // コンパイルでイベントは消える
+            _list.SelectEvent += SelectDataEvent;
+            
+            if (_editDefine == null)
             {
-                _right = new TreeViewModule();
+                _editDefine = new DefineEditModule();
+            }
+            if (_editData == null)
+            {
+                _editData = new DataEditModule();
             }
         }
 
-        private void SelectDataEvent(YorozuDBDataObject data)
+        private void SelectDataEvent(int instanceId)
         {
-            _right?.SetData(data);
-            Repaint();
-        }
-
-        internal void ChangeModule(Type nextType, object param)
-        {
-            var index = _modules.FindIndex(m => m.GetType() == nextType);
-            if (index < 0)
+            var obj = EditorUtility.InstanceIDToObject(instanceId);
+            if (obj == null)
                 return;
 
-            current.OnExit();
-            _moduleIndex = index;
-            current.OnEnter(param);
+            if (obj.GetType() == typeof(YorozuDBDataDefineObject))
+            {
+                _editDefine?.SetData(obj as YorozuDBDataDefineObject);
+                _mode = Mode.Define;
+            }
+            if (obj.GetType() == typeof(YorozuDBDataObject))
+            {
+                _editData?.SetData(obj as YorozuDBDataObject);
+                _mode = Mode.Data;
+            }
+            
             Repaint();
         }
 
@@ -65,18 +78,33 @@ namespace Yorozu.DB
             {
                 using (new EditorGUILayout.VerticalScope(GUILayout.Width(200)))
                 {
-                    _left.OnGUI();
-                }
-
-                using (new EditorGUILayout.VerticalScope("helpbox", GUILayout.Width(1), GUILayout.ExpandHeight(true)))
-                {
+                    if (_list.OnGUI()) 
+                        Repaint();
                 }
                 
+                var rect = GUILayoutUtility.GetRect(2, 2, 0, 100000);
+                EditorGUI.DrawRect(rect, SPLITTER_COLOR);
+                
+                EditorGUILayout.Space(3);
+
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    _right.OnGUI();
+                    var module = GetRightModule();
+                    if (module != null)
+                        if (module.OnGUI())
+                            Repaint();
                 }
             }
+        }
+
+        private YorozuDBEditorModule GetRightModule()
+        {
+            return _mode switch
+            {
+                Mode.Define => _editDefine,
+                Mode.Data => _editData,
+                _ => null
+            };
         }
     }
 }

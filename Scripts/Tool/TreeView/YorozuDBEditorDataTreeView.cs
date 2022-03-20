@@ -140,13 +140,7 @@ namespace Yorozu.DB.TreeView
 
     internal class YorozuDBEditorMultiColumnHeader : MultiColumnHeader
     {
-	    private static readonly string EditorField = "EditorField";
-	    private int _renameIndex = -1;
-	    private string _temp;
-	    
 	    internal event Action<int> DeleteEvent;
-	    internal event Action<int, string> RenameEvent;
-	    internal event Action<int> SetKeyEvent;
 	    
         internal YorozuDBEditorMultiColumnHeader(MultiColumnHeaderState state) : base(state)
         {
@@ -156,78 +150,25 @@ namespace Yorozu.DB.TreeView
 
         protected override void ColumnHeaderGUI(MultiColumnHeaderState.Column column, Rect headerRect, int columnIndex)
         {
-	        if (_renameIndex == columnIndex)
-	        {
-		        headerRect.height = EditorGUIUtility.singleLineHeight;
-		        GUI.SetNextControlName(EditorField);
-		        _temp = GUI.TextField(headerRect, _temp);
-		        var e = Event.current;
-		        if (e.keyCode == KeyCode.Return && _renameIndex != -1)
-		        {
-			        RenameEvent?.Invoke(columnIndex - 1, _temp);
-			        _renameIndex = -1;
-			        Repaint();
-		        }
-
-		        if (e.keyCode == KeyCode.Escape)
-		        {
-			        Repaint();
-			        _renameIndex = -1;
-		        }
-	        }
-	        else
-	        {
-				base.ColumnHeaderGUI(column, headerRect, columnIndex);
-	        }
+	        base.ColumnHeaderGUI(column, headerRect, columnIndex);
 	        
-	        if (columnIndex <= 0 || _renameIndex == columnIndex)
+	        if (columnIndex <= 0)
 		        return;
-
-	        headerRect.y = headerRect.height - EditorGUIUtility.singleLineHeight;  
-	        headerRect.height = EditorGUIUtility.singleLineHeight - 4;
-
-	        
-	        // Key として有効ならば表示
-	        if (column.contextMenuText == DataType.Int.ToString() ||
-	            column.contextMenuText == DataType.String.ToString())
-	        {
-		        var prevWidth = headerRect.width;
-		        headerRect.width = 24;
-		        
-		        var content = column.userData == 1
-			        ? EditorGUIUtility.TrIconContent("d_Favorite")
-			        : EditorGUIUtility.TrIconContent("TestNormal");
-		        if (GUI.Button(headerRect, content, EditorStyles.label))
-		        {
-			        SetKeyEvent?.Invoke(columnIndex - 1);
-		        }
-
-		        headerRect.width = prevWidth;
-	        }
 	        
 	        var width = 16;
-			headerRect.x += headerRect.width - width * 2;
+	        headerRect.y = headerRect.height - EditorGUIUtility.singleLineHeight;  
+			headerRect.x += headerRect.width - width;
 	        headerRect.width = width;
-	        
-	        // リネームボタン
-	        if (GUI.Button(headerRect, EditorGUIUtility.TrIconContent("d_Grid.PaintTool"), EditorStyles.label))
-	        {
-				_renameIndex = columnIndex;
-				_temp = column.headerContent.text;
-				GUI.FocusControl(EditorField);
-	        }
-
-	        headerRect.x += headerRect.width;
 	        headerRect.height = EditorGUIUtility.singleLineHeight;
 	        
 	        // 削除ボタン
 	        if (GUI.Button(headerRect, EditorGUIUtility.TrIconContent("Toolbar minus"), EditorStyles.label))
 	        {
-		        if (EditorUtility.DisplayDialog("Warning", $"Can Delete {column.headerContent.text} row?",
+		        if (EditorUtility.DisplayDialog("Warning", $"Delete {column.headerContent.text}?",
 			            "YES",
 			            "NO"))
 		        {
-			        DeleteEvent?.Invoke(columnIndex - 1);
+			        DeleteEvent?.Invoke(column.userData);
 			        GUIUtility.ExitGUI();
 		        }
 	        }
@@ -244,13 +185,13 @@ namespace Yorozu.DB.TreeView
     internal class YorozuDBEditorTreeViewItem : TreeViewItem
     {
 	    private List<DataType> _types = new List<DataType>();
-	    private List<DBData> _data = new List<DBData>();
+	    private List<DBDataContainer> _data = new List<DBDataContainer>();
 	    
 	    internal YorozuDBEditorTreeViewItem(int id) : base(id, 0, (id).ToString())
 	    {
 	    }
 
-	    internal void AddData(DataType type, DBData data)
+	    internal void AddData(DataType type, DBDataContainer data)
 	    {
 		    _types.Add(type);
 		    _data.Add(data);
@@ -258,7 +199,7 @@ namespace Yorozu.DB.TreeView
 
 	    internal void Draw(Rect cellRect, int index)
 	    {
-            YorozuDBEditorUtility.DrawDataField(cellRect, _types[index], _data[index]);
+            YorozuDBEditorUtility.DrawDataField(cellRect, _types[index], _data[index], GUIContent.none);
 	    }
     }
 }
