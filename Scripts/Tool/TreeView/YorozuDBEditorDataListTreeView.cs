@@ -15,6 +15,8 @@ namespace Yorozu.DB
         /// TreeViewItemのクリック
         /// </summary>
         internal event Action<int> SelectItemEvent;
+        internal event Action<IList<int>> DeleteItemsEvent;
+        internal event Action<int> CreateDataEvent;
         
         public YorozuDBEditorDataListTreeView(TreeViewState state) : base(state)
         {
@@ -42,31 +44,38 @@ namespace Yorozu.DB
              
                 root.AddChild(define);
             }
-
-            return root;
-        }
-        
-        protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
-        {
-            _rows.Clear();
-
-            if (root.hasChildren)
-            {
-                foreach (var child in root.children)
-                {
-                    _rows.Add(child);
-                }
-            }
             
-            SetupParentsAndChildrenFromDepths(root, _rows);
-
-            return _rows;
+            SetupDepthsFromParentsAndChildren(root);
+            
+            return root;
         }
 
         protected override void ContextClickedItem(int id)
         {
-            var obj = EditorUtility.InstanceIDToObject(id);
+            var ev = Event.current;
+            ev.Use();
+            var menu = new GenericMenu();
             
+            var obj = EditorUtility.InstanceIDToObject(id);
+            if (obj.GetType() == typeof(YorozuDBDataDefineObject))
+            {
+                menu.AddItem(new GUIContent("Create Data"), false, () => 
+                {
+                    CreateDataEvent?.Invoke(id);
+                });
+            }
+            
+            menu.AddItem(new GUIContent("Delete"), false, () =>
+            {
+                DeleteItemsEvent?.Invoke(GetSelection());
+            });
+    
+            menu.ShowAsContext();
+        }
+
+        protected override void SelectionChanged(IList<int> selectedIds)
+        {
+            SelectItemEvent?.Invoke(selectedIds.First());
         }
 
         protected override void SingleClickedItem(int id)

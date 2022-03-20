@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -8,9 +10,6 @@ namespace Yorozu.DB
     [Serializable]
     internal class ListModule : YorozuDBEditorModule
     {
-        [SerializeField]
-        private YorozuDBDataDefineObject[] _defines;
-
         [SerializeField]
         private YorozuDBSetting _setting;
 
@@ -29,7 +28,6 @@ namespace Yorozu.DB
             {
                 _setting = YorozuDBSetting.Load();
                 _saveScriptFolder = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
-                _defines = YorozuDBEditorUtility.LoadAllDefineAsset();
             }
 
             if (_state == null)
@@ -42,6 +40,9 @@ namespace Yorozu.DB
                 {
                     SelectEvent?.Invoke(id);
                 };
+                // 選択したやつを全部削除
+                _treeView.DeleteItemsEvent += DeleteAssets;
+                _treeView.CreateDataEvent += CreateDataAsset;
             }
         }
 
@@ -73,15 +74,12 @@ namespace Yorozu.DB
             // データ定義を作成
             if (GUILayout.Button("Create Data Define Asset"))
             {
-                var loadFrom = _defines is {Length: > 0} ? AssetDatabase.GetAssetPath(_defines[0]) : "Assets/";
-                var path = EditorUtility.SaveFilePanelInProject("Select", "Data", "asset", "Select Create Path", loadFrom);
-                if (!string.IsNullOrEmpty(path))
+                var defines = YorozuDBEditorUtility.LoadAllDefineAsset();
+                var loadFrom = defines is {Length: > 0} ? 
+                    System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
+                    "Assets/";
+                if (YorozuDBEditorUtility.CreateDefineAsset(loadFrom))
                 {
-                    var instance = ScriptableObject.CreateInstance<YorozuDBDataDefineObject>();
-                    AssetDatabase.CreateAsset(instance, path);
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
-                    _defines = YorozuDBEditorUtility.LoadAllDefineAsset();
                     _treeView.Reload();
                 }
             }
@@ -101,6 +99,54 @@ namespace Yorozu.DB
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
             _treeView.OnGUI(rect);
             return false;
+        }
+
+        /// <summary>
+        /// Data を作成
+        /// </summary>
+        private void CreateDataAsset(int parentId)
+        {
+            var define= EditorUtility.InstanceIDToObject(parentId);
+            var path = AssetDatabase.GetAssetPath(define);
+            var parentPath = System.IO.Path.GetDirectoryName(path);
+            if (YorozuDBEditorUtility.CreateDataAsset(define as YorozuDBDataDefineObject, parentPath))
+            {
+                _treeView?.Reload();
+            }   
+        }
+
+        /// <summary>
+        /// 全削除
+        /// </summary>
+        private void DeleteAssets(IList<int> ids)
+        {
+            if (!EditorUtility.DisplayDialog("Warning", $"Delete Select Assets?",
+                    "YES",
+                    "NO"))
+            {
+                return;
+            }
+            
+            var deletes = ids.Select(EditorUtility.InstanceIDToObject);
+            foreach (var id in ids)
+            {
+                var obj = EditorUtility.InstanceIDToObject(id);
+                // defineだったら依存しているやつを全部削除
+                if (obj.GetType() != typeof(YorozuDBDataDefineObject)) 
+                    continue;
+                
+                var dependencyAssets = YorozuDBEditorUtility.LoadAllDataAsset(obj as YorozuDBDataDefineObject);
+                deletes = deletes.Concat(dependencyAssets);
+            }
+
+            var deletePaths = deletes.Distinct()
+                .Select(AssetDatabase.GetAssetPath)
+                .ToArray();
+            var fails = new List<string>();
+            AssetDatabase.DeleteAssets(deletePaths, fails);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            _treeView?.Reload();
         }
     }
 }

@@ -34,15 +34,18 @@ namespace Yorozu.DB
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                EditorGUILayout.LabelField($"[ {_data.name} ]");
-
+                EditorGUILayout.LabelField($"Data Editor: 【{_data.name}】");
+                
                 GUILayout.FlexibleSpace();
 
-                if (GUILayout.Button("Add Row", EditorStyles.toolbarButton))
+                using (new EditorGUI.DisabledScope(_data.Define.Fields.Count <= 0))
                 {
-                    _data.Add();
-                    Reload();
-                    return true;
+                    if (GUILayout.Button("Add Row", EditorStyles.toolbarButton))
+                    {
+                        _data.Add();
+                        Reload();
+                        return true;
+                    }
                 }
             }
 

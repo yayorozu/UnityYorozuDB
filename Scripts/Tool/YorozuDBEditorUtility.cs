@@ -214,5 +214,38 @@ namespace Yorozu.DB
             
             return new MultiColumnHeaderState(columns);
         }
+
+        /// <summary>
+        /// DefineAssetを作成
+        /// </summary>
+        internal static bool CreateDefineAsset(string defaultPath)
+        {
+            var path = EditorUtility.SaveFilePanelInProject("Select", "Define", "asset", "Select Create Path", defaultPath);
+            if (string.IsNullOrEmpty(path)) 
+                return false;
+            
+            var instance = ScriptableObject.CreateInstance<YorozuDBDataDefineObject>();
+            AssetDatabase.CreateAsset(instance, path);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            return true;
+        }
+        
+        /// <summary>
+        /// データアセットを作成
+        /// </summary>
+        internal static bool CreateDataAsset(YorozuDBDataDefineObject define, string defaultPath)
+        {
+            var path = EditorUtility.SaveFilePanelInProject("Select", "Data", "asset", "Select Create Path", defaultPath);
+            if (string.IsNullOrEmpty(path)) 
+                return false;
+            
+            var instance = ScriptableObject.CreateInstance<YorozuDBDataObject>();
+            instance.Define = define;
+            AssetDatabase.CreateAsset(instance, path);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            return true;
+        }
     }
 }
