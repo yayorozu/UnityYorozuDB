@@ -13,8 +13,6 @@ namespace Yorozu.DB
         [SerializeField]
         private YorozuDBSetting _setting;
 
-        private string _saveScriptFolder;
-
         internal event Action<int> SelectEvent;
 
         [SerializeField]
@@ -27,7 +25,6 @@ namespace Yorozu.DB
             if (_setting == null)
             {
                 _setting = YorozuDBSetting.Load();
-                _saveScriptFolder = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
             }
 
             if (_state == null)
@@ -50,27 +47,6 @@ namespace Yorozu.DB
         {
             Initialize();
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField("Script Export Folder",
-                    _setting.ScriptExportFolder, typeof(DefaultAsset), false);
-                if (check.changed && newAsset != null)
-                {
-                    var path = AssetDatabase.GetAssetPath(newAsset);
-                    if (AssetDatabase.IsValidFolder(path))
-                    {
-                        _setting.SetFolder(path);
-                    }
-
-                    _saveScriptFolder = path;
-                }
-            }
-
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.TextField($"Script Generate Folder", _saveScriptFolder);
-            }
-
             // データ定義を作成
             if (GUILayout.Button("Create Data Define Asset"))
             {
@@ -83,21 +59,38 @@ namespace Yorozu.DB
                     _treeView.Reload();
                 }
             }
+            
+            EditorGUILayout.Space(1);
+            
+            EditorGUILayout.LabelField("Define & Data", EditorStyles.boldLabel);
 
+            var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
+            _treeView.OnGUI(rect);
+            
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField("Script Export Folder", _setting.ScriptExportFolder, typeof(DefaultAsset), false);
+                if (check.changed && newAsset != null)
+                {
+                    var path = AssetDatabase.GetAssetPath(newAsset);
+                    if (AssetDatabase.IsValidFolder(path))
+                    {
+                        _setting.SetFolder(path);
+                    }
+                }
+            }
+            
             using (new EditorGUI.DisabledScope(_setting.ScriptExportFolder == null))
             {
-                if (GUILayout.Button("Generate Script From Data"))
+                if (GUILayout.Button("Generate Script From Define"))
                 {
                     var exportPath = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
                     YorozuDBEditorUtility.GenerateScript(exportPath);
                 }
             }
             
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Data", EditorStyles.boldLabel);
-
-            var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
-            _treeView.OnGUI(rect);
+            EditorGUILayout.Space(1);
+            
             return false;
         }
 
