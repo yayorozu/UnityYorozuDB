@@ -19,7 +19,7 @@ namespace Yorozu.DB
         /// </summary>
         [SerializeField]
         private int _keyID;
-
+        
         internal bool IsKeyField(DBDataField field) => field.ID == _keyID;
     }
 }

@@ -13,7 +13,11 @@ namespace Yorozu.DB
         /// </summary>
         internal void SetKey(int fieldID)
         {
-            _keyID = fieldID;
+            if (_keyID == fieldID)
+                _keyID = -1;
+            else
+                _keyID = fieldID;
+            
             this.Dirty();
         }
 

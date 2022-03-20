@@ -14,11 +14,15 @@ namespace Yorozu.DB
         {
             internal static GUIContent Rename;
             internal static GUIContent Delete;
+            internal static GUIContent Key;
+            internal static GUIContent UnKey;
             
             static Style()
             {
                 Rename = EditorGUIUtility.TrIconContent("d_Grid.PaintTool");
                 Delete = EditorGUIUtility.TrIconContent("d_TreeEditor.Trash");
+                Key = EditorGUIUtility.TrIconContent("Favorite On Icon");
+                UnKey = EditorGUIUtility.TrIconContent("TestIgnored");
             }
         }
         [SerializeField]
@@ -29,9 +33,6 @@ namespace Yorozu.DB
 
         [SerializeField]
         private DataType _dataType;
-
-        [SerializeField]
-        private GUIContent _content = new GUIContent();
 
         private int _renameID = -1;
         private string _temp;
@@ -52,76 +53,68 @@ namespace Yorozu.DB
             {
                 EditorGUILayout.LabelField($"[ {_data.name} ]");
             }
-            
-            
-            //  Primaryを更新
-            // if (GUILayout.Button("Reset Key"))
-            // {
-            //     _data.SetKey(string.Empty);
-            // }
 
             GUILayout.Space(10);
 
-            using (new EditorGUILayout.HorizontalScope())
+            EditorGUILayout.LabelField("Add Field", EditorStyles.boldLabel);
+            using (new EditorGUILayout.VerticalScope("box"))
             {
-                _name = EditorGUILayout.TextField("Name", _name);
-                _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
-                
-                using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name)))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button("Add Field"))
+                    _name = EditorGUILayout.TextField("Name", _name);
+                    _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
+                    
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    
+                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name)))
                     {
-                        _data.AddField(_name, _dataType);
-                        _name = "";
-                        _dataType = default;
+                        if (GUILayout.Button("Add Field"))
+                        {
+                            _data.AddField(_name, _dataType);
+                            _name = "";
+                            _dataType = default;
+                        }
                     }
                 }
             }
-            
+
             GUILayout.Space(10);
 
             EditorGUILayout.LabelField("Fields", EditorStyles.boldLabel);
 
-            var data = new DBDataContainer();
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
             
             rect.height = EditorGUIUtility.singleLineHeight;
+            var initialX = rect.x;
             
             using (new EditorGUI.IndentLevelScope())
             {
                 foreach (var field in _data.Fields)
                 {
-                    rect.width = 300;
-                    _content.text = $"{field.Name} ( {field.DataType.ToString()} )";
-                    var boxyRect = EditorGUI.PrefixLabel(rect, _content);
-                    YorozuDBEditorUtility.DrawDataField(boxyRect, field.DataType, data, GUIContent.none);
-                    
                     // Key として有効なのであればボタンを表示
                     if (field.ValidKey())
                     {
-                        rect.x -= 3f;
-                        var prevWidth = rect.width;
-                        rect.width = 24;
+                        rect.x = initialX - 4f;
+                        rect.width = 20;
 
-                        var content = _data.IsKeyField(field)
-                            ? EditorGUIUtility.TrIconContent("d_Favorite")
-                            : EditorGUIUtility.TrIconContent("TestNormal");
-                        
+                        var content = _data.IsKeyField(field) ? Style.Key : Style.UnKey;
                         if (GUI.Button(rect, content, EditorStyles.label))
                         {
                             _data.SetKey(field.ID);
                         }
-
-                        rect.width = prevWidth;
-                        rect.x += 3f;
                     }
-
+                    
+                    rect.x = initialX;
+                    rect.width = 100;
                     // リネーム状態だったら TextField を表示
                     if (_renameID == field.ID)
                     {
                         rect.x += EditorGUI.indentLevel * 15f;
-                        rect.width = EditorGUIUtility.labelWidth;
-
+                        
                         GUI.SetNextControlName(EditorField);
                         _temp = GUI.TextField(rect, _temp);
                         var e = Event.current;
@@ -140,12 +133,24 @@ namespace Yorozu.DB
 
                         rect.x -= EditorGUI.indentLevel * 15f;
                     }
+                    else
+                    {
+                        EditorGUI.LabelField(rect, field.Name);   
+                    }
+                    
+                    rect.x += rect.width;
 
-                    boxyRect.x += boxyRect.width + EditorGUIUtility.standardVerticalSpacing;
-                    boxyRect.width = 16;
+                    rect.width = 140;
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        field.DataType = (DataType) EditorGUI.EnumPopup(rect, GUIContent.none, field.DataType);
+                    }
+
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    rect.width = 16;
 
                     // リネームボタン
-                    if (GUI.Button(boxyRect, Style.Rename, EditorStyles.label))
+                    if (GUI.Button(rect, Style.Rename, EditorStyles.label))
                     {
                         if (_renameID == field.ID)
                             _renameID = -1;
@@ -157,10 +162,10 @@ namespace Yorozu.DB
                         return true;
                     }
                     
-                    boxyRect.x += boxyRect.width + EditorGUIUtility.standardVerticalSpacing;
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     
                     // 削除ボタン
-                    if (GUI.Button(boxyRect, Style.Delete, EditorStyles.label))
+                    if (GUI.Button(rect, Style.Delete, EditorStyles.label))
                     {
                         if (EditorUtility.DisplayDialog("Warning", $"Delete {field.Name}?",
                                 "YES",
