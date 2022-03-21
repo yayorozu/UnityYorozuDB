@@ -14,14 +14,16 @@ namespace Yorozu.DB
     {
         private static class Style
         {
-            internal static GUIContent Rename;
+            internal static GUILayoutOption EnumWidth;
+            internal static GUILayoutOption ButtonWidth;
             internal static GUIContent Delete;
             internal static GUIContent Key;
             internal static GUIContent UnKey;
             
             static Style()
             {
-                Rename = EditorGUIUtility.TrIconContent("d_Grid.PaintTool");
+                EnumWidth = GUILayout.Width(300);
+                ButtonWidth = GUILayout.Width(100);
                 Delete = EditorGUIUtility.TrIconContent("d_TreeEditor.Trash");
                 Key = EditorGUIUtility.TrIconContent("Favorite On Icon");
                 UnKey = EditorGUIUtility.TrIconContent("TestIgnored");
@@ -91,7 +93,7 @@ namespace Yorozu.DB
                         var index = Array.IndexOf(_enums, _enumName);
                         using (var check = new EditorGUI.ChangeCheckScope())
                         {
-                            index = EditorGUILayout.Popup(index, _enums);
+                            index = EditorGUILayout.Popup("Enum Select", index, _enums, Style.EnumWidth);
                             if (check.changed)
                             {
                                 _enumName = _enums[index];
@@ -103,7 +105,7 @@ namespace Yorozu.DB
                     
                     using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name) || (_dataType == DataType.Enum && _enums == null && string.IsNullOrEmpty(_enumName))))
                     {
-                        if (GUILayout.Button("Add Field"))
+                        if (GUILayout.Button("Add Field", Style.ButtonWidth))
                         {
                             _data.AddField(_name, _dataType, _enumName);
                             _name = "";
