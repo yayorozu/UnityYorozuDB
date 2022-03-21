@@ -23,7 +23,7 @@ namespace Yorozu.DB
             internal int ID;
             
             [SerializeField]
-            internal List<DBDataContainer> Data = new List<DBDataContainer>();
+            internal List<DataContainer> Data = new List<DataContainer>();
 
             internal Field(int fieldId)
             {
@@ -35,7 +35,7 @@ namespace Yorozu.DB
             /// </summary>
             internal void Insert(int insertIndex, IOrderedEnumerable<int> targetIndexes)
             {
-                var cache = new List<DBDataContainer>();
+                var cache = new List<DataContainer>();
                 foreach (var index in targetIndexes)
                 {
                     cache.Add(Data[index]);
@@ -80,7 +80,7 @@ namespace Yorozu.DB
         /// <summary>
         /// ID からデータを取得
         /// </summary>
-        internal DBDataContainer GetData(int fieldId, int row)
+        internal DataContainer GetData(int fieldId, int row)
         {
             if (_fieldIdToIndex == null)
             {
@@ -121,7 +121,7 @@ namespace Yorozu.DB
             {
                 for (var i = 0; i < DataCount; i++)
                 {
-                    addField.Data.Add(new DBDataContainer());
+                    addField.Data.Add(new DataContainer());
                 }
             }
 
@@ -147,7 +147,7 @@ namespace Yorozu.DB
         {
             foreach (var g in _fields)
             {
-                g.Data.Add(new DBDataContainer());
+                g.Data.Add(new DataContainer());
             }
             this.Dirty();
         }
@@ -171,7 +171,7 @@ namespace Yorozu.DB
         {
             foreach (var g in _fields)
             {
-                g.Data[index] = new DBDataContainer();
+                g.Data[index] = new DataContainer();
             }
             this.Dirty();
         }

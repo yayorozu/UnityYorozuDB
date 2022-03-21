@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Yorozu.DB.TreeView
 {
-    internal class YorozuDBEditorTreeView : UnityEditor.IMGUI.Controls.TreeView
+    internal class YorozuDBEditorDataTreeView : UnityEditor.IMGUI.Controls.TreeView
     {
 	    internal event Action<IList<int>> DeleteRowEvent;
 	    internal event Action<IList<int>> ResetRowEvent;
@@ -17,7 +17,7 @@ namespace Yorozu.DB.TreeView
 	    
         private readonly List<TreeViewItem> _rows = new List<TreeViewItem>(100);
         
-        internal YorozuDBEditorTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, YorozuDBDataObject data) : base(state, multiColumnHeader)
+        internal YorozuDBEditorDataTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, YorozuDBDataObject data) : base(state, multiColumnHeader)
         {
             _data = data;
             
@@ -183,8 +183,8 @@ namespace Yorozu.DB.TreeView
     /// </summary>
     internal class YorozuDBEditorTreeViewItem : TreeViewItem
     {
-	    private List<DBDataField> _fields = new List<DBDataField>();
-	    private List<DBDataContainer> _data = new List<DBDataContainer>();
+	    private List<DataField> _fields = new List<DataField>();
+	    private List<DataContainer> _data = new List<DataContainer>();
 
 	    private YorozuDBEnumDataObject _enumData;
 	    
@@ -193,7 +193,7 @@ namespace Yorozu.DB.TreeView
 		    _enumData = enumData;
 	    }
 
-	    internal void AddData(DBDataField field, DBDataContainer data)
+	    internal void AddData(DataField field, DataContainer data)
 	    {
 		    _fields.Add(field);
 		    _data.Add(data);
@@ -204,7 +204,7 @@ namespace Yorozu.DB.TreeView
             DrawDataField(cellRect, _fields[index], _data[index], GUIContent.none);
 	    }
 	    
-	    private void DrawDataField(Rect rect, DBDataField field, DBDataContainer data, GUIContent content)
+	    private void DrawDataField(Rect rect, DataField field, DataContainer data, GUIContent content)
         {
             switch (field.DataType)
             {

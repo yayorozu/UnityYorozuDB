@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Yorozu.DB
 {
-    public abstract class YorozuDBDataAbstract
+    public abstract class DataAbstract
     {
         /// <summary>
         /// もととなるデータ生成されたやつはIndexでデータを見る
@@ -24,7 +24,7 @@ namespace Yorozu.DB
             _enumData = enumData;
         }
 
-        private DBDataContainer Data(int fieldId) => _data.GetData(fieldId, _row);
+        private DataContainer Data(int fieldId) => _data.GetData(fieldId, _row);
         
         /// <summary>
         /// primitive

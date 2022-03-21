@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Yorozu.DB
 {
-    public class Define2 : YorozuDBDataAbstract
+    public class Define2 : DataAbstract
     {
        public int Key2 => Int(1);
 

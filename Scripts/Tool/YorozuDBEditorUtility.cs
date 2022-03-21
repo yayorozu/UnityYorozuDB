@@ -35,7 +35,7 @@ namespace Yorozu.DB
                 
                 builder.AppendLine("namespace Yorozu.DB");
                 builder.AppendLine("{");
-                builder.AppendLine($"    public class {data.name} : {nameof(YorozuDBDataAbstract)}");
+                builder.AppendLine($"    public class {data.name} : {nameof(DataAbstract)}");
                 builder.AppendLine("    {");
                 foreach (var field in data.Fields)
                 {

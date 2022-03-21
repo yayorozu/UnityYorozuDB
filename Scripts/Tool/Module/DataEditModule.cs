@@ -23,7 +23,7 @@ namespace Yorozu.DB
         [NonSerialized]
         private bool _Initialized;
 
-        private YorozuDBEditorTreeView _treeView;
+        private YorozuDBEditorDataTreeView _treeView;
 
         internal override bool OnGUI()
         {
@@ -83,7 +83,7 @@ namespace Yorozu.DB
             multiColumnHeader.DeleteEvent += DeleteColumn;
             multiColumnHeader.ResizeToFit();
 
-            _treeView = new YorozuDBEditorTreeView(_state, multiColumnHeader, _data);
+            _treeView = new YorozuDBEditorDataTreeView(_state, multiColumnHeader, _data);
             _treeView.DeleteRowEvent += DeleteRow;
             _treeView.ResetRowEvent += ResetRow;
             _treeView.SortEvent += InsertItems;

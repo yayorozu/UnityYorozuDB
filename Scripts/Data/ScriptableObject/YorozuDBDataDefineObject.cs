@@ -10,9 +10,9 @@ namespace Yorozu.DB
     internal class YorozuDBDataDefineObject : ScriptableObject
     {
         [SerializeField]
-        private List<DBDataField> _fields = new List<DBDataField>();
+        private List<DataField> _fields = new List<DataField>();
 
-        internal List<DBDataField> Fields => _fields;
+        internal List<DataField> Fields => _fields;
         
         /// <summary>
         /// 検索時にKeyにする名前
@@ -21,7 +21,7 @@ namespace Yorozu.DB
         [SerializeField]
         private int _keyID;
         
-        internal bool IsKeyField(DBDataField field) => field.ID == _keyID;
+        internal bool IsKeyField(DataField field) => field.ID == _keyID;
         
 #if UNITY_EDITOR
         /// <summary>
@@ -62,7 +62,7 @@ namespace Yorozu.DB
                 }
             }
 
-            var field = new DBDataField(typeId)
+            var field = new DataField(typeId)
             {
                 Name = name,
                 ID = fieldId,

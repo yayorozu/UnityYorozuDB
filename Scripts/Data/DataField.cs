@@ -8,7 +8,7 @@ namespace Yorozu.DB
     /// 各フィールドの定義
     /// </summary>
     [Serializable]
-    internal class DBDataField : IDBName
+    internal class DataField : IDBName
     {
         [SerializeField]
         internal string Name;
@@ -34,9 +34,9 @@ namespace Yorozu.DB
         /// <summary>
         /// Keyとして有効かどうか
         /// </summary>
-        internal bool ValidKey() => DataType == DataType.Int || DataType == DataType.String;
+        internal bool ValidKey() => DataType == DataType.Int || DataType == DataType.String || DataType == DataType.Enum;
 
-        internal DBDataField(int typeId)
+        internal DataField(int typeId)
         {
             EnumDefineId = typeId;
         }
