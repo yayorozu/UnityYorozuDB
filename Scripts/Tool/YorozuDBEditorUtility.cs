@@ -35,8 +35,22 @@ namespace Yorozu.DB
                 
                 builder.AppendLine("namespace Yorozu.DB");
                 builder.AppendLine("{");
-                builder.AppendLine($"    public class {data.name} : {nameof(DataAbstract)}");
+                builder.Append($"    public class {data.name} : {nameof(DataAbstract)}");
+                var keyField = data.Fields.FirstOrDefault(data.IsKeyField);
+                if (keyField != null)
+                {
+                    builder.Append($", {GetInterfaceName(keyField.DataType)}");
+                }
+
+                builder.AppendLine("");
+                
                 builder.AppendLine("    {");
+
+                if (keyField != null)
+                {
+                    builder.AppendLine($"       {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => {keyField.Name};");
+                }
+
                 foreach (var field in data.Fields)
                 {
                     if (field.DataType == DataType.Enum)
@@ -69,6 +83,19 @@ namespace Yorozu.DB
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+
+            string GetInterfaceName(DataType type)
+            {
+                switch (type)
+                {
+                    case DataType.String:
+                        return nameof(IStringKey);
+                    case DataType.Int:
+                        return nameof(IIntKey);
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                }
+            }
         }
 
         /// <summary>
