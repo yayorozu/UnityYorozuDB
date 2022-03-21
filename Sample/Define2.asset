@@ -16,7 +16,7 @@ MonoBehaviour:
   - Name: Key2
     DataType: 2
     ID: 1
-  - Name: Value
+  - Name: sae
     DataType: 0
     ID: 2
   _keyID: -1

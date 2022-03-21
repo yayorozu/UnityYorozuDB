@@ -112,7 +112,6 @@ namespace Yorozu.DB
             var find = _fields.Any(g => g.ID == fieldId);
             if (find)
             {
-                Debug.LogError($"Already define field id. {fieldId}");
                 return;
             }
             _fields.Add(new Field(fieldId));
@@ -144,8 +143,7 @@ namespace Yorozu.DB
         /// <summary>
         /// データの削除
         /// </summary>
-        /// <param name="index"></param>
-        internal void RemoveAt(int index)
+        internal void RemoveRow(int index)
         {
             foreach (var g in _fields)
             {

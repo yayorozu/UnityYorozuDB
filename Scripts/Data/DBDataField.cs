@@ -7,10 +7,12 @@ namespace Yorozu.DB
     /// 各フィールドの定義
     /// </summary>
     [Serializable]
-    internal class DBDataField
+    internal class DBDataField : IDBName
     {
         [SerializeField]
         internal string Name;
+        
+        string IDBName.Name => Name;
         
         [SerializeField]
         internal DataType DataType;

@@ -137,7 +137,7 @@ namespace Yorozu.DB
                 // 降順にして消す
                 foreach (var index in indexes.OrderByDescending(v => v))
                 {
-                    _data.RemoveAt(index);
+                    _data.RemoveRow(index);
                 }
 
                 Reload();

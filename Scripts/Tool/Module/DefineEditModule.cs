@@ -135,7 +135,16 @@ namespace Yorozu.DB
                     }
                     else
                     {
-                        EditorGUI.LabelField(rect, field.Name);   
+                        rect.x += 15f;
+                        rect.width -= 15f;
+                        if (GUI.Button(rect, field.Name, EditorStyles.label))
+                        {
+                            _renameID = field.ID;
+                        
+                            _temp = field.Name;
+                            GUI.FocusControl(EditorField);
+                            return true;
+                        }
                     }
                     
                     rect.x += rect.width;
@@ -148,21 +157,6 @@ namespace Yorozu.DB
 
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     rect.width = 16;
-
-                    // リネームボタン
-                    if (GUI.Button(rect, Style.Rename, EditorStyles.label))
-                    {
-                        if (_renameID == field.ID)
-                            _renameID = -1;
-                        else
-                            _renameID = field.ID;
-                        
-                        _temp = field.Name;
-                        GUI.FocusControl(EditorField);
-                        return true;
-                    }
-                    
-                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     
                     // 削除ボタン
                     if (GUI.Button(rect, Style.Delete, EditorStyles.label))

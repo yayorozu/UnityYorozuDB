@@ -1,13 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace Yorozu.DB
 {
+    internal interface IDBName
+    {
+        string Name { get; }
+    }
+    
     internal static class YorozuDBEditorUtility
     {
         /// <summary>
@@ -290,6 +297,33 @@ namespace Yorozu.DB
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             return true;
+        }
+
+        /// <summary>
+        /// 文字のチェック
+        /// </summary>
+        internal static bool NameValidator(IEnumerable<IDBName> names, string name, out string editName)
+        {
+            editName = name.Trim();
+            if (names.Any(d => d.Name == name))
+                return false;
+            
+            if (string.IsNullOrEmpty(name))
+                return false;
+
+            if (Regex.IsMatch(name, @"^[0-9]"))
+                return false;
+            
+            // 小文字なら大文字にする
+            if (Regex.IsMatch(name, @"^[a-z]"))
+            {
+                var array = editName.ToCharArray();
+                array[0] = char.ToUpper(array[0]);
+                editName = new string(array);
+            }
+            
+            // 英数以外は許可しない
+            return Regex.IsMatch(name, @"^[0-9a-zA-Z]+$");
         }
     }
 }

@@ -26,9 +26,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void AddField(string name, DataType dataType)
         {
-            name = name.Trim();
-            // 重複禁止
-            if (_fields.Any(g => g.Name == name))
+            if (!YorozuDBEditorUtility.NameValidator(_fields, name, out name))
                 return;
 
             var fieldId = 1;
@@ -61,11 +59,9 @@ namespace Yorozu.DB
         /// </summary>
         internal void RenameField(int fieldId, string newName)
         {
-            newName = newName.Trim();
-            // すでに存在する
-            if (_fields.Any(g => g.Name == newName))
+            if (!YorozuDBEditorUtility.NameValidator(_fields, newName, out newName))
                 return;
-
+            
             var index = _fields.FindIndex(f => f.ID == fieldId);
             if (index >= 0)
             {
@@ -85,7 +81,7 @@ namespace Yorozu.DB
             var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
             foreach (var asset in assets)
             {
-                asset.RemoveAt(fieldId);
+                asset.RemoveField(fieldId);
             }
             this.Dirty();
         }

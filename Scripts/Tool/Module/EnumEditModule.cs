@@ -32,6 +32,13 @@ namespace Yorozu.DB
         private Vector2 _scrollPosition;
         private string _temp;
         private YorozuDBEnumDataObject _data;
+
+        [NonSerialized]
+        private int _editId = -1;
+        [NonSerialized]
+        private string _rename;
+        
+        private static readonly string EditorField = "EditorField";
         
         private void Initialize(bool force = false)
         {
@@ -104,9 +111,34 @@ namespace Yorozu.DB
             {
                 drawHeaderCallback = rect =>
                 {
-                    EditorGUI.LabelField(rect, $"{define.Name}", EditorStyles.boldLabel);
+                    rect.width -= Style.ButtonWidth * 2;
+                    if (_editId == define.ID)
+                    {
+                        GUI.SetNextControlName(EditorField);
+                        _rename = GUI.TextField(rect, _rename);
+                        var e = Event.current;
+                        if (e.keyCode == KeyCode.Return && _editId != -1)
+                        {
+                            _data.Rename(define.ID, _rename);
+                            _editId = -1;
+                        }
 
-                    rect.x += rect.width - Style.ButtonWidth * 2;
+                        if (e.keyCode == KeyCode.Escape)
+                        {
+                            _editId = -1;
+                        }
+                    }
+                    else
+                    {
+                        if (GUI.Button(rect, $"{define.Name}", EditorStyles.boldLabel))
+                        {
+                            _editId = define.ID;
+                            _rename = define.Name;
+                            GUI.FocusControl(EditorField);
+                        }
+                    }
+                    
+                    rect.x += rect.width;
                     rect.width = Style.ButtonWidth;
 
                     if (GUI.Button(rect, Style.DeleteContent, Style.AddStyle))
