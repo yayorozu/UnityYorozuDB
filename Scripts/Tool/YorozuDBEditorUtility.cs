@@ -25,6 +25,8 @@ namespace Yorozu.DB
         internal static void GenerateScript(string savePath)
         {
             var assets = LoadAllDefineAsset();
+            var enumData = LoadEnumDataAsset();
+
             foreach (var data in assets)
             {
                 var builder = new StringBuilder();
@@ -37,7 +39,18 @@ namespace Yorozu.DB
                 builder.AppendLine("    {");
                 foreach (var field in data.Fields)
                 {
-                    builder.AppendLine($"       public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                    if (field.DataType == DataType.Enum)
+                    {
+                        var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
+                        if (enumDefine != null)
+                        {
+                            builder.AppendLine($"       public {enumDefine.Name} {field.Name} => ({enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                        }
+                    }
+                    else
+                    {
+                        builder.AppendLine($"       public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                    }
                     builder.AppendLine("");
                 }
                 builder.AppendLine("    }");
@@ -49,10 +62,53 @@ namespace Yorozu.DB
                 {
                     writer.WriteLine(builder.ToString());
                 }
-            }   
+            }
+            
+            // Export Enum files
+            CreateEnumFiles(enumData, savePath);
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// Enum ファイルを生成
+        /// </summary>
+        private static void CreateEnumFiles(YorozuDBEnumDataObject enumData, string savePath)
+        {
+            if (enumData == null)
+                return;
+            
+            var enumExportPath = Path.Combine(savePath, "Enum");
+            // ディレクトリ作成
+            if (!AssetDatabase.IsValidFolder(enumExportPath))
+            {
+                AssetDatabase.CreateFolder(savePath, "Enum");
+            }
+
+            foreach (var define in enumData.Defines)
+            {
+                var filePath = Path.Combine(enumExportPath, $"{define.Name}.cs");
+                
+                var builder = new StringBuilder();
+                builder.AppendLine("");
+                
+                builder.AppendLine("namespace Yorozu.DB");
+                builder.AppendLine("{");
+                builder.AppendLine($"    public enum {define.Name}");
+                builder.AppendLine("    {");
+                foreach (var kv in define.KeyValues)
+                {
+                    builder.AppendLine($"       {kv.Value},");
+                }
+                builder.AppendLine("    }");
+                builder.AppendLine("}");
+                
+                using (StreamWriter writer = new StreamWriter(filePath, false))
+                {
+                    writer.WriteLine(builder.ToString());
+                }
+            }
         }
         
         internal static YorozuDBDataDefineObject[] LoadAllDefineAsset()

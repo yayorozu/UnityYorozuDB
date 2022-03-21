@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Yorozu.DB
 {
@@ -20,8 +21,9 @@ namespace Yorozu.DB
         /// <summary>
         /// Enum のときにどれと紐付いているのか判定するよう
         /// </summary>
+        [FormerlySerializedAs("DataTypeId")]
         [SerializeField]
-        internal int DataTypeId;
+        internal int EnumDefineId;
 
         /// <summary>
         /// 並べ替えや削除したときにIDでデータと一致させる
@@ -36,7 +38,7 @@ namespace Yorozu.DB
 
         internal DBDataField(int typeId)
         {
-            DataTypeId = typeId;
+            EnumDefineId = typeId;
         }
         
         

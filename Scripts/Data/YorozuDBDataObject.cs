@@ -134,6 +134,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void RemoveField(int fieldId)
         {
+            _fieldIdToIndex = null;
             _fields.RemoveAll(g => g.ID == fieldId);
             this.Dirty();
         }

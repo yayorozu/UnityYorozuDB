@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -8,15 +10,18 @@ namespace Yorozu.DB
         /// もととなるデータ生成されたやつはIndexでデータを見る
         /// </summary>
         private YorozuDBDataObject _data;
+
+        private YorozuDBEnumDataObject _enumData;
         /// <summary>
         /// 何行目のデータか
         /// </summary>
         private int _row;
         
-        internal void SetUp(YorozuDBDataObject data, int row)
+        internal void SetUp(YorozuDBDataObject data, int row, YorozuDBEnumDataObject enumData)
         {
             _data = data;
             _row = row;
+            _enumData = enumData;
         }
 
         private DBDataContainer Data(int fieldId) => _data.GetData(fieldId, _row);
@@ -28,6 +33,24 @@ namespace Yorozu.DB
         protected string String(int fieldId) => Data(fieldId).String;
         protected float Float(int fieldId) => Data(fieldId).Float;
         protected int Int(int fieldId) => Data(fieldId).Int;
+
+        protected int Enum(int fieldId, int enumDefineId)
+        {
+            if (_enumData == null)
+            {
+                throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not attach.");
+            }
+            var findDefine = _enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
+            if (findDefine == null)
+            {
+                Debug.LogError("Enum Data is not Define");
+                return 0;
+            }
+
+            var key = Int(fieldId);
+            var index = findDefine.KeyValues.FindIndex(kv => kv.Key == key);
+            return index;
+        } 
         
         /// <summary>
         /// UnityEngin.Object

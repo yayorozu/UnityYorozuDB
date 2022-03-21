@@ -81,7 +81,8 @@ namespace Yorozu.DB
             
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField("Script Export Folder", _setting.ScriptExportFolder, typeof(DefaultAsset), false);
+                EditorGUILayout.LabelField("Script Export Folder");
+                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField(GUIContent.none, _setting.ScriptExportFolder, typeof(DefaultAsset), false);
                 if (check.changed && newAsset != null)
                 {
                     var path = AssetDatabase.GetAssetPath(newAsset);

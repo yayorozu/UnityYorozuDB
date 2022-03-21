@@ -275,14 +275,14 @@ namespace Yorozu.DB.TreeView
                     }
                     break;
                 case DataType.Enum:
-                    var enums = _enumData.GetEnums(field.DataTypeId);
-                    var index = _enumData.GetEnumIndex(field.DataTypeId, data.Int);
+                    var enums = _enumData.GetEnums(field.EnumDefineId);
+                    var index = _enumData.GetEnumIndex(field.EnumDefineId, data.Int);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         index = EditorGUI.Popup(rect, index, enums);
                         if (check.changed)
                         {
-                            var key = _enumData.GetEnumKey(field.DataTypeId, enums[index]);
+                            var key = _enumData.GetEnumKey(field.EnumDefineId, enums[index]);
                             if (key.HasValue)
                             {
                                 data.Int = key.Value;
