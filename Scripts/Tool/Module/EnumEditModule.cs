@@ -37,6 +37,8 @@ namespace Yorozu.DB
         private int _editId = -1;
         [NonSerialized]
         private string _rename;
+
+        private bool _repaint;
         
         private static readonly string EditorField = "EditorField";
         
@@ -102,6 +104,11 @@ namespace Yorozu.DB
                 }
             }
 
+            if (_repaint)
+            {
+                _repaint = false;
+                return true;
+            }
             return false;
         }
         
@@ -121,11 +128,13 @@ namespace Yorozu.DB
                         {
                             _data.Rename(define.ID, _rename);
                             _editId = -1;
+                            _repaint = true;
                         }
 
                         if (e.keyCode == KeyCode.Escape)
                         {
                             _editId = -1;
+                            _repaint = true;
                         }
                     }
                     else
