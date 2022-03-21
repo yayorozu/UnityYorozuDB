@@ -177,22 +177,22 @@ namespace Yorozu.DB.TreeView
     /// </summary>
     internal class YorozuDBEditorTreeViewItem : TreeViewItem
     {
-	    private List<DataType> _types = new List<DataType>();
+	    private List<DBDataField> _fields = new List<DBDataField>();
 	    private List<DBDataContainer> _data = new List<DBDataContainer>();
 	    
 	    internal YorozuDBEditorTreeViewItem(int id) : base(id, 0, (id).ToString())
 	    {
 	    }
 
-	    internal void AddData(DataType type, DBDataContainer data)
+	    internal void AddData(DBDataField field, DBDataContainer data)
 	    {
-		    _types.Add(type);
+		    _fields.Add(field);
 		    _data.Add(data);
 	    }
 
 	    internal void Draw(Rect cellRect, int index)
 	    {
-            YorozuDBEditorUtility.DrawDataField(cellRect, _types[index], _data[index], GUIContent.none);
+            YorozuDBEditorUtility.DrawDataField(cellRect, _fields[index], _data[index], GUIContent.none);
 	    }
     }
 }

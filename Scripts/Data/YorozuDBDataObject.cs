@@ -114,7 +114,18 @@ namespace Yorozu.DB
             {
                 return;
             }
-            _fields.Add(new Field(fieldId));
+
+            var addField = new Field(fieldId);
+            // 既存のフィールドのデータ分だけ追加する必要がある
+            if (DataCount > 0)
+            {
+                for (var i = 0; i < DataCount; i++)
+                {
+                    addField.Data.Add(new DBDataContainer());
+                }
+            }
+
+            _fields.Add(addField);
             this.Dirty();
         }
         
@@ -189,7 +200,7 @@ namespace Yorozu.DB
                     var item = new YorozuDBEditorTreeViewItem(i);
                     foreach (var f in Define.Fields)
                     {
-                        item.AddData(f.DataType, GetData(f.ID, i));
+                        item.AddData(f, GetData(f.ID, i));
                     }
                     
                     root.AddChild(item);

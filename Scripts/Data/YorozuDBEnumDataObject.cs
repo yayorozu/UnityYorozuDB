@@ -60,6 +60,18 @@ namespace Yorozu.DB
         internal List<EnumDefine> Defines = new List<EnumDefine>();
 
         /// <summary>
+        /// 探す
+        /// </summary>
+        internal EnumDefine Find(int defineId)
+        {
+            var index = Defines.FindIndex(d => d.ID == defineId);
+            if (index < 0)
+                return null;
+
+            return Defines[index];
+        }
+
+        /// <summary>
         /// 追加 
         /// </summary>
         internal void AddDefine(string name)
@@ -73,6 +85,9 @@ namespace Yorozu.DB
             this.Dirty();
         }
 
+        /// <summary>
+        /// 名前変更
+        /// </summary>
         internal void Rename(int defineId, string newName)
         {
             if (!YorozuDBEditorUtility.NameValidator(Defines, newName, out newName))

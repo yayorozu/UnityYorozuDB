@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,10 +31,14 @@ namespace Yorozu.DB
         private YorozuDBDataDefineObject _data;
 
         [SerializeField]
-        private string _name;
+        private string[] _enums;
 
-        [SerializeField]
+        [NonSerialized]
+        private string _name;
+        [NonSerialized]
         private DataType _dataType;
+        [NonSerialized]
+        private string _enumName;
 
         private int _renameID = -1;
         private string _temp;
@@ -62,19 +68,44 @@ namespace Yorozu.DB
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     _name = EditorGUILayout.TextField("Name", _name);
-                    _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
-                    
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
+                        if (check.changed && _dataType == DataType.Enum)
+                        {
+                            var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+                            if (enumData != null)
+                            {
+                                _enums = enumData.Defines.Select(d => d.Name).ToArray();
+                                _enumName = _enums.Length > 0 ? _enums[0] : "";
+                            }
+                        }
+                    }
                 }
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
+                    // enumなら候補を表示
+                    if (_dataType == DataType.Enum && _enums != null && _enums.Length > 0)
+                    {
+                        var index = Array.IndexOf(_enums, _enumName);
+                        using (var check = new EditorGUI.ChangeCheckScope())
+                        {
+                            index = EditorGUILayout.Popup(index, _enums);
+                            if (check.changed)
+                            {
+                                _enumName = _enums[index];
+                            }
+                        }
+                    }
+                    
                     GUILayout.FlexibleSpace();
                     
-                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name)))
+                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name) || (_dataType == DataType.Enum && _enums == null && string.IsNullOrEmpty(_enumName))))
                     {
                         if (GUILayout.Button("Add Field"))
                         {
-                            _data.AddField(_name, _dataType);
+                            _data.AddField(_name, _dataType, _enumName);
                             _name = "";
                             _dataType = default;
                         }

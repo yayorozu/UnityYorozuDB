@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -121,13 +123,15 @@ namespace Yorozu.DB
                 DataType.Vector3 => "Vector3",
                 DataType.Vector2Int => "Vector3Int",
                 DataType.Vector3Int => "Vector3Int",
+                // TODO Enumの場合は型がいる
+                DataType.Enum => "enum",
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
         
-        internal static void DrawDataField(Rect rect, DataType type, DBDataContainer data, GUIContent content)
+        internal static void DrawDataField(Rect rect, DBDataField field, DBDataContainer data, GUIContent content)
         {
-            switch (type)
+            switch (field.DataType)
             {
                 case DataType.String:
                     data.String = EditorGUI.TextField(rect, content, data.String);
@@ -195,8 +199,19 @@ namespace Yorozu.DB
                         }
                     }
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                case DataType.Enum:
+                    var enums = field.GetEnums();
+                    var index = Array.IndexOf(enums, data.String);
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        index = EditorGUI.Popup(rect, index, enums);
+                        if (check.changed)
+                        {
+                            data.String = enums[index];
+                        }
+                    }
+                    
+                    break;
             }
         }
 
@@ -327,3 +342,5 @@ namespace Yorozu.DB
         }
     }
 }
+
+#endif

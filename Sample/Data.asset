@@ -56,6 +56,11 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
   - ID: 2
     Data:
     - String: 
@@ -98,5 +103,55 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
-  - ID: 4
-    Data: []
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+  - ID: 3
+    Data:
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: S
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: S
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: Warning
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}

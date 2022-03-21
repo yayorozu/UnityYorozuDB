@@ -15,8 +15,14 @@ MonoBehaviour:
   _fields:
   - Name: Key2
     DataType: 2
+    _dataTypeId: 0
     ID: 1
   - Name: sae
     DataType: 0
+    _dataTypeId: 0
     ID: 2
+  - Name: Kkkk
+    DataType: 8
+    _dataTypeId: 1
+    ID: 3
   _keyID: -1

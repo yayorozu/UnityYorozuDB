@@ -16,6 +16,10 @@ namespace Yorozu.DB
         /// その他の UnityEngine.Object
         /// </summary>
         UnityObject,
+        /// <summary>
+        /// YorozuDBEnumDataObject で定義した Enum を利用する
+        /// </summary>
+        Enum,
         Vector2,
         Vector3,
         Vector2Int,
