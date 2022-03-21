@@ -46,11 +46,9 @@ namespace Yorozu.DB
             }
             
             // Enum追加
-            var findEnumAssetsGuids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
-            if (findEnumAssetsGuids.Any())
+            var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+            if (enumData != null)
             {
-                var path = AssetDatabase.GUIDToAssetPath(findEnumAssetsGuids.First());
-                var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
                 root.AddChild(new TreeViewItem(enumData.GetInstanceID(), 0, "Enum"));
             }
             

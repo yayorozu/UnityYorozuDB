@@ -66,6 +66,17 @@ namespace Yorozu.DB
                 ;
         }
 
+        internal static YorozuDBEnumDataObject LoadEnumDataAsset()
+        {
+            var findEnumAssetsGuids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
+            if (!findEnumAssetsGuids.Any())
+                return null;
+
+            var path = AssetDatabase.GUIDToAssetPath(findEnumAssetsGuids.First());
+            var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
+            return enumData;
+        }
+
         internal static void Dirty(this YorozuDBDataDefineObject asset)
         {
             EditorUtility.SetDirty(asset);
@@ -73,6 +84,12 @@ namespace Yorozu.DB
         }
         
         internal static void Dirty(this YorozuDBDataObject asset)
+        {
+            EditorUtility.SetDirty(asset);
+            AssetDatabase.SaveAssets();
+        }
+        
+        internal static void Dirty(this YorozuDBEnumDataObject asset)
         {
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssets();

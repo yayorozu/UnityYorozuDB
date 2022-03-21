@@ -43,7 +43,7 @@ namespace Yorozu.DB
                 _treeView.DeleteItemsEvent += DeleteAssets;
                 _treeView.CreateDataEvent += CreateDataAsset;
 
-                _hasEnum = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}").Any();
+                _hasEnum = YorozuDBEditorUtility.LoadEnumDataAsset() != null;
             }
         }
 

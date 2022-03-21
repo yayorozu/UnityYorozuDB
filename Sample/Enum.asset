@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4317f6c37a61450bb4129397a0d29e54, type: 3}
   m_Name: Enum
   m_EditorClassIdentifier: 
-  Defines: []
+  Defines:
+  - Name: Sample
+    ID: 1
+    Values:
+    - Warning
+    - 
+    - S
+    - 
+    Description: 
