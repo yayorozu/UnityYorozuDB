@@ -42,14 +42,7 @@ namespace Yorozu.DB.TreeView
             if (!root.hasChildren)
 	            return _rows;
 
-            foreach (var child in root.children)
-            {
-	            _rows.Add(child);
-            }
-
-            SetupDepthsFromParentsAndChildren(root);
-
-            return _rows;
+            return base.BuildRows(root);
         }
         
         protected override void ContextClickedItem(int id)

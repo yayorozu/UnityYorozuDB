@@ -20,6 +20,8 @@ namespace Yorozu.DB
 
         private YorozuDBEditorDataListTreeView _treeView;
 
+        private bool _hasEnum; 
+
         internal void Initialize()
         {
             if (_setting == null)
@@ -40,6 +42,8 @@ namespace Yorozu.DB
                 // 選択したやつを全部削除
                 _treeView.DeleteItemsEvent += DeleteAssets;
                 _treeView.CreateDataEvent += CreateDataAsset;
+
+                _hasEnum = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}").Any();
             }
         }
 
@@ -50,16 +54,24 @@ namespace Yorozu.DB
             // データ定義を作成
             if (GUILayout.Button("Create Data Define Asset"))
             {
-                var defines = YorozuDBEditorUtility.LoadAllDefineAsset();
-                var loadFrom = defines is {Length: > 0} ? 
-                    System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
-                    "Assets/";
-                if (YorozuDBEditorUtility.CreateDefineAsset(loadFrom))
+                if (YorozuDBEditorUtility.CreateDefineAsset())
                 {
                     _treeView.Reload();
                 }
             }
-            
+
+            if (!_hasEnum)
+            {
+                if (GUILayout.Button("Create Data Enum Asset"))
+                {
+                    if (YorozuDBEditorUtility.CreateEnumAsset())
+                    {
+                        _treeView.Reload();
+                        _hasEnum = true;
+                    }
+                }
+            }
+
             EditorGUILayout.Space(1);
             
             EditorGUILayout.LabelField("Define & Data", EditorStyles.boldLabel);
@@ -120,7 +132,9 @@ namespace Yorozu.DB
                 return;
             }
             
-            var deletes = ids.Select(EditorUtility.InstanceIDToObject);
+            var deletes = ids.Select(EditorUtility.InstanceIDToObject)
+                .Where(o => o.GetType() != typeof(YorozuDBEnumDataObject));
+            
             foreach (var id in ids)
             {
                 var obj = EditorUtility.InstanceIDToObject(id);

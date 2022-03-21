@@ -218,9 +218,14 @@ namespace Yorozu.DB
         /// <summary>
         /// DefineAssetを作成
         /// </summary>
-        internal static bool CreateDefineAsset(string defaultPath)
+        internal static bool CreateDefineAsset()
         {
-            var path = EditorUtility.SaveFilePanelInProject("Select", "Define", "asset", "Select Create Path", defaultPath);
+            var defines = LoadAllDefineAsset();
+            var loadFrom = defines is {Length: > 0} ? 
+                Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
+                "Assets/";
+            
+            var path = EditorUtility.SaveFilePanelInProject("Select", "Define", "asset", "Select Create Path", loadFrom);
             if (string.IsNullOrEmpty(path)) 
                 return false;
             
@@ -246,6 +251,24 @@ namespace Yorozu.DB
             {
                 instance.AddField(field.ID);
             }
+            AssetDatabase.CreateAsset(instance, path);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            return true;
+        }
+
+        internal static bool CreateEnumAsset()
+        {
+            var defines = LoadAllDefineAsset();
+            var loadFrom = defines is {Length: > 0} ? 
+                Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
+                "Assets/";
+            
+            var path = EditorUtility.SaveFilePanelInProject("Select", "Enum", "asset", "Select Create Path", loadFrom);
+            if (string.IsNullOrEmpty(path)) 
+                return false;
+            
+            var instance = ScriptableObject.CreateInstance<YorozuDBEnumDataObject>();
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -45,6 +45,15 @@ namespace Yorozu.DB
                 root.AddChild(define);
             }
             
+            // Enum追加
+            var findEnumAssetsGuids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
+            if (findEnumAssetsGuids.Any())
+            {
+                var path = AssetDatabase.GUIDToAssetPath(findEnumAssetsGuids.First());
+                var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
+                root.AddChild(new TreeViewItem(enumData.GetInstanceID(), 0, "Enum"));
+            }
+            
             return root;
         }
         
@@ -54,22 +63,11 @@ namespace Yorozu.DB
             
             if (!root.hasChildren)
                 return _rows;
-            
-            foreach (var child in root.children)
-            {
-                _rows.Add(child);
-                if (!child.hasChildren) 
-                    continue;
-                
-                foreach (var child2 in child.children)
-                {
-                    _rows.Add(child2);
-                }
-            }
-            
-            return _rows;
+
+            return base.BuildRows(root);
         }
 
+        
         protected override void ContextClickedItem(int id)
         {
             var ev = Event.current;
@@ -84,11 +82,14 @@ namespace Yorozu.DB
                     CreateDataEvent?.Invoke(id);
                 });
             }
-            
-            menu.AddItem(new GUIContent("Delete"), false, () =>
+
+            if (obj.GetType() != typeof(YorozuDBEnumDataObject))
             {
-                DeleteItemsEvent?.Invoke(GetSelection());
-            });
+                menu.AddItem(new GUIContent("Delete"), false, () =>
+                {
+                    DeleteItemsEvent?.Invoke(GetSelection());
+                });
+            }
     
             menu.ShowAsContext();
         }

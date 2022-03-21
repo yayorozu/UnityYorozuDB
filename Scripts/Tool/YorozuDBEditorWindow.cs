@@ -22,12 +22,15 @@ namespace Yorozu.DB
         private DefineEditModule _editDefine;
         [SerializeField]
         private DataEditModule _editData;
+        [SerializeField]
+        private EnumEditModule _editEnum;
 
         private enum Mode
         {
             None,
             Define,
-            Data
+            Data,
+            Enum
         }
 
         [SerializeField]
@@ -42,14 +45,14 @@ namespace Yorozu.DB
             // コンパイルでイベントは消える
             _list.SelectEvent += SelectDataEvent;
             
-            if (_editDefine == null)
-            {
+            if (_editDefine == null) 
                 _editDefine = new DefineEditModule();
-            }
-            if (_editData == null)
-            {
+            
+            if (_editData == null) 
                 _editData = new DataEditModule();
-            }
+            
+            if (_editEnum == null)
+                _editEnum = new EnumEditModule();
         }
 
         private void SelectDataEvent(int instanceId)
@@ -63,10 +66,15 @@ namespace Yorozu.DB
                 _editDefine?.SetData(obj as YorozuDBDataDefineObject);
                 _mode = Mode.Define;
             }
-            if (obj.GetType() == typeof(YorozuDBDataObject))
+            else if (obj.GetType() == typeof(YorozuDBDataObject))
             {
                 _editData?.SetData(obj as YorozuDBDataObject);
                 _mode = Mode.Data;
+            }
+
+            else if (obj.GetType() == typeof(YorozuDBEnumDataObject))
+            {
+                _mode = Mode.Enum;
             }
             
             Repaint();
@@ -103,6 +111,7 @@ namespace Yorozu.DB
             {
                 Mode.Define => _editDefine,
                 Mode.Data => _editData,
+                Mode.Enum => _editEnum,
                 _ => null
             };
         }
