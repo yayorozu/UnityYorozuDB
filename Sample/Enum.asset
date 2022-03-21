@@ -15,8 +15,5 @@ MonoBehaviour:
   Defines:
   - Name: Sample
     ID: 1
-    Values:
-    - Warning
-    - S
-    - 
+    KeyValues: []
     Description: 

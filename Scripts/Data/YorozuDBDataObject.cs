@@ -190,14 +190,14 @@ namespace Yorozu.DB
         /// <summary>
         /// TreeView用の木構造を作成
         /// </summary>
-        internal TreeViewItem CreateTree()
+        internal TreeViewItem CreateTree(YorozuDBEnumDataObject enumData)
         {
             var root = new TreeViewItem(-1, -1, "root");
             if (Define.Fields.Any())
             {
                 for (var i = 0; i < DataCount; i++)
                 {
-                    var item = new YorozuDBEditorTreeViewItem(i);
+                    var item = new YorozuDBEditorTreeViewItem(i, enumData);
                     foreach (var f in Define.Fields)
                     {
                         item.AddData(f, GetData(f.ID, i));

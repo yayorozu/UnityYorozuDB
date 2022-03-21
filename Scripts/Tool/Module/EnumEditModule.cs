@@ -114,7 +114,7 @@ namespace Yorozu.DB
         
         private ReorderableList CreateInstance(YorozuDBEnumDataObject.EnumDefine define)
         {
-            return new ReorderableList(define.Values, typeof(string), true, true, false, false)
+            return new ReorderableList(define.KeyValues, typeof(string), true, true, false, false)
             {
                 drawHeaderCallback = rect =>
                 {
@@ -171,14 +171,14 @@ namespace Yorozu.DB
                 },
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
-                    if (define.Values.Count <= index)
+                    if (define.KeyValues.Count <= index)
                         return;
 
                     rect.width -= Style.ButtonWidth;
 
                     using (var change = new EditorGUI.ChangeCheckScope())
                     {
-                        define.Values[index] = EditorGUI.TextField(rect, define.Values[index]);
+                        define.KeyValues[index].Value = EditorGUI.TextField(rect, define.KeyValues[index].Value);
                         if (change.changed)
                         {
                             _data.Dirty();
@@ -196,6 +196,9 @@ namespace Yorozu.DB
      
                 drawFooterCallback = rect => { },
                 footerHeight = 0f,
+                onReorderCallback = v =>
+                {
+                }
             };
         }
     }

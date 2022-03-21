@@ -31,7 +31,13 @@ namespace Yorozu.DB.TreeView
 
         protected override TreeViewItem BuildRoot()
         {
-	        var root = _data.CreateTree();
+	        var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+	        if (enumData != null)
+	        {
+				enumData.ResetEnumCache();
+	        }
+	        
+	        var root = _data.CreateTree(enumData);
 	        return root;
         }
 
@@ -179,9 +185,12 @@ namespace Yorozu.DB.TreeView
     {
 	    private List<DBDataField> _fields = new List<DBDataField>();
 	    private List<DBDataContainer> _data = new List<DBDataContainer>();
+
+	    private YorozuDBEnumDataObject _enumData;
 	    
-	    internal YorozuDBEditorTreeViewItem(int id) : base(id, 0, (id).ToString())
+	    internal YorozuDBEditorTreeViewItem(int id, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
 	    {
+		    _enumData = enumData;
 	    }
 
 	    internal void AddData(DBDataField field, DBDataContainer data)
@@ -192,7 +201,97 @@ namespace Yorozu.DB.TreeView
 
 	    internal void Draw(Rect cellRect, int index)
 	    {
-            YorozuDBEditorUtility.DrawDataField(cellRect, _fields[index], _data[index], GUIContent.none);
+            DrawDataField(cellRect, _fields[index], _data[index], GUIContent.none);
 	    }
+	    
+	    private void DrawDataField(Rect rect, DBDataField field, DBDataContainer data, GUIContent content)
+        {
+            switch (field.DataType)
+            {
+                case DataType.String:
+                    data.String = EditorGUI.TextField(rect, content, data.String);
+                    break;
+                case DataType.Float:
+                    data.Float = EditorGUI.FloatField(rect, content, data.Float);
+                    break;
+                case DataType.Int:
+                    data.Int = EditorGUI.IntField(rect, content, data.Int);
+                    break;
+                case DataType.Bool:
+                    data.Bool = EditorGUI.Toggle(rect, content, data.Bool);
+                    break;
+                case DataType.Sprite:
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(Sprite), false);
+                    break;
+                case DataType.GameObject:
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(GameObject), false);
+                    break;
+                case DataType.UnityObject:
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(UnityEngine.Object), false);
+                    break;
+                case DataType.Vector2:
+                    var vector2 = data.GetFromString<Vector2>();
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        vector2 = EditorGUI.Vector2Field(rect, content, vector2);
+                        if (check.changed)
+                        {
+                            data.SetToString(vector2);
+                        }
+                    }
+                    break;
+                case DataType.Vector3:
+                    var vector3 = data.GetFromString<Vector3>();
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        vector3 = EditorGUI.Vector3Field(rect, content, vector3);
+                        if (check.changed)
+                            data.SetToString(vector3);
+                    }
+                    break;
+                case DataType.ScriptableObject:
+                    data.UnityObject = EditorGUI.ObjectField(rect, content, data.UnityObject, typeof(UnityEngine.ScriptableObject), false);
+                    break;
+                case DataType.Vector2Int:
+                    var vector2Int = data.GetFromString<Vector2Int>();
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        vector2Int = EditorGUI.Vector2IntField(rect, content, vector2Int);
+                        if (check.changed)
+                        {
+                            data.SetToString(vector2Int);
+                        }
+                    }
+                    break;
+                case DataType.Vector3Int:
+                    var vector3Int = data.GetFromString<Vector3Int>();
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        vector3Int = EditorGUI.Vector3IntField(rect, content, vector3Int);
+                        if (check.changed)
+                        {
+                            data.SetToString(vector3Int);
+                        }
+                    }
+                    break;
+                case DataType.Enum:
+                    var enums = _enumData.GetEnums(field.DataTypeId);
+                    var index = _enumData.GetEnumIndex(field.DataTypeId, data.Int);
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        index = EditorGUI.Popup(rect, index, enums);
+                        if (check.changed)
+                        {
+                            var key = _enumData.GetEnumKey(field.DataTypeId, enums[index]);
+                            if (key.HasValue)
+                            {
+                                data.Int = key.Value;
+                            }
+                        }
+                    }
+                    
+                    break;
+            }
+        }
     }
 }

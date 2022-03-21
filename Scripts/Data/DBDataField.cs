@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -22,7 +21,7 @@ namespace Yorozu.DB
         /// Enum のときにどれと紐付いているのか判定するよう
         /// </summary>
         [SerializeField]
-        private int _dataTypeId;
+        internal int DataTypeId;
 
         /// <summary>
         /// 並べ替えや削除したときにIDでデータと一致させる
@@ -37,40 +36,9 @@ namespace Yorozu.DB
 
         internal DBDataField(int typeId)
         {
-            _dataTypeId = typeId;
-        }
-
-#if UNITY_EDITOR
-        [NonSerialized]
-        private bool _searched;
-
-        [NonSerialized]
-        private string[] _enumValues;
-        
-        internal string[] GetEnums()
-        {
-            if (!_searched)
-            {
-                _searched = true;
-                var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
-                if (enumData != null)
-                {
-                    var enumDefine = enumData.Find(_dataTypeId);
-                    if (enumDefine != null)
-                    {
-                        _enumValues = enumDefine.Values
-                            .Where(v => !string.IsNullOrEmpty(v))
-                            .ToArray();
-                    }
-                }
-            }
-
-            if (_enumValues == null)
-                _enumValues = Array.Empty<string>();
-
-            return _enumValues;
+            DataTypeId = typeId;
         }
         
-#endif
+        
     }
 }

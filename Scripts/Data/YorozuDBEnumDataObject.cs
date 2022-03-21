@@ -28,8 +28,8 @@ namespace Yorozu.DB
             internal int ID;
             
             [SerializeField]
-            internal List<string> Values = new List<string>();
-
+            internal List<KeyValue> KeyValues = new List<KeyValue>();
+            
             /// <summary>
             /// 説明
             /// </summary>
@@ -44,13 +44,34 @@ namespace Yorozu.DB
 
             internal void AddValue(string value)
             {
-                Values.Add(value);
+                var key = 1;
+                if (KeyValues.Any())
+                {
+                    key = KeyValues.Max(v => v.Key) + 1;
+                }
+                
+                KeyValues.Add(new KeyValue()
+                {
+                    Key = key,
+                    Value = value,
+                });
             }
             
             internal void RemoveAt(int index)
             {
-                Values.RemoveAt(index);
+                KeyValues.RemoveAt(index);
             }
+        }
+
+        /// <summary>
+        /// 名前と Key を連動させる
+        /// これにより名前を変えても Key は変わらない
+        /// </summary>
+        [Serializable]
+        internal class KeyValue
+        {
+            internal int Key;
+            internal string Value;
         }
 
         /// <summary>
@@ -111,6 +132,68 @@ namespace Yorozu.DB
                 this.Dirty();
             }
         }
+
+        /// <summary>
+        /// DataEditor側で見る
+        /// </summary>
+        [NonSerialized]
+        private static Dictionary<int, string[]> _valuesDictionary = new Dictionary<int, string[]>();
+        [NonSerialized]
+        private static Dictionary<int, int[]> _keysDictionary = new Dictionary<int, int[]>();
+
+        internal void ResetEnumCache()
+        {
+            _valuesDictionary.Clear();
+            _keysDictionary.Clear();
+        }
+        
+        internal string[] GetEnums(int id)
+        {
+            if (!_valuesDictionary.ContainsKey(id))
+            {
+                var values = Array.Empty<string>();
+                var keys = Array.Empty<int>();
+                var index = Defines.FindIndex(d => d.ID == id);
+                if (index >= 0)
+                {
+                    // 同じタイミングで両方作る
+                    values = Defines[index].KeyValues
+                        .Where(v => !string.IsNullOrEmpty(v.Value))
+                        .Select(v => v.Value)
+                        .ToArray();
+                    
+                    keys = Defines[index].KeyValues
+                        .Where(v => !string.IsNullOrEmpty(v.Value))
+                        .Select(v => v.Key)
+                        .ToArray();
+                }
+                
+                _valuesDictionary.Add(id, values);
+                _keysDictionary.Add(id, keys);
+            }
+            
+            return _valuesDictionary[id];
+        }
+
+        internal int GetEnumIndex(int id, int key)
+        {
+            if (!_keysDictionary.ContainsKey(id))
+            {
+                return 0;
+            }
+
+            return Array.IndexOf(_keysDictionary[id], key);
+        }
+
+        internal int? GetEnumKey(int id, string value)
+        {
+            if (!_valuesDictionary.ContainsKey(id))
+                return null;
+
+            var index = Array.IndexOf(_valuesDictionary[id], value);
+            return _keysDictionary[id][index];
+        }
+        
     }
     
 #if UNITY_EDITOR

@@ -7,7 +7,7 @@ namespace Yorozu.DB
     /// <summary>
     /// データを保存
     /// </summary>
-    internal partial class YorozuDBDataDefineObject : ScriptableObject
+    internal class YorozuDBDataDefineObject : ScriptableObject
     {
         [SerializeField]
         private List<DBDataField> _fields = new List<DBDataField>();
@@ -60,7 +60,6 @@ namespace Yorozu.DB
                 {
                     typeId = enumData.Defines[index].ID;
                 }
-
             }
 
             var field = new DBDataField(typeId)
