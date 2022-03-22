@@ -27,9 +27,16 @@ namespace Yorozu.DB
             var assets = LoadAllDefineAsset();
             var enumData = LoadEnumDataAsset();
 
+            var definePath = Path.Combine(savePath, "Define");
+            // ディレクトリ作成
+            if (!AssetDatabase.IsValidFolder(definePath))
+            {
+                AssetDatabase.CreateFolder(savePath, "Define");
+            }
+
             foreach (var data in assets)
             {
-                var exportPath = Path.Combine(savePath, $"{data.name}.cs");
+                var exportPath = Path.Combine(definePath, $"{data.name}.cs");
                 // 出力
                 using (StreamWriter writer = new StreamWriter(exportPath, false))
                 {

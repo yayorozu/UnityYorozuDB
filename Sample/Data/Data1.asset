@@ -58,28 +58,6 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
-  - ID: 3
-    Data:
-    - String: 
-      Int: 2
-      Float: 0
-      Bool: 0
-      UnityObject: {fileID: 0}
-    - String: 
-      Int: 1
-      Float: 0
-      Bool: 0
-      UnityObject: {fileID: 0}
-    - String: 
-      Int: 1
-      Float: 0
-      Bool: 0
-      UnityObject: {fileID: 0}
-    - String: 
-      Int: 1
-      Float: 0
-      Bool: 0
-      UnityObject: {fileID: 0}
   - ID: 4
     Data:
     - String: '{"x":1.0,"y":23.0,"z":0.0}'

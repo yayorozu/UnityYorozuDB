@@ -125,9 +125,23 @@ namespace Yorozu.DB
         /// <summary>
         /// 削除
         /// </summary>
-        internal void RemoveDefine(int id)
+        internal void RemoveDefine(int enumDefineId)
         {
-            if (Defines.RemoveAll(v => v.ID == id) > 0)
+            // 関連するデータのフィールドも削除する
+            var defines = YorozuDBEditorUtility.LoadAllDefineAsset();
+            foreach (var d in defines)
+            {
+                var targetFieldIds = d.Fields.Where(f => f.DataType == DataType.Enum && f.EnumDefineId == enumDefineId)
+                    .Select(f => f.ID)
+                    .ToArray();
+                // 定義したデータがある場合は
+                foreach (var fieldId in targetFieldIds)
+                {
+                    d.RemoveField(fieldId);
+                }
+            }
+            
+            if (Defines.RemoveAll(v => v.ID == enumDefineId) > 0)
             {
                 this.Dirty();
             }

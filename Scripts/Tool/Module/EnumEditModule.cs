@@ -17,9 +17,13 @@ namespace Yorozu.DB
             internal static GUIContent SubContent;
             internal static GUIContent DeleteContent;
             internal const float ButtonWidth = 16f;
+            internal static GUILayoutOption AddButtonLabelWidth;
+            internal static GUILayoutOption AddButtonWidth;
             
             static Style()
             {
+                AddButtonLabelWidth = GUILayout.Width(74);
+                AddButtonWidth = GUILayout.Width(130);
                 AddContent = EditorGUIUtility.TrIconContent("Toolbar Plus", "Add to list");
                 AddStyle = "RL FooterButton";
                 SubContent = EditorGUIUtility.TrIconContent("Toolbar Minus", "Remove selection from list");
@@ -65,10 +69,11 @@ namespace Yorozu.DB
             
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                EditorGUILayout.LabelField($"Enum Editor");
+                EditorGUILayout.LabelField($"Enum Editor", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
                 
-                _temp = EditorGUILayout.TextField("Enum Name", _temp, EditorStyles.toolbarTextField);
+                EditorGUILayout.LabelField("Enum Name", Style.AddButtonLabelWidth);
+                _temp = EditorGUILayout.TextField(GUIContent.none, _temp, EditorStyles.toolbarTextField, Style.AddButtonWidth);
                 using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_temp)))
                 {
                     if (GUILayout.Button("Add Enum", EditorStyles.toolbarButton))
@@ -152,7 +157,7 @@ namespace Yorozu.DB
 
                     if (GUI.Button(rect, Style.DeleteContent, Style.AddStyle))
                     {
-                        if (EditorUtility.DisplayDialog("Warning", $"Delete {define.Name}?",
+                        if (EditorUtility.DisplayDialog("Warning", $"Delete {define.Name} Enum Define?\nEnum field defined in the data is Deleted",
                                 "YES",
                                 "NO"))
                         {

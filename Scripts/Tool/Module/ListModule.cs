@@ -74,7 +74,7 @@ namespace Yorozu.DB
 
             EditorGUILayout.Space(1);
             
-            EditorGUILayout.LabelField("Define & Data", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Define, Data, Enum", EditorStyles.boldLabel);
 
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
             _treeView.OnGUI(rect);

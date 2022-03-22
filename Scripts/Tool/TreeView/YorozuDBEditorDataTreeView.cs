@@ -139,7 +139,7 @@ namespace Yorozu.DB.TreeView
 
     internal class YorozuDBEditorMultiColumnHeader : MultiColumnHeader
     {
-	    internal event Action<int> DeleteEvent;
+	    internal event Action<MultiColumnHeaderState.Column> DeleteEvent;
 	    
         internal YorozuDBEditorMultiColumnHeader(MultiColumnHeaderState state) : base(state)
         {
@@ -163,13 +163,8 @@ namespace Yorozu.DB.TreeView
 	        // 削除ボタン
 	        if (GUI.Button(headerRect, EditorGUIUtility.TrIconContent("Toolbar minus"), EditorStyles.label))
 	        {
-		        if (EditorUtility.DisplayDialog("Warning", $"Delete {column.headerContent.text}?",
-			            "YES",
-			            "NO"))
-		        {
-			        DeleteEvent?.Invoke(column.userData);
-			        GUIUtility.ExitGUI();
-		        }
+		        DeleteEvent?.Invoke(column);
+		        GUIUtility.ExitGUI();
 	        }
         }
 

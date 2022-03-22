@@ -34,7 +34,7 @@ namespace Yorozu.DB
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                EditorGUILayout.LabelField($"Data Editor: 【{_data.name}】");
+                EditorGUILayout.LabelField($"Data Editor: 【{_data.name}】", EditorStyles.boldLabel);
                 
                 GUILayout.FlexibleSpace();
 
@@ -120,10 +120,16 @@ namespace Yorozu.DB
         /// <summary>
         /// 列削除
         /// </summary>
-        private void DeleteColumn(int fieldId)
+        private void DeleteColumn(MultiColumnHeaderState.Column column)
         {
-            _data.Define.RemoveField(fieldId);
-            Reload();
+            if (EditorUtility.DisplayDialog("Warning", $"Delete {column.headerContent.text} Field?\nFields of related data will be Deleted.",
+                    "YES",
+                    "NO"))
+            {
+                var fieldId = column.userData;
+                _data.Define.RemoveField(fieldId);
+                Reload();
+            }
         }
 
         /// <summary>

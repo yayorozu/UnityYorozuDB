@@ -58,7 +58,7 @@ namespace Yorozu.DB
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                EditorGUILayout.LabelField($"Define Editor: 【{_data.name}】");
+                EditorGUILayout.LabelField($"Define Editor: 【{_data.name}】", EditorStyles.boldLabel);
             }
 
             GUILayout.Space(10);
