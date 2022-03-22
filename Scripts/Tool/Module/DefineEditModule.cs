@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -13,23 +14,30 @@ namespace Yorozu.DB
     {
         private static class Style
         {
+            internal static GUIStyle DeleteStyle;
             internal static GUILayoutOption EnumWidth;
             internal static GUILayoutOption ButtonWidth;
             internal static GUIContent Delete;
             internal static GUIContent Key;
             internal static GUIContent UnKey;
             
+            internal const float RemoveButtonWidth = 16f;
+            
             static Style()
             {
                 EnumWidth = GUILayout.Width(300);
                 ButtonWidth = GUILayout.Width(100);
-                Delete = EditorGUIUtility.TrIconContent("d_TreeEditor.Trash");
+                Delete = EditorGUIUtility.TrIconContent("Toolbar Minus");
                 Key = EditorGUIUtility.TrIconContent("Favorite On Icon");
                 UnKey = EditorGUIUtility.TrIconContent("TestIgnored");
+                DeleteStyle = "RL FooterButton";
             }
         }
+        
         [SerializeField]
         private YorozuDBDataDefineObject _data;
+        [SerializeField]
+        private YorozuDBEnumDataObject _enumData;
 
         [SerializeField]
         private string[] _enums;
@@ -41,20 +49,31 @@ namespace Yorozu.DB
         [NonSerialized]
         private string _enumName;
 
+        [NonSerialized]
+        private bool _repaint;
+        
         private int _renameID = -1;
         private string _temp;
         
         private static readonly string EditorField = "EditorField";
+
+        private ReorderableList _reorderableList;
         
         internal void SetData(YorozuDBDataDefineObject data)
         {
             _data = data;
+            _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
         }
 
         internal override bool OnGUI()
         {
             if (_data == null)
                 return false;
+
+            if (_reorderableList == null)
+            {
+                _reorderableList = CreateReorderableList(_data);
+            }
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -114,39 +133,48 @@ namespace Yorozu.DB
                 }
             }
 
-            GUILayout.Space(10);
-
-            EditorGUILayout.LabelField("Fields", EditorStyles.boldLabel);
-
-            var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
-            
-            rect.height = EditorGUIUtility.singleLineHeight;
-            var initialX = rect.x;
-            
-            using (new EditorGUI.IndentLevelScope())
+            _reorderableList.DoLayoutList();
+            if (_repaint)
             {
-                foreach (var field in _data.Fields)
+                _repaint = false;
+                return true;
+            }
+            return false;
+        }
+
+        private ReorderableList CreateReorderableList(YorozuDBDataDefineObject data)
+        {
+            return new ReorderableList(data.Fields, typeof(DataField), true, true, false, false)
+            {
+                drawHeaderCallback = rect =>
                 {
+                    EditorGUI.LabelField(rect, "Fields", EditorStyles.boldLabel);
+                },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    if (data.Fields.Count <= index)
+                        return;
+
+                    var width = rect.width;
+                    var x = rect.x;
+                    var field = data.Fields[index];
+                    rect.width = 20;
                     // Key として有効なのであればボタンを表示
                     if (field.ValidKey())
                     {
-                        rect.x = initialX - 4f;
-                        rect.width = 20;
-
                         var content = _data.IsKeyField(field) ? Style.Key : Style.UnKey;
                         if (GUI.Button(rect, content, EditorStyles.label))
                         {
                             _data.SetKey(field.ID);
                         }
                     }
+
+                    rect.x += rect.width;
                     
-                    rect.x = initialX;
-                    rect.width = 100;
+                    rect.width = 150;
                     // リネーム状態だったら TextField を表示
                     if (_renameID == field.ID)
                     {
-                        rect.x += EditorGUI.indentLevel * 15f;
-                        
                         GUI.SetNextControlName(EditorField);
                         _temp = GUI.TextField(rect, _temp);
                         var e = Event.current;
@@ -154,59 +182,66 @@ namespace Yorozu.DB
                         {
                             _data.RenameField(_renameID, _temp);
                             _renameID = -1;
-                            return true;
+                            _repaint = true;
                         }
 
                         if (e.keyCode == KeyCode.Escape)
                         {
                             _renameID = -1;
-                            return true;
+                            _repaint = true;
                         }
 
                         rect.x -= EditorGUI.indentLevel * 15f;
                     }
                     else
                     {
-                        rect.x += 15f;
-                        rect.width -= 15f;
                         if (GUI.Button(rect, field.Name, EditorStyles.label))
                         {
                             _renameID = field.ID;
                         
                             _temp = field.Name;
                             GUI.FocusControl(EditorField);
-                            return true;
+                            _repaint = true;
                         }
                     }
                     
                     rect.x += rect.width;
 
+                    // 型情報
                     rect.width = 140;
                     using (new EditorGUI.DisabledScope(true))
                     {
                         field.DataType = (DataType) EditorGUI.EnumPopup(rect, GUIContent.none, field.DataType);
                     }
-
-                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
-                    rect.width = 16;
                     
-                    // 削除ボタン
-                    if (GUI.Button(rect, Style.Delete, EditorStyles.label))
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+
+                    // Enum だったらどのEnumかを表示 
+                    if (field.DataType == DataType.Enum && _enumData != null)
                     {
-                        if (EditorUtility.DisplayDialog("Warning", $"Delete {field.Name}?",
+                        var enumIndex = _enumData.Defines.FindIndex(d => d.ID == field.EnumDefineId);
+                        if (enumIndex >= 0)
+                            EditorGUI.LabelField(rect, _enumData.Defines[enumIndex].Name);
+                    }
+                    
+                    rect.x = x + width - Style.RemoveButtonWidth;
+
+                    rect.width = Style.RemoveButtonWidth;
+                    if (GUI.Button(rect, Style.Delete, Style.DeleteStyle))
+                    {
+                        if (EditorUtility.DisplayDialog("Warning", $"Delete {field.Name} Field?",
                                 "YES",
                                 "NO"))
                         {
                             _data.RemoveField(field.ID);
-                            GUIUtility.ExitGUI();
+                            _repaint = true;
                         }
                     }
-
-                    rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
-                }
-            }
-
-            return false;
+                },
+     
+                drawFooterCallback = rect => { },
+                footerHeight = 0f,
+            };
         }
     }
 }
