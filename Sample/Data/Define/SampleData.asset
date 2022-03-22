@@ -10,11 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6006ac978ac407492d83659d60675fd, type: 3}
-  m_Name: Define2
+  m_Name: SampleData
   m_EditorClassIdentifier: 
   _fields:
-  - Name: Key2
-    DataType: 2
+  - Name: Key
+    DataType: 0
     EnumDefineId: 0
     ID: 1
+  - Name: Value
+    DataType: 1
+    EnumDefineId: 0
+    ID: 2
+  - Name: EnumValue1
+    DataType: 8
+    EnumDefineId: 1
+    ID: 3
+  - Name: Vector3Data
+    DataType: 10
+    EnumDefineId: 0
+    ID: 4
+  - Name: Obj
+    DataType: 5
+    EnumDefineId: 0
+    ID: 5
   _keyID: 1

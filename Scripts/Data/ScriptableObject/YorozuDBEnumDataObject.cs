@@ -8,7 +8,7 @@ namespace Yorozu.DB
     /// <summary>
     /// Enum っぽいデータを保持
     /// </summary>
-    internal class YorozuDBEnumDataObject : ScriptableObject
+    public class YorozuDBEnumDataObject : ScriptableObject
     {
         [Serializable]
         internal class EnumDefine : IDBName

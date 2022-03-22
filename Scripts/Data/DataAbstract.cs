@@ -11,17 +11,16 @@ namespace Yorozu.DB
         /// </summary>
         private YorozuDBDataObject _data;
 
-        private YorozuDBEnumDataObject _enumData;
+        private YorozuDBEnumDataObject _enumData => YorozuDB.EnumData;
         /// <summary>
         /// 何行目のデータか
         /// </summary>
         private int _row;
         
-        internal void SetUp(YorozuDBDataObject data, int row, YorozuDBEnumDataObject enumData)
+        internal void SetUp(YorozuDBDataObject data, int row)
         {
             _data = data;
             _row = row;
-            _enumData = enumData;
         }
 
         private DataContainer Data(int fieldId) => _data.GetData(fieldId, _row);

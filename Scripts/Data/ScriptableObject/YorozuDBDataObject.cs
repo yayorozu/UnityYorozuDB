@@ -11,7 +11,7 @@ namespace Yorozu.DB
     /// <summary>
     /// データをまとめる
     /// </summary>
-    internal class YorozuDBDataObject : ScriptableObject
+    public class YorozuDBDataObject : ScriptableObject
     {
         [Serializable]
         private class Field
@@ -74,34 +74,15 @@ namespace Yorozu.DB
             }
         }
         
-        [NonSerialized]
-        private Dictionary<int, int> _fieldIdToIndex;
-
         /// <summary>
         /// ID からデータを取得
         /// </summary>
         internal DataContainer GetData(int fieldId, int row)
         {
-            if (_fieldIdToIndex == null)
-            {
-                _fieldIdToIndex = new Dictionary<int, int>();
-                foreach (var (v, i) in _fields.Select((v, i) => (v, i)))
-                {
-                    _fieldIdToIndex.Add(v.ID, i);
-                }
-            }
-            
-            if (_fieldIdToIndex.TryGetValue(fieldId, out var index))
-            {
-                if (row >= _fields[index].Data.Count)
-                {
-                    throw new Exception($"Data Count is {_fields[index].Data.Count}. Require Index is {row}.");        
-                }
-                
-                return _fields[index].Data[row];
-            }
-            
-            throw new Exception($"Field Id {fieldId}. Is Not Contains");
+            return _fields
+                .Where(f => f.ID == fieldId)
+                .Select(f => f.Data[row])
+                .First();
         }
 
         /// <summary>
@@ -134,7 +115,6 @@ namespace Yorozu.DB
         /// </summary>
         internal void RemoveField(int fieldId)
         {
-            _fieldIdToIndex = null;
             _fields.RemoveAll(g => g.ID == fieldId);
             this.Dirty();
         }

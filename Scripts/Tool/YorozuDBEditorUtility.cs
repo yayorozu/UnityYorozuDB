@@ -29,52 +29,11 @@ namespace Yorozu.DB
 
             foreach (var data in assets)
             {
-                var builder = new StringBuilder();
-                builder.AppendLine("using UnityEngine;");
-                builder.AppendLine("");
-                
-                builder.AppendLine("namespace Yorozu.DB");
-                builder.AppendLine("{");
-                builder.Append($"    public class {data.name} : {nameof(DataAbstract)}");
-                var keyField = data.Fields.FirstOrDefault(data.IsKeyField);
-                if (keyField != null)
-                {
-                    builder.Append($", {GetInterfaceName(keyField.DataType)}");
-                }
-
-                builder.AppendLine("");
-                
-                builder.AppendLine("    {");
-
-                if (keyField != null)
-                {
-                    builder.AppendLine($"       {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => {keyField.Name};");
-                }
-
-                foreach (var field in data.Fields)
-                {
-                    if (field.DataType == DataType.Enum)
-                    {
-                        var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
-                        if (enumDefine != null)
-                        {
-                            builder.AppendLine($"       public {enumDefine.Name} {field.Name} => ({enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
-                        }
-                    }
-                    else
-                    {
-                        builder.AppendLine($"       public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
-                    }
-                    builder.AppendLine("");
-                }
-                builder.AppendLine("    }");
-                builder.AppendLine("}");
-
                 var exportPath = Path.Combine(savePath, $"{data.name}.cs");
                 // 出力
                 using (StreamWriter writer = new StreamWriter(exportPath, false))
                 {
-                    writer.WriteLine(builder.ToString());
+                    writer.WriteLine(DataScriptString(data, enumData));
                 }
             }
             
@@ -83,7 +42,69 @@ namespace Yorozu.DB
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
 
+        /// <summary>
+        /// 出力用の文字列を取得
+        /// </summary>
+        private static string DataScriptString(YorozuDBDataDefineObject data, YorozuDBEnumDataObject enumData)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("// -------------------- //"); 
+            builder.AppendLine("// Auto Generate Code.  //"); 
+            builder.AppendLine("// Do not edit!!!       //"); 
+            builder.AppendLine("// -------------------- //");
+            builder.AppendLine("using UnityEngine;");
+            builder.AppendLine("");
+            
+            builder.AppendLine("namespace Yorozu.DB");
+            builder.AppendLine("{");
+            builder.Append($"    public class {data.name} : {nameof(DataAbstract)}");
+            var keyField = data.Fields.FirstOrDefault(data.IsKeyField);
+            if (keyField != null)
+            {
+                builder.Append($", {GetInterfaceName(keyField.DataType)}");
+            }
+
+            builder.AppendLine("");
+            
+            builder.AppendLine("    {");
+
+            if (keyField != null)
+            {
+                builder.AppendLine($"       {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => {keyField.Name};");
+            }
+
+            foreach (var field in data.Fields)
+            {
+                if (field.DataType == DataType.Enum)
+                {
+                    var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
+                    if (enumDefine != null)
+                    {
+                        builder.AppendLine($"        public {enumDefine.Name} {field.Name} => ({enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                    }
+                }
+                else
+                {
+                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                }
+                builder.AppendLine("");
+            }
+            
+            builder.AppendLine("        public override string ToString()");
+            builder.AppendLine("        {");
+            builder.AppendLine("            var builder = new System.Text.StringBuilder();");
+            builder.AppendLine("            builder.AppendLine($\"Type: {GetType().Name}\");");
+            foreach (var field in data.Fields)
+            {
+                builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
+            }
+            builder.AppendLine("            return builder.ToString();");
+            builder.AppendLine("        }");
+            builder.AppendLine("    }");
+            builder.AppendLine("}");
+            
             string GetInterfaceName(DataType type)
             {
                 switch (type)
@@ -96,6 +117,8 @@ namespace Yorozu.DB
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
             }
+
+            return builder.ToString();
         }
 
         /// <summary>

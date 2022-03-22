@@ -5,9 +5,9 @@ namespace Yorozu.DB
     /// </summary>
     internal enum DataType
     {
+        Int,
         String,
         Float,
-        Int,
         Bool,
         Sprite,
         GameObject,
