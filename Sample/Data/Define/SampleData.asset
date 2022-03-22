@@ -29,4 +29,8 @@ MonoBehaviour:
     DataType: 5
     EnumDefineId: 0
     ID: 5
-  _keyID: 1
+  - Name: EnumKey
+    DataType: 8
+    EnumDefineId: 1
+    ID: 6
+  _keyID: 6

@@ -134,7 +134,7 @@ namespace Yorozu.DB
                 var targetFieldIds = d.Fields.Where(f => f.DataType == DataType.Enum && f.EnumDefineId == enumDefineId)
                     .Select(f => f.ID)
                     .ToArray();
-                // 定義したデータがある場合は
+                // 定義したデータがある場合は削除する
                 foreach (var fieldId in targetFieldIds)
                 {
                     d.RemoveField(fieldId);

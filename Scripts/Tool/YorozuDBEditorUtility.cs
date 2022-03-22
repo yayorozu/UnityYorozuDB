@@ -79,7 +79,8 @@ namespace Yorozu.DB
 
             if (keyField != null)
             {
-                builder.AppendLine($"       {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => {keyField.Name};");
+                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
+                builder.AppendLine("");
             }
 
             foreach (var field in data.Fields)
@@ -89,7 +90,7 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public {enumDefine.Name} {field.Name} => ({enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
                     }
                 }
                 else
@@ -119,6 +120,7 @@ namespace Yorozu.DB
                     case DataType.String:
                         return nameof(IStringKey);
                     case DataType.Int:
+                    case DataType.Enum:
                         return nameof(IIntKey);
                     default:
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -236,8 +238,7 @@ namespace Yorozu.DB
                 DataType.Vector3 => "Vector3",
                 DataType.Vector2Int => "Vector3Int",
                 DataType.Vector3Int => "Vector3Int",
-                // TODO Enumの場合は型がいる
-                DataType.Enum => "enum",
+                DataType.Enum => "int",
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }

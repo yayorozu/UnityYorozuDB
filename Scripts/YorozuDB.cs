@@ -108,6 +108,11 @@ namespace Yorozu.DB
             return finds.First();
         }
         
+        public static T Find<T>(Enum key) where T : DataAbstract
+        {
+            return Find<T>(key.GetHashCode());
+        }
+        
         public static IEnumerable<T> FindMany<T>(int key) where T : DataAbstract
         {
             return FindMany<T>(key, int.MaxValue);
@@ -116,6 +121,11 @@ namespace Yorozu.DB
         public static IEnumerable<T> FindMany<T>(string key) where T : DataAbstract
         {
             return FindMany<T>(key, int.MaxValue);
+        }
+        
+        public static IEnumerable<T> FindMany<T>(Enum key) where T : DataAbstract
+        {
+            return FindMany<T>(key.GetHashCode(), int.MaxValue);
         }
     }
 }
