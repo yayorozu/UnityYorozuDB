@@ -65,7 +65,7 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
-    - String: 
+    - String: '{"x":223.0,"y":0.0,"z":0.0}'
       Int: 0
       Float: 0
       Bool: 0
@@ -111,7 +111,7 @@ MonoBehaviour:
       Bool: 0
       UnityObject: {fileID: 0}
     - String: 
-      Int: 0
+      Int: 1
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}

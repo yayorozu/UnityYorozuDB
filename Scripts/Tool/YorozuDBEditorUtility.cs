@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace Yorozu.DB
 {
@@ -106,7 +107,18 @@ namespace Yorozu.DB
             builder.AppendLine("            builder.AppendLine($\"Type: {GetType().Name}\");");
             foreach (var field in data.Fields)
             {
-                builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
+                switch (field.DataType)
+                {
+                    case DataType.Sprite:
+                    case DataType.GameObject:
+                    case DataType.ScriptableObject:
+                    case DataType.UnityObject:
+                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{({field.Name} == null ? \"null\" : {field.Name}.ToString())}}\");");
+                        break;
+                    default:
+                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
+                        break;
+                }
             }
             builder.AppendLine("            return builder.ToString();");
             builder.AppendLine("        }");

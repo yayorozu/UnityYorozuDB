@@ -27,7 +27,7 @@ namespace Yorozu.DB
             builder.AppendLine($"Key: {Key.ToString()}");
             builder.AppendLine($"Value: {Value.ToString()}");
             builder.AppendLine($"Vector3Data: {Vector3Data.ToString()}");
-            builder.AppendLine($"Obj: {Obj.ToString()}");
+            builder.AppendLine($"Obj: {(Obj == null ? "null" : Obj.ToString())}");
             builder.AppendLine($"EnumKey: {EnumKey.ToString()}");
             return builder.ToString();
         }
