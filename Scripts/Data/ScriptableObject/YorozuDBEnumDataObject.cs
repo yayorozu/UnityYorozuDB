@@ -196,7 +196,7 @@ namespace Yorozu.DB
                 return 0;
             }
 
-            return Array.IndexOf(_keysDictionary[id], key);
+            return Mathf.Max(Array.IndexOf(_keysDictionary[id], key), 0);
         }
 
         internal int? GetEnumKey(int id, string value)
