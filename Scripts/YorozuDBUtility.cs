@@ -44,7 +44,7 @@ namespace Yorozu.DB
             }
 
             // 同じ名前を探す
-            return _types.First(t => t.Name == data.Define.name);
+            return _types.First(t => t.Name == data.Define.ClassName);
         }
     }
 }

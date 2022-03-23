@@ -1,15 +1,11 @@
 #if UNITY_EDITOR
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace Yorozu.DB
 {
@@ -20,168 +16,6 @@ namespace Yorozu.DB
     
     internal static class YorozuDBEditorUtility
     {
-        /// <summary>
-        /// データからファイルを出力
-        /// </summary>
-        internal static void GenerateScript(string savePath)
-        {
-            var assets = LoadAllDefineAsset();
-            var enumData = LoadEnumDataAsset();
-
-            var definePath = Path.Combine(savePath, "Define");
-            // ディレクトリ作成
-            if (!AssetDatabase.IsValidFolder(definePath))
-            {
-                AssetDatabase.CreateFolder(savePath, "Define");
-            }
-
-            foreach (var data in assets)
-            {
-                var exportPath = Path.Combine(definePath, $"{data.name}.cs");
-                // 出力
-                using (StreamWriter writer = new StreamWriter(exportPath, false))
-                {
-                    writer.WriteLine(DataScriptString(data, enumData));
-                }
-            }
-            
-            // Export Enum files
-            CreateEnumFiles(enumData, savePath);
-            
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-
-        /// <summary>
-        /// 出力用の文字列を取得
-        /// </summary>
-        private static string DataScriptString(YorozuDBDataDefineObject data, YorozuDBEnumDataObject enumData)
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine("// -------------------- //"); 
-            builder.AppendLine("// Auto Generate Code.  //"); 
-            builder.AppendLine("// Do not edit!!!       //"); 
-            builder.AppendLine("// -------------------- //");
-            builder.AppendLine("using UnityEngine;");
-            builder.AppendLine("");
-            
-            builder.AppendLine("namespace Yorozu.DB");
-            builder.AppendLine("{");
-            builder.Append($"    public class {data.name} : {nameof(DataAbstract)}");
-            var keyField = data.KeyField;
-            if (keyField != null)
-            {
-                builder.Append($", {GetInterfaceName(keyField.DataType)}");
-            }
-
-            builder.AppendLine("");
-            
-            builder.AppendLine("    {");
-
-            if (keyField != null)
-            {
-                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
-                builder.AppendLine("");
-            }
-
-            foreach (var field in data.Fields)
-            {
-                if (field.DataType == DataType.Enum)
-                {
-                    var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
-                    if (enumDefine != null)
-                    {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
-                    }
-                }
-                else
-                {
-                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
-                }
-                builder.AppendLine("");
-            }
-            
-            builder.AppendLine("        public override string ToString()");
-            builder.AppendLine("        {");
-            builder.AppendLine("            var builder = new System.Text.StringBuilder();");
-            builder.AppendLine("            builder.AppendLine($\"Type: {GetType().Name}\");");
-            foreach (var field in data.Fields)
-            {
-                switch (field.DataType)
-                {
-                    case DataType.Sprite:
-                    case DataType.GameObject:
-                    case DataType.ScriptableObject:
-                    case DataType.UnityObject:
-                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{({field.Name} == null ? \"null\" : {field.Name}.ToString())}}\");");
-                        break;
-                    default:
-                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
-                        break;
-                }
-            }
-            builder.AppendLine("            return builder.ToString();");
-            builder.AppendLine("        }");
-            builder.AppendLine("    }");
-            builder.AppendLine("}");
-            
-            string GetInterfaceName(DataType type)
-            {
-                switch (type)
-                {
-                    case DataType.String:
-                        return nameof(IStringKey);
-                    case DataType.Int:
-                    case DataType.Enum:
-                        return nameof(IIntKey);
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
-                }
-            }
-
-            return builder.ToString();
-        }
-
-        /// <summary>
-        /// Enum ファイルを生成
-        /// </summary>
-        private static void CreateEnumFiles(YorozuDBEnumDataObject enumData, string savePath)
-        {
-            if (enumData == null)
-                return;
-            
-            var enumExportPath = Path.Combine(savePath, "Enum");
-            // ディレクトリ作成
-            if (!AssetDatabase.IsValidFolder(enumExportPath))
-            {
-                AssetDatabase.CreateFolder(savePath, "Enum");
-            }
-
-            foreach (var define in enumData.Defines)
-            {
-                var filePath = Path.Combine(enumExportPath, $"{define.Name}.cs");
-                
-                var builder = new StringBuilder();
-                builder.AppendLine("");
-                
-                builder.AppendLine("namespace Yorozu.DB");
-                builder.AppendLine("{");
-                builder.AppendLine($"    public enum {define.Name}");
-                builder.AppendLine("    {");
-                foreach (var kv in define.KeyValues)
-                {
-                    builder.AppendLine($"       {kv.Value},");
-                }
-                builder.AppendLine("    }");
-                builder.AppendLine("}");
-                
-                using (StreamWriter writer = new StreamWriter(filePath, false))
-                {
-                    writer.WriteLine(builder.ToString());
-                }
-            }
-        }
-        
         internal static YorozuDBDataDefineObject[] LoadAllDefineAsset()
         {
             var findAssets = AssetDatabase.FindAssets($"t:{nameof(YorozuDBDataDefineObject)}");
@@ -230,70 +64,7 @@ namespace Yorozu.DB
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssets();
         }
-
-        /// <summary>
-        /// 文字列に変換
-        /// </summary>
-        private static string ConvertString(this DataType type)
-        {
-            return type switch
-            {
-                DataType.String => "string",
-                DataType.Float => "float",
-                DataType.Int => "int",
-                DataType.Bool => "bool",
-                DataType.Sprite => "Sprite",
-                DataType.GameObject => "GameObject",
-                DataType.ScriptableObject => "ScriptableObject",
-                DataType.UnityObject => "UnityEngine.Object",
-                DataType.Vector2 => "Vector2",
-                DataType.Vector3 => "Vector3",
-                DataType.Vector2Int => "Vector3Int",
-                DataType.Vector3Int => "Vector3Int",
-                DataType.Enum => "int",
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
-        }
-
-        /// <summary>
-        /// TreeView の Header情報を取得
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        internal static MultiColumnHeaderState CreateMultiColumnHeaderState(YorozuDBDataObject data)
-        {
-            var fields = data.Define.Fields;
-            var columns = new MultiColumnHeaderState.Column[fields.Count() + 1];
-            // 制御用に1フィールド用意する
-            columns[0] = new MultiColumnHeaderState.Column()
-            {
-                headerContent = new GUIContent(""),
-                width = 28,
-                minWidth = 28,
-                maxWidth = 28,
-            };
-            
-            foreach (var (v, i) in fields.Select((v, i) => (v, i)))
-            {
-                columns[i + 1] = new MultiColumnHeaderState.Column()
-                {
-                    headerContent = new GUIContent($"    {v.Name}"),
-                    headerTextAlignment = TextAlignment.Left,
-                    contextMenuText = v.DataType.ToString(),
-                    sortedAscending = true,
-                    sortingArrowAlignment = TextAlignment.Right,
-                    width = 150,
-                    minWidth = 150,
-                    maxWidth = 200,
-                    autoResize = false,
-                    allowToggleVisibility = false,
-                    userData = v.ID,
-                };
-            }
-            
-            return new MultiColumnHeaderState(columns);
-        }
-
+        
         /// <summary>
         /// DefineAssetを作成
         /// </summary>

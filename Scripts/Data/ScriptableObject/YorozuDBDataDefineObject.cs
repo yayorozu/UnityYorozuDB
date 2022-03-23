@@ -13,6 +13,8 @@ namespace Yorozu.DB
         private List<DataField> _fields = new List<DataField>();
 
         internal List<DataField> Fields => _fields;
+
+        internal string ClassName => name.Replace("Define", "");
         
         /// <summary>
         /// 検索時にKeyにする名前

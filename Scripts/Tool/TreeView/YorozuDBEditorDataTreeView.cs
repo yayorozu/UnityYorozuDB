@@ -141,6 +141,46 @@ namespace Yorozu.DB.TreeView
 				}
 			}
         }
+	    
+	            
+	    /// <summary>
+	    /// TreeView の Header情報を取得
+	    /// </summary>
+	    /// <param name="data"></param>
+	    /// <returns></returns>
+	    internal static MultiColumnHeaderState CreateMultiColumnHeaderState(YorozuDBDataObject data)
+	    {
+		    var fields = data.Define.Fields;
+		    var columns = new MultiColumnHeaderState.Column[fields.Count() + 1];
+		    // 制御用に1フィールド用意する
+		    columns[0] = new MultiColumnHeaderState.Column()
+		    {
+			    headerContent = new GUIContent(""),
+			    width = 28,
+			    minWidth = 28,
+			    maxWidth = 28,
+		    };
+            
+		    foreach (var (v, i) in fields.Select((v, i) => (v, i)))
+		    {
+			    columns[i + 1] = new MultiColumnHeaderState.Column()
+			    {
+				    headerContent = new GUIContent($"    {v.Name}"),
+				    headerTextAlignment = TextAlignment.Left,
+				    contextMenuText = v.DataType.ToString(),
+				    sortedAscending = true,
+				    sortingArrowAlignment = TextAlignment.Right,
+				    width = 150,
+				    minWidth = 150,
+				    maxWidth = 200,
+				    autoResize = false,
+				    allowToggleVisibility = false,
+				    userData = v.ID,
+			    };
+		    }
+            
+		    return new MultiColumnHeaderState(columns);
+	    }
     }
 
     internal class YorozuDBEditorMultiColumnHeader : MultiColumnHeader

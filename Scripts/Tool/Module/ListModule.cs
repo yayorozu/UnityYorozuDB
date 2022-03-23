@@ -98,7 +98,7 @@ namespace Yorozu.DB
                 if (GUILayout.Button("Generate Script From Define"))
                 {
                     var exportPath = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
-                    YorozuDBEditorUtility.GenerateScript(exportPath);
+                    YorozuDBScriptGenerator.GenerateScript(exportPath);
                 }
             }
             

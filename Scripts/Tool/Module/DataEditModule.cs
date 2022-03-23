@@ -74,7 +74,7 @@ namespace Yorozu.DB
                 _state = new TreeViewState();
             }
 
-            var headerState = YorozuDBEditorUtility.CreateMultiColumnHeaderState(_data);
+            var headerState = YorozuDBEditorDataTreeView.CreateMultiColumnHeaderState(_data);
             if (MultiColumnHeaderState.CanOverwriteSerializedFields(_columnHeaderState, headerState))
                 MultiColumnHeaderState.OverwriteSerializedFields(_columnHeaderState, headerState);
             _columnHeaderState = headerState;
