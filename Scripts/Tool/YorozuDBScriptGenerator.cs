@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
+using UnityEngine;
 
 namespace Yorozu.DB
 {
@@ -13,8 +14,32 @@ namespace Yorozu.DB
         /// <summary>
         /// データからファイルを出力
         /// </summary>
-        internal static void GenerateScript(string savePath)
+        internal static void GenerateScript()
         {
+            var savePath = "";
+            var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBScriptExportMarker)}");
+            // 見つからなかったら作成
+            if (guids.Length <= 0)
+            {
+                var path = EditorUtility.OpenFolderPanel("Select Export Folder", Application.dataPath, "");
+                if (string.IsNullOrEmpty(path))
+                    return;
+                
+                // UnityPathじゃない
+                if (!path.Contains(Application.dataPath))
+                    return;
+
+                savePath = path.Replace(Application.dataPath, "Assets"); 
+                var marker = ScriptableObject.CreateInstance<YorozuDBScriptExportMarker>();
+                var tagSavePath = Path.Combine(savePath, "Marker.asset");
+                AssetDatabase.CreateAsset(marker, tagSavePath);
+            }
+            else
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                savePath = Path.GetDirectoryName(path);
+            }
+
             var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
 
             CreateDefineScript(savePath, enumData);

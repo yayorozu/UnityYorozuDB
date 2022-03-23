@@ -10,7 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bb8fac3e39a4ad9b9e519a4a4c0e168, type: 3}
-  m_Name: YorozuDBSetting
+  m_Name: Marker
   m_EditorClassIdentifier: 
-  ScriptExportFolder: {fileID: 102900000, guid: efb1e424a77dd495a81f95760869fed5,
-    type: 3}

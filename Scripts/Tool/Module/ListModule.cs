@@ -10,9 +10,6 @@ namespace Yorozu.DB
     [Serializable]
     internal class ListModule : YorozuDBEditorModule
     {
-        [SerializeField]
-        private YorozuDBSetting _setting;
-
         internal event Action<int> SelectEvent;
 
         [SerializeField]
@@ -24,11 +21,6 @@ namespace Yorozu.DB
 
         internal void Initialize()
         {
-            if (_setting == null)
-            {
-                _setting = YorozuDBSetting.Load();
-            }
-
             if (_state == null)
                 _state = new TreeViewState();
 
@@ -78,30 +70,12 @@ namespace Yorozu.DB
 
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
             _treeView.OnGUI(rect);
-            
-            using (var check = new EditorGUI.ChangeCheckScope())
+
+            if (GUILayout.Button("Generate Script From Define"))
             {
-                EditorGUILayout.LabelField("Script Export Folder");
-                var newAsset = (DefaultAsset) EditorGUILayout.ObjectField(GUIContent.none, _setting.ScriptExportFolder, typeof(DefaultAsset), false);
-                if (check.changed && newAsset != null)
-                {
-                    var path = AssetDatabase.GetAssetPath(newAsset);
-                    if (AssetDatabase.IsValidFolder(path))
-                    {
-                        _setting.SetFolder(path);
-                    }
-                }
+                YorozuDBScriptGenerator.GenerateScript();
             }
-            
-            using (new EditorGUI.DisabledScope(_setting.ScriptExportFolder == null))
-            {
-                if (GUILayout.Button("Generate Script From Define"))
-                {
-                    var exportPath = AssetDatabase.GetAssetPath(_setting.ScriptExportFolder);
-                    YorozuDBScriptGenerator.GenerateScript(exportPath);
-                }
-            }
-            
+
             EditorGUILayout.Space(1);
             
             return false;
