@@ -1,0 +1,204 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f5c1270144844c19ff9555c0a89b070, type: 3}
+  m_Name: Data1
+  m_EditorClassIdentifier: 
+  Define: {fileID: 11400000, guid: 188a94d0632684ced9391cea7b260f2b, type: 2}
+  _fields:
+  - ID: 1
+    Data:
+    - String: 
+      Int: 100
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 101
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 102
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 103
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+  - ID: 2
+    Data:
+    - String: sada
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: b
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: d
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: c
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+  - ID: 4
+    Data:
+    - String: '{"x":1.0,"y":23.0,"z":0.0}'
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: '{"x":223.0,"y":0.0,"z":0.0}'
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+  - ID: 6
+    Data:
+    - String: 
+      Int: 2
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 1
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
