@@ -226,6 +226,7 @@ namespace Yorozu.DB
                     
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     
+                    rect.width = 200;
                     field.DefaultValue.DrawField(rect, field, GUIContent.none, _enumData);
                     
                     rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth, rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);

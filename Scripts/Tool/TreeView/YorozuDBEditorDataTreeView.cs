@@ -158,21 +158,21 @@ namespace Yorozu.DB.TreeView
 			    maxWidth = 28,
 		    };
             
-		    foreach (var (v, i) in fields.Select((v, i) => (v, i)))
+		    foreach (var (field, i) in fields.Select((v, i) => (v, i)))
 		    {
 			    columns[i + 1] = new MultiColumnHeaderState.Column()
 			    {
-				    headerContent = data.Define.IsKeyField(v) ? new GUIContent($"★ {v.Name}") : new GUIContent($"    {v.Name}"),
+				    headerContent = data.Define.IsKeyField(field) ? new GUIContent($"★ {field.Name}") : new GUIContent($"    {field.Name}"),
 				    headerTextAlignment = TextAlignment.Left,
-				    contextMenuText = v.DataType.ToString(),
+				    contextMenuText = field.DataType.ToString(),
 				    sortedAscending = true,
 				    sortingArrowAlignment = TextAlignment.Right,
-				    width = 150,
-				    minWidth = 150,
-				    maxWidth = 200,
+				    width = field.GetRectWidth(),
+				    minWidth = field.GetRectWidth(),
+				    maxWidth = field.GetRectWidth() + 50,
 				    autoResize = false,
 				    allowToggleVisibility = false,
-				    userData = v.ID,
+				    userData = field.ID,
 			    };
 		    }
             
@@ -198,8 +198,8 @@ namespace Yorozu.DB.TreeView
 		        return;
 	        
 	        var width = 16;
-	        headerRect.y = headerRect.height - EditorGUIUtility.singleLineHeight;  
-			headerRect.x += headerRect.width - width;
+	        headerRect.y += 1;
+			headerRect.x += headerRect.width - width - EditorGUIUtility.standardVerticalSpacing * 2;
 	        headerRect.width = width;
 	        headerRect.height = EditorGUIUtility.singleLineHeight;
 	        

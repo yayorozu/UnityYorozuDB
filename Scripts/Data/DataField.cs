@@ -43,5 +43,30 @@ namespace Yorozu.DB
         {
             EnumDefineId = typeId;
         }
+
+        internal float GetRectWidth()
+        {
+            switch (DataType)
+            {
+                case DataType.Int:
+                case DataType.Float:
+                case DataType.Bool:
+                    return 100;
+                case DataType.String:
+                case DataType.Sprite:
+                case DataType.GameObject:
+                case DataType.ScriptableObject:
+                case DataType.UnityObject:
+                case DataType.Enum:
+                    return 150;
+                case DataType.Vector2:
+                case DataType.Vector3:
+                case DataType.Vector2Int:
+                case DataType.Vector3Int:
+                    return 200;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
