@@ -36,11 +36,12 @@ namespace Yorozu.DB
         /// </summary>
         internal bool ValidKey() => DataType == DataType.Int || DataType == DataType.String || DataType == DataType.Enum;
 
+        [SerializeField]
+        internal DataContainer DefaultValue;
+
         internal DataField(int typeId)
         {
             EnumDefineId = typeId;
         }
-        
-        
     }
 }

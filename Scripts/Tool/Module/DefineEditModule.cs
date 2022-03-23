@@ -172,7 +172,7 @@ namespace Yorozu.DB
 
                     rect.x += rect.width;
                     
-                    rect.width = 150;
+                    rect.width = 130;
                     // リネーム状態だったら TextField を表示
                     if (_renameID == field.ID)
                     {
@@ -212,20 +212,23 @@ namespace Yorozu.DB
                     rect.width = 140;
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        field.DataType = (DataType) EditorGUI.EnumPopup(rect, GUIContent.none, field.DataType);
+                        if (field.DataType == DataType.Enum && _enumData != null)
+                        {
+                            var enumIndex = _enumData.Defines.FindIndex(d => d.ID == field.EnumDefineId);
+                            if (enumIndex >= 0)
+                                EditorGUI.LabelField(rect, $"Enum ({_enumData.Defines[enumIndex].Name})", EditorStyles.popup);
+                        }
+                        else
+                        {
+                            EditorGUI.LabelField(rect, field.DataType.ToString(), EditorStyles.popup);
+                        }
                     }
                     
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
-
-                    // Enum だったらどのEnumかを表示 
-                    if (field.DataType == DataType.Enum && _enumData != null)
-                    {
-                        var enumIndex = _enumData.Defines.FindIndex(d => d.ID == field.EnumDefineId);
-                        if (enumIndex >= 0)
-                            EditorGUI.LabelField(rect, _enumData.Defines[enumIndex].Name);
-                    }
                     
-                    rect.x = x + width - Style.RemoveButtonWidth;
+                    field.DefaultValue.DrawField(rect, field, GUIContent.none, _enumData);
+                    
+                    rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth, rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);
 
                     rect.width = Style.RemoveButtonWidth;
                     if (GUI.Button(rect, Style.Delete, Style.DeleteStyle))

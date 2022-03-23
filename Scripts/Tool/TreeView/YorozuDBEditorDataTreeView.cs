@@ -34,11 +34,6 @@ namespace Yorozu.DB.TreeView
         protected override TreeViewItem BuildRoot()
         {
 	        var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
-	        if (enumData != null)
-	        {
-				enumData.ResetEnumCache();
-	        }
-	        
 	        var root = _data.CreateTree(enumData);
 	        return root;
         }

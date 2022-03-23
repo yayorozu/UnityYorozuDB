@@ -26,6 +26,17 @@ namespace Yorozu.DB
         private UnityEngine.Object _unityObject;
         internal UnityEngine.Object UnityObject => _unityObject;
 
+        internal DataContainer Copy()
+        {
+            var copy = new DataContainer();
+            copy._string = _string;
+            copy._int = _int;
+            copy._float = _float;
+            copy._bool = _bool;
+            copy._unityObject = _unityObject;
+            return copy;
+        }
+
         internal void UpdateInt(int value)
         {
             _int = value;

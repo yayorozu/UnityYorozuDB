@@ -44,6 +44,7 @@ namespace Yorozu.DB
 
             var path = AssetDatabase.GUIDToAssetPath(findEnumAssetsGuids.First());
             var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
+            enumData.ResetEnumCache();
             return enumData;
         }
 

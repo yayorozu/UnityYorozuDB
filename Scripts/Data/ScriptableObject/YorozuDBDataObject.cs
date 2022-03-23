@@ -125,9 +125,10 @@ namespace Yorozu.DB
         /// </summary>
         internal void Add()
         {
-            foreach (var g in _fields)
+            foreach (var field in _fields)
             {
-                g.Data.Add(new DataContainer());
+                var targetField = Define.Fields.First(f => f.ID == field.ID);
+                field.Data.Add(targetField.DefaultValue.Copy());
             }
             this.Dirty();
         }
