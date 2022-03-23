@@ -92,6 +92,57 @@ namespace Yorozu.DB
             menu.ShowAsContext();
         }
 
+        protected override bool CanRename(TreeViewItem item)
+        {
+            // EnumじゃなかったらRename可
+            var asset = EditorUtility.InstanceIDToObject(item.id);
+            return asset.GetType() != typeof(YorozuDBEnumDataObject);
+        }
+
+        protected override void RenameEnded(RenameEndedArgs args)
+        {
+            if (!args.acceptedRename)
+                return;
+
+            if (string.IsNullOrEmpty(args.newName))
+                return;
+                    
+            if (args.newName == args.originalName)
+                return;
+            
+            // 同じ名前のアセット内科
+            var asset = EditorUtility.InstanceIDToObject(args.itemID);
+            var assetPath = AssetDatabase.GetAssetPath(asset);
+            var parentPath = System.IO.Path.GetDirectoryName(assetPath);
+            var guids = AssetDatabase.FindAssets("*", new[] {parentPath});
+            foreach (var path in guids.Select(AssetDatabase.GUIDToAssetPath))
+            {
+                if (!path.EndsWith(".asset"))
+                    continue;
+
+                var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+                // 前のやつ
+                if (fileName == args.originalName)
+                    continue;
+
+                // 新しい名前に一致するものがあったため無理
+                if (fileName == args.newName)
+                {
+                    Debug.LogError("file with the same name already exists.");
+                    return;
+                }
+            }
+            
+            // ここまで来たら許可
+            AssetDatabase.RenameAsset(assetPath, args.newName);
+
+            var item = FindItem(args.itemID, rootItem);
+            item.displayName = args.newName;
+            
+            EditorUtility.SetDirty(asset);
+            AssetDatabase.SaveAssets();
+        }
+
         protected override void SelectionChanged(IList<int> selectedIds)
         {
             SelectItemEvent?.Invoke(selectedIds.First());
