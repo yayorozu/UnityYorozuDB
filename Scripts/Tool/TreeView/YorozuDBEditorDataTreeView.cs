@@ -167,7 +167,7 @@ namespace Yorozu.DB.TreeView
 		    {
 			    columns[i + 1] = new MultiColumnHeaderState.Column()
 			    {
-				    headerContent = new GUIContent($"    {v.Name}"),
+				    headerContent = data.Define.IsKeyField(v) ? new GUIContent($"★ {v.Name}") : new GUIContent($"    {v.Name}"),
 				    headerTextAlignment = TextAlignment.Left,
 				    contextMenuText = v.DataType.ToString(),
 				    sortedAscending = true,
