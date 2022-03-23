@@ -129,6 +129,11 @@ namespace Yorozu.DB
                     }
                     break;
                 case DataType.Enum:
+                    if (enumData == null)
+                    {
+                        EditorGUI.LabelField(rect, "Enum Asset Not Found.");
+                        return;
+                    }
                     var enums = enumData.GetEnums(field.EnumDefineId);
                     var index = enumData.GetEnumIndex(field.EnumDefineId, _int);
                     using (var check = new EditorGUI.ChangeCheckScope())

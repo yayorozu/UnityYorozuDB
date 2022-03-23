@@ -124,9 +124,13 @@ namespace Yorozu.DB
                     
                     GUILayout.FlexibleSpace();
                     
-                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_name) || (_dataType == DataType.Enum && _enums == null && string.IsNullOrEmpty(_enumName))))
+                    using (new EditorGUI.DisabledScope(
+                               string.IsNullOrEmpty(_name) || 
+                               (_dataType == DataType.Enum && _enums == null) ||
+                               (_dataType == DataType.Enum && _enumData == null)
+                        ))
                     {
-                        if (GUILayout.Button("Add Field", Style.ButtonWidth))
+                        if (GUILayout.Button("Add", Style.ButtonWidth))
                         {
                             _data.AddField(_name, _dataType, _enumName);
                             _name = "";
