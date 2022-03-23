@@ -155,7 +155,7 @@ namespace Yorozu.DB
 
         protected override void DoubleClickedItem(int id)
         {
-            SelectItemEvent?.Invoke(id);
+             Selection.activeInstanceID = id;
         }
     }
 }
