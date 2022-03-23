@@ -7,7 +7,9 @@ namespace Yorozu.DB
 {
     internal class YorozuDBEditorWindow : EditorWindow
     {
-        [MenuItem("Tools/YorozuDB")]
+        internal const string MenuPath = "Tools/YorozuDB";
+        
+        [MenuItem(MenuPath)]
         private static void ShowWindow()
         {
             var window = GetWindow<YorozuDBEditorWindow>("YorozuDB");

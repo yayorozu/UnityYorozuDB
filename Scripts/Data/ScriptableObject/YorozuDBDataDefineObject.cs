@@ -125,7 +125,7 @@ namespace Yorozu.DB
         {
             if (GUILayout.Button("Open Editor"))
             {
-                // TODO 
+                UnityEditor.EditorApplication.ExecuteMenuItem(YorozuDBEditorWindow.MenuPath);
             }
         }
     }
