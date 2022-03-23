@@ -88,6 +88,7 @@ namespace Yorozu.DB
             _treeView.ResetRowEvent += ResetRow;
             _treeView.SortEvent += InsertItems;
             _treeView.AutoIdEvent += SetAutoId;
+            _treeView.SameIdEvent += SetSameId;
 
             _Initialized = true;
         }
@@ -107,6 +108,26 @@ namespace Yorozu.DB
             {
                 _data.GetData(keyField.ID, index).Int = incId++; 
             }
+            _data.Dirty();
+            Reload();
+        }
+
+        /// <summary>
+        /// 同じID振り分け
+        /// </summary>
+        private void SetSameId(IList<int> indexes)
+        {
+            var keyField = _data.Define.KeyField;
+            if (keyField == null)
+                return;
+            
+            var minIndex = indexes.Min();
+            var replaceId = _data.GetData(keyField.ID, minIndex).Int;
+            foreach (var index in indexes)
+            {
+                _data.GetData(keyField.ID, index).Int = replaceId; 
+            }
+            _data.Dirty();
             Reload();
         }
 
