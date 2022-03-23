@@ -42,6 +42,7 @@ namespace Yorozu.DB
                 ID = id;
             }
 
+#if UNITY_EDITOR
             internal void AddValue(string value)
             {
                 var key = 1;
@@ -61,6 +62,8 @@ namespace Yorozu.DB
             {
                 KeyValues.RemoveAt(index);
             }
+#endif
+            
         }
 
         /// <summary>
@@ -80,18 +83,7 @@ namespace Yorozu.DB
         [SerializeField]
         internal List<EnumDefine> Defines = new List<EnumDefine>();
 
-        /// <summary>
-        /// 探す
-        /// </summary>
-        internal EnumDefine Find(int defineId)
-        {
-            var index = Defines.FindIndex(d => d.ID == defineId);
-            if (index < 0)
-                return null;
-
-            return Defines[index];
-        }
-
+#if UNITY_EDITOR
         /// <summary>
         /// 追加 
         /// </summary>
@@ -207,7 +199,7 @@ namespace Yorozu.DB
             var index = Array.IndexOf(_valuesDictionary[id], value);
             return _keysDictionary[id][index];
         }
-        
+#endif
     }
     
 #if UNITY_EDITOR

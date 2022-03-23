@@ -9,4 +9,7 @@ namespace Yorozu.DB
     internal class YorozuDBScriptExportMarker : ScriptableObject
     {
     }
+    
+#if UNITY_EDITOR
+#endif
 }

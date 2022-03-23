@@ -39,6 +39,8 @@ namespace Yorozu.DB
         [SerializeField]
         internal DataContainer DefaultValue;
 
+#if UNITY_EDITOR
+        
         internal DataField(int typeId)
         {
             EnumDefineId = typeId;
@@ -68,5 +70,6 @@ namespace Yorozu.DB
                     throw new ArgumentOutOfRangeException();
             }
         }
+#endif
     }
 }

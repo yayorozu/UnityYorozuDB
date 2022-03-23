@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 
 namespace Yorozu.DB
@@ -8,3 +10,5 @@ namespace Yorozu.DB
         internal abstract bool OnGUI();
     }
 }
+
+#endif

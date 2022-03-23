@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Yorozu.DB.TreeView;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.IMGUI.Controls;
+#endif
 
 namespace Yorozu.DB
 { 
@@ -30,6 +33,7 @@ namespace Yorozu.DB
                 ID = fieldId;
             }
             
+#if UNITY_EDITOR
             /// <summary>
             /// 入れ替え
             /// </summary>
@@ -49,6 +53,8 @@ namespace Yorozu.DB
                 insertIndex -= frontRemoveCount;
                 Data.InsertRange(insertIndex, cache);
             }
+#endif
+            
         }
         
         /// <summary>
@@ -85,6 +91,7 @@ namespace Yorozu.DB
                 .First();
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// フィールドの追加
         /// </summary>
@@ -191,8 +198,10 @@ namespace Yorozu.DB
 
             return root;
         }
+#endif
     }
 
+#if UNITY_EDITOR
     [CustomEditor(typeof(YorozuDBDataObject))]
     internal class YorozuDBDataObjectEditor : Editor
     {
@@ -204,4 +213,6 @@ namespace Yorozu.DB
             }
         }
     }
+#endif
+    
 }
