@@ -68,7 +68,7 @@ namespace Yorozu.DB
             builder.AppendLine("namespace Yorozu.DB");
             builder.AppendLine("{");
             builder.Append($"    public class {data.name} : {nameof(DataAbstract)}");
-            var keyField = data.Fields.FirstOrDefault(data.IsKeyField);
+            var keyField = data.KeyField;
             if (keyField != null)
             {
                 builder.Append($", {GetInterfaceName(keyField.DataType)}");

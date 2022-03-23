@@ -11,6 +11,7 @@ namespace Yorozu.DB.TreeView
     {
 	    internal event Action<IList<int>> DeleteRowEvent;
 	    internal event Action<IList<int>> ResetRowEvent;
+	    internal event Action<IList<int>> AutoIdEvent;
 	    internal event Action<int, IList<int>> SortEvent;
 	    
 	    private YorozuDBDataObject _data;
@@ -59,6 +60,11 @@ namespace Yorozu.DB.TreeView
 	        var menu = new GenericMenu();
 	        menu.AddItem(new GUIContent("Delete"), false, () => DeleteRowEvent?.Invoke(GetSelection()));
 	        menu.AddItem(new GUIContent("Reset Row Value"), false, () => ResetRowEvent?.Invoke(GetSelection()));
+	        // KeyがInt だったらAutoInc有効にする
+	        if (_data.Define.KeyField != null && _data.Define.KeyField.DataType == DataType.Int)
+	        {
+		        menu.AddItem(new GUIContent("Assign sequential numbers from the first Key Number"), false, () => AutoIdEvent?.Invoke(GetSelection()));
+	        }
 	        menu.ShowAsContext();
         }
 

@@ -87,8 +87,27 @@ namespace Yorozu.DB
             _treeView.DeleteRowEvent += DeleteRow;
             _treeView.ResetRowEvent += ResetRow;
             _treeView.SortEvent += InsertItems;
+            _treeView.AutoIdEvent += SetAutoId;
 
             _Initialized = true;
+        }
+
+        /// <summary>
+        /// 選択したやつに最初のIDから順番に振り分けていく
+        /// </summary>
+        private void SetAutoId(IList<int> indexes)
+        {
+            var keyField = _data.Define.KeyField;
+            if (keyField == null)
+                return;
+            
+            var minIndex = indexes.Min();
+            var incId = Mathf.Max(_data.GetData(keyField.ID, minIndex).Int, 1);
+            foreach (var index in indexes)
+            {
+                _data.GetData(keyField.ID, index).Int = incId++; 
+            }
+            Reload();
         }
 
         /// <summary>

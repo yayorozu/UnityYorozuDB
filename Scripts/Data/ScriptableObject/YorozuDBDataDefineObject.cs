@@ -22,6 +22,8 @@ namespace Yorozu.DB
         private int _keyID;
         
         internal bool IsKeyField(DataField field) => field.ID == _keyID;
+
+        internal DataField KeyField => Fields.FirstOrDefault(IsKeyField);
         
 #if UNITY_EDITOR
         /// <summary>

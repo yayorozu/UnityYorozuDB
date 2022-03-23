@@ -17,22 +17,47 @@ MonoBehaviour:
   - ID: 1
     Data:
     - String: 
-      Int: 1
+      Int: 100
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
     - String: 
-      Int: 2
+      Int: 101
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
     - String: 
-      Int: 3
+      Int: 102
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
     - String: 
-      Int: 4
+      Int: 103
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
@@ -48,12 +73,37 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
+    - String: d
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
     - String: c
       Int: 0
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
-    - String: d
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
       Int: 0
       Float: 0
       Bool: 0
@@ -80,14 +130,16 @@ MonoBehaviour:
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
-  - ID: 5
-    Data:
     - String: 
       Int: 0
       Float: 0
       Bool: 0
-      UnityObject: {fileID: 1472306454991696, guid: 391f3f5af0de844219032b8bca26b069,
-        type: 3}
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
     - String: 
       Int: 0
       Float: 0
@@ -106,12 +158,37 @@ MonoBehaviour:
   - ID: 6
     Data:
     - String: 
-      Int: 0
+      Int: 2
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
     - String: 
       Int: 1
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
+      Float: 0
+      Bool: 0
+      UnityObject: {fileID: 0}
+    - String: 
+      Int: 0
       Float: 0
       Bool: 0
       UnityObject: {fileID: 0}
