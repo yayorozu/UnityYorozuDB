@@ -33,16 +33,6 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  - Name: EnumKey
-    DataType: 8
-    EnumDefineId: 1
-    ID: 6
-    DefaultValue:
-      _string: 
-      _int: 0
-      _float: 0
-      _bool: 0
-      _unityObject: {fileID: 0}
   - Name: Vector3Data
     DataType: 10
     EnumDefineId: 0

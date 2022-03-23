@@ -126,7 +126,7 @@ namespace Yorozu.DB
                     
                     using (new EditorGUI.DisabledScope(
                                string.IsNullOrEmpty(_name) || 
-                               (_dataType == DataType.Enum && _enums == null) ||
+                               (_dataType == DataType.Enum && _enums == null || _enums.Length <= 0) ||
                                (_dataType == DataType.Enum && _enumData == null)
                         ))
                     {

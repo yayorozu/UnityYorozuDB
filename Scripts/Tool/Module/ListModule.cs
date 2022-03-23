@@ -56,7 +56,7 @@ namespace Yorozu.DB
 
             if (!_hasEnum)
             {
-                if (GUILayout.Button("Create Data Enum Asset"))
+                if (GUILayout.Button("Create Enum Data Asset"))
                 {
                     if (YorozuDBEditorUtility.CreateEnumAsset())
                     {
