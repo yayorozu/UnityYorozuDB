@@ -63,6 +63,7 @@ namespace Yorozu.DB
         {
             _data = data;
             _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+            _reorderableList = null;
         }
 
         internal override bool OnGUI()
