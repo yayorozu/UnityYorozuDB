@@ -17,16 +17,40 @@ MonoBehaviour:
     DataType: 0
     EnumDefineId: 0
     ID: 1
+    DefaultValue:
+      _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
   - Name: Value
     DataType: 1
     EnumDefineId: 0
     ID: 2
+    DefaultValue:
+      _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
   - Name: EnumKey
     DataType: 8
     EnumDefineId: 1
     ID: 6
+    DefaultValue:
+      _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
   - Name: Vector3Data
     DataType: 10
     EnumDefineId: 0
     ID: 4
-  _keyID: 2
+    DefaultValue:
+      _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+  _keyID: 1
