@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Yorozu.DB;
@@ -13,6 +16,15 @@ public class YorozuDBSample : MonoBehaviour
     [SerializeField]
     private Button _button;
 
+    [SerializeField]
+    private InputField _inputField;
+
+    [SerializeField]
+    private Toggle _toggle;
+
+    [SerializeField]
+    private Text _findDataText;
+
     private void Awake()
     {
         YorozuDB.SetEnum(_enumData);
@@ -22,10 +34,33 @@ public class YorozuDBSample : MonoBehaviour
 
     private void Click()
     {
-        var data = YorozuDB.Find<SampleData>(Yorozu.DB.Sample.A);
-        if (data == null)
+        if (!int.TryParse(_inputField.text, out int key))
             return;
 
-        Debug.Log(data.ToString());
+        if (_toggle.isOn)
+        {
+             var finds = YorozuDB.FindMany<SampleData>(key);
+             var builder = new StringBuilder();
+             builder.AppendLine($"Find {finds.Count()} Data");
+             builder.AppendLine("");
+             foreach (var find in finds)
+             {
+                 builder.AppendLine(find.ToString());
+                 builder.AppendLine("");
+             }
+             _findDataText.text = builder.ToString();
+        }
+        else
+        {
+            YorozuDB.Find<SampleData>(key);
+            var data = YorozuDB.Find<SampleData>(key);
+            if (data == null)
+            {
+                _findDataText.text = "Not Found";
+                return;
+            }
+            
+            _findDataText.text = data.ToString();
+        }
     }
 }

@@ -23,7 +23,7 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  - Name: Value
+  - Name: Name
     DataType: 1
     EnumDefineId: 0
     ID: 2
@@ -33,10 +33,10 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  - Name: Vector3Data
-    DataType: 10
-    EnumDefineId: 0
-    ID: 4
+  - Name: Fruits
+    DataType: 8
+    EnumDefineId: 2
+    ID: 6
     DefaultValue:
       _string: 
       _int: 0

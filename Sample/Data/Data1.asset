@@ -61,54 +61,64 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
+    - _string: 
+      _int: 10
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
   - ID: 2
     Data:
-    - _string: 
+    - _string: Ringo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Mikan
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Budo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Ringo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Mikan
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Budo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: RIngo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Mikan
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-    - _string: 
+    - _string: Ichigo
       _int: 0
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  - ID: 4
+    - _string: remon
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+  - ID: 6
     Data:
     - _string: 
       _int: 0
@@ -116,7 +126,12 @@ MonoBehaviour:
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: 
-      _int: 0
+      _int: 2
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 3
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
@@ -126,7 +141,12 @@ MonoBehaviour:
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: 
-      _int: 0
+      _int: 2
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 3
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
@@ -136,22 +156,17 @@ MonoBehaviour:
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: 
-      _int: 0
+      _int: 2
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: 
-      _int: 0
+      _int: 4
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: 
-      _int: 0
-      _float: 0
-      _bool: 0
-      _unityObject: {fileID: 0}
-    - _string: 
-      _int: 0
+      _int: 5
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
