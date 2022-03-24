@@ -65,6 +65,7 @@ namespace Yorozu.DB
                 case DataType.Vector3:
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
+                case DataType.Color:
                     return 200;
                 default:
                     throw new ArgumentOutOfRangeException();

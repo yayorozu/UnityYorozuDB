@@ -24,5 +24,6 @@ namespace Yorozu.DB
         Vector3,
         Vector2Int,
         Vector3Int,
+        Color,
     }
 }

@@ -170,6 +170,19 @@ namespace Yorozu.DB
                         }
                     }
                     break;
+                case DataType.Color:
+                    var color = string.IsNullOrEmpty(_string) ? Color.white : GetFromString<Color>();
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        color = EditorGUI.ColorField(rect, content, color);
+                        if (check.changed)
+                        {
+                            SetToString(color);
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 #endif

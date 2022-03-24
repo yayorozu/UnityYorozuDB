@@ -66,5 +66,6 @@ namespace Yorozu.DB
         protected Vector3 Vector3(int fieldId) => Data(fieldId).GetFromString<Vector3>();
         protected Vector2Int Vector2Int(int fieldId) => Data(fieldId).GetFromString<Vector2Int>();
         protected Vector3Int Vector3Int(int fieldId) => Data(fieldId).GetFromString<Vector3Int>();
+        protected Color Color(int fieldId) => Data(fieldId).GetFromString<Color>();
     }
 }

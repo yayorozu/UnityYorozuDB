@@ -226,6 +226,7 @@ namespace Yorozu.DB
                 DataType.Vector2Int => "Vector3Int",
                 DataType.Vector3Int => "Vector3Int",
                 DataType.Enum => "int",
+                DataType.Color => "Color",
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
