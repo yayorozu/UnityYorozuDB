@@ -104,7 +104,18 @@ namespace Yorozu.DB
                     }
                     break;
                 case DataType.ScriptableObject:
+                    rect.width -= 40;
                     _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(UnityEngine.ScriptableObject), false);
+                    rect.x += rect.width;
+                    rect.width = 40;
+                    using (new EditorGUI.DisabledScope(_unityObject == null))
+                    {
+                        if (GUI.Button(rect, "Open"))
+                        {
+                            Selection.objects = new UnityEngine.Object[] {_unityObject};
+                            EditorApplication.ExecuteMenuItem("Assets/Properties...");
+                        }
+                    }
                     break;
                 case DataType.Vector2Int:
                     var vector2Int = GetFromString<Vector2Int>();
