@@ -47,7 +47,7 @@ namespace Yorozu.DB
             }
 
             var key = Int(fieldId);
-            var index = findDefine.KeyValues.FindIndex(kv => kv.Key == key);
+            var index = Mathf.Max(findDefine.KeyValues.FindIndex(kv => kv.Key == key), 0);
             return index;
         } 
         
