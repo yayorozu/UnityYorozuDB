@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Text;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Yorozu.DB;
@@ -8,10 +7,7 @@ using Yorozu.DB;
 public class YorozuDBSample : MonoBehaviour
 {
     [SerializeField]
-    private YorozuDBEnumDataObject _enumData;
-
-    [SerializeField]
-    private YorozuDBDataObject[] _data;
+    private YorozuDBDataLoader _loader;
 
     [SerializeField]
     private Button _button;
@@ -27,8 +23,7 @@ public class YorozuDBSample : MonoBehaviour
 
     private void Awake()
     {
-        YorozuDB.SetEnum(_enumData);
-        YorozuDB.SetData(_data);
+        _loader.Load();
         _button.onClick.AddListener(Click);
     }
 
