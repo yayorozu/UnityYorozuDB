@@ -95,14 +95,16 @@ namespace Yorozu.DB
                 var rect = GUILayoutUtility.GetRect(2, 2, 0, 100000);
                 EditorGUI.DrawRect(rect, SPLITTER_COLOR);
                 
-                EditorGUILayout.Space(3);
-
-                using (new EditorGUILayout.VerticalScope())
+                var module = GetRightModule();
+                if (module != null)
                 {
-                    var module = GetRightModule();
-                    if (module != null)
+                    EditorGUILayout.Space(3);
+
+                    using (new EditorGUILayout.VerticalScope())
+                    {
                         if (module.OnGUI())
                             Repaint();
+                    }
                 }
             }
         }
