@@ -57,7 +57,17 @@ namespace Yorozu.DB
         }
         
 #if UNITY_EDITOR
-        
+
+        private static class Style
+        {
+            internal static GUIContent OpenButton;
+
+            static Style()
+            {
+                OpenButton = EditorGUIUtility.TrIconContent("d_UnityEditor.InspectorWindow", "Open Properties");
+            }
+        }
+
         internal void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
             switch (field.DataType)
@@ -104,13 +114,13 @@ namespace Yorozu.DB
                     }
                     break;
                 case DataType.ScriptableObject:
-                    rect.width -= 40;
+                    rect.width -= 22;
                     _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(UnityEngine.ScriptableObject), false);
                     rect.x += rect.width;
-                    rect.width = 40;
+                    rect.width = 22;
                     using (new EditorGUI.DisabledScope(_unityObject == null))
                     {
-                        if (GUI.Button(rect, "Open"))
+                        if (GUI.Button(rect, Style.OpenButton))
                         {
                             Selection.objects = new UnityEngine.Object[] {_unityObject};
                             EditorApplication.ExecuteMenuItem("Assets/Properties...");
