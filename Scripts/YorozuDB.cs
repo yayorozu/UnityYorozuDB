@@ -127,5 +127,20 @@ namespace Yorozu.DB
         {
             return FindMany<T>(key.GetHashCode(), int.MaxValue);
         }
+
+        /// <summary>
+        /// 全データを取得
+        /// </summary>
+        public static IEnumerable<T> All<T>() where T : DataAbstract
+        {
+            var type = typeof(T);
+            if (!_data.TryGetValue(type, out var list))
+                return new List<T>();
+            
+            if (list.Count <= 0)
+                return new List<T>();
+
+            return _data[type].Cast<T>();
+        }
     }
 }
