@@ -13,11 +13,17 @@ MonoBehaviour:
   m_Name: Enum
   m_EditorClassIdentifier: 
   Defines:
-  - Name: Kind
-    ID: 1
-    KeyValues: []
-    Description: 
   - Name: Fruits
     ID: 2
-    KeyValues: []
+    KeyValues:
+    - Key: 1
+      Value: Apple
+    - Key: 2
+      Value: Orange
+    - Key: 3
+      Value: Grape
+    - Key: 4
+      Value: Strawberry
+    - Key: 5
+      Value: Lemon
     Description: 

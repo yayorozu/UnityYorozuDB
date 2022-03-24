@@ -172,8 +172,7 @@ namespace Yorozu.DB
 
                     if (GUI.Button(rect, Style.AddContent, Style.AddStyle))
                     {
-                        define.AddValue("");
-                        _data.Dirty();
+                        _data.AddValue(define.ID, "");
                     }
                 },
                 drawElementCallback = (rect, index, isActive, isFocused) =>
@@ -196,8 +195,7 @@ namespace Yorozu.DB
                     rect.width = Style.ButtonWidth;
                     if (GUI.Button(rect, Style.SubContent, Style.AddStyle))
                     {
-                        define.RemoveAt(index);
-                        _data.Dirty();
+                        _data.RemoveValue(define.ID, index);
                     }
                 },
      

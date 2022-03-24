@@ -41,29 +41,6 @@ namespace Yorozu.DB
                 Name = name;
                 ID = id;
             }
-
-#if UNITY_EDITOR
-            internal void AddValue(string value)
-            {
-                var key = 1;
-                if (KeyValues.Any())
-                {
-                    key = KeyValues.Max(v => v.Key) + 1;
-                }
-                
-                KeyValues.Add(new KeyValue()
-                {
-                    Key = key,
-                    Value = value,
-                });
-            }
-            
-            internal void RemoveAt(int index)
-            {
-                KeyValues.RemoveAt(index);
-            }
-#endif
-            
         }
 
         /// <summary>
@@ -73,7 +50,9 @@ namespace Yorozu.DB
         [Serializable]
         internal class KeyValue
         {
+            [SerializeField]
             internal int Key;
+            [SerializeField]
             internal string Value;
         }
 
@@ -84,6 +63,7 @@ namespace Yorozu.DB
         internal List<EnumDefine> Defines = new List<EnumDefine>();
 
 #if UNITY_EDITOR
+        
         /// <summary>
         /// 追加 
         /// </summary>
@@ -137,6 +117,36 @@ namespace Yorozu.DB
             {
                 this.Dirty();
             }
+        }
+        
+        internal void AddValue(int defineId, string value)
+        {
+            var index = Defines.FindIndex(d => d.ID == defineId);
+            if (index < 0)
+                return;
+            
+            var key = 1;
+            if (Defines[index].KeyValues.Any())
+            {
+                key = Defines[index].KeyValues.Max(v => v.Key) + 1;
+            }
+                
+            Defines[index].KeyValues.Add(new KeyValue()
+            {
+                Key = key,
+                Value = value,
+            });
+            this.Dirty();
+        }
+        
+        internal void RemoveValue(int defineId, int removeIndex)
+        {
+            var index = Defines.FindIndex(d => d.ID == defineId);
+            if (index < 0)
+                return;
+            
+            Defines[index].KeyValues.RemoveAt(removeIndex);
+            this.Dirty();
         }
 
         /// <summary>
