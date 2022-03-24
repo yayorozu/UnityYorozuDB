@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Yorozu.DB
 {
-    public class SampleData : DataAbstract, IIntKey
+    public partial class SampleData : DataAbstract, IIntKey
     {
         int IIntKey.Key => (int)Key;
 

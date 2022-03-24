@@ -64,6 +64,14 @@ namespace Yorozu.DB
                 AssetDatabase.CreateFolder(savePath, "Define");
             }
             
+            // いじれるクラス
+            var customPath = Path.Combine(savePath, "Custom");
+            // ディレクトリ作成
+            if (!AssetDatabase.IsValidFolder(customPath))
+            {
+                AssetDatabase.CreateFolder(savePath, "Custom");
+            }
+            
             foreach (var data in assets)
             {
                 var exportPath = Path.Combine(definePath, $"{data.ClassName}.cs");
@@ -71,6 +79,15 @@ namespace Yorozu.DB
                 using (StreamWriter writer = new StreamWriter(exportPath, false))
                 {
                     writer.WriteLine(DataScriptString(data, enumData));
+                }
+                
+                var customExportPath = Path.Combine(customPath, $"{data.ClassName}.cs");
+                if (System.IO.File.Exists(customExportPath))
+                    continue;
+                
+                using (StreamWriter writer = new StreamWriter(customExportPath, false))
+                {
+                    writer.WriteLine(CustomDataScriptString(data));
                 }
             }    
         }
@@ -90,7 +107,7 @@ namespace Yorozu.DB
             
             builder.AppendLine("namespace Yorozu.DB");
             builder.AppendLine("{");
-            builder.Append($"    public class {data.ClassName} : {nameof(DataAbstract)}");
+            builder.Append($"    public partial class {data.ClassName} : {nameof(DataAbstract)}");
             var keyField = data.KeyField;
             if (keyField != null)
             {
@@ -162,6 +179,19 @@ namespace Yorozu.DB
                 }
             }
 
+            return builder.ToString();
+        }
+        
+        private static string CustomDataScriptString(YorozuDBDataDefineObject data)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("namespace Yorozu.DB");
+            builder.AppendLine("{");
+            builder.AppendLine($"    public partial class {data.ClassName}");
+            builder.AppendLine("    {");
+            builder.AppendLine("    }");
+            builder.AppendLine("}");
+            
             return builder.ToString();
         }
 
