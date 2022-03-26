@@ -151,6 +151,10 @@ namespace Yorozu.DB
             // 複数データがあれば許可しない\
             using (new EditorGUI.DisabledScope(_relativeDataCount > 1))
             {
+                if (_relativeDataCount > 1)
+                {
+                    EditorGUILayout.HelpBox("To Use The Extend, The Number Of Data Must Be Set To 1", MessageType.Info);
+                }
                 _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Extend Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
             }
             if (_extendReorderableList.count > 0)

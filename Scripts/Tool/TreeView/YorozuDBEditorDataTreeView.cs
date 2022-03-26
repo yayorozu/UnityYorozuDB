@@ -305,7 +305,7 @@ namespace Yorozu.DB.TreeView
 			if (!elementProp.isExpanded)
 				elementProp.isExpanded = true;
 			
-		    EditorGUI.PropertyField(rect, elementProp, GUIContent.none, false);
+		    EditorGUI.PropertyField(rect, elementProp, GUIContent.none, true);
 		    _editor.serializedObject.ApplyModifiedProperties();
 	    }
     }
