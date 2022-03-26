@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -140,6 +141,18 @@ namespace Yorozu.DB
                 }
                 builder.AppendLine("");
             }
+
+            if (data.ExtendFieldsObject != null)
+            {
+                var extendType = data.ExtendFieldsObject.GetType(); 
+                builder.AppendLine($"        // Extend Fields");
+                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                foreach (var field in fields)
+                {
+                    builder.AppendLine($"        public {field.FieldType.GetArrayType().FullName} {field.Name} => Extend<{extendType.FullName}>().{field.Name}[row];");
+                    builder.AppendLine("");
+                }
+            }
             
             builder.AppendLine("        public override string ToString()");
             builder.AppendLine("        {");
@@ -160,6 +173,16 @@ namespace Yorozu.DB
                         break;
                 }
             }
+
+            if (data.ExtendFieldsObject != null)
+            {
+                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                foreach (var field in fields)
+                {
+                    builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");   
+                }
+            }
+
             builder.AppendLine("            return builder.ToString();");
             builder.AppendLine("        }");
             builder.AppendLine("    }");

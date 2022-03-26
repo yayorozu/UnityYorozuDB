@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -11,11 +12,21 @@ namespace Yorozu.DB
         /// </summary>
         private YorozuDBDataObject _data;
 
+        /// <summary>
+        /// 拡張を参照する際にはこれから
+        /// </summary>
+        protected T Extend<T>() where T : ScriptableObject
+        {
+            return _data.Define.ExtendFieldsObject as T;
+        }
+
         private YorozuDBEnumDataObject _enumData => YorozuDB.EnumData;
         /// <summary>
         /// 何行目のデータか
         /// </summary>
         private int _row;
+
+        protected int row => _row;
         
         internal void SetUp(YorozuDBDataObject data, int row)
         {
