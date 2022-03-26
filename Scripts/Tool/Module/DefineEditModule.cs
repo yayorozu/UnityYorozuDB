@@ -302,7 +302,7 @@ namespace Yorozu.DB
                     rect.y += 2;
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        EditorGUI.LabelField(rect, fields[index].FieldType.GetArrayType().Name, EditorStyles.popup);
+                        EditorGUI.LabelField(rect, fields[index].FieldType.GetArrayType().ConvertGenerateString(false), EditorStyles.popup);
                     }
                 },
      
