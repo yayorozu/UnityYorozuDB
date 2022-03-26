@@ -189,19 +189,37 @@ namespace Yorozu.DB.TreeView
 				    userData = field.ID,
 			    };
 		    }
-
+		    
+		    // 今定義されてないやつは全部消す
+		    data.Define.ExtendFieldWidths.RemoveAll(v => !addFields.Select(f => f.Name).Contains(v.Name));
+		    
 		    var index = fields.Count + 1;
 		    foreach (var (value, i) in addFields.Select((v, i) => (v, i)))
 		    {
+			    var widthIndex = data.Define.ExtendFieldWidths.FindIndex(v => v.Name == value.Name);
+			    var width = 150f;
+			    if (widthIndex < 0)
+			    {
+				    data.Define.ExtendFieldWidths.Add(new YorozuDBDataDefineObject.ExtendFieldWidth()
+				    {
+					    Name = value.Name,
+					    Width = width,
+				    });
+			    }
+			    else
+			    {
+					width = data.Define.ExtendFieldWidths[widthIndex].Width;
+			    }
+			    
 			    columns[index + i] = new MultiColumnHeaderState.Column()
 			    {
 				    headerContent = new GUIContent($"    {value.Name}"),
 				    headerTextAlignment = TextAlignment.Left,
 				    sortedAscending = true,
 				    sortingArrowAlignment = TextAlignment.Right,
-				    width = 200,
-				    minWidth = 200,
-				    maxWidth = 200 + 50,
+				    width = width,
+				    minWidth = 50,
+				    maxWidth = 500,
 				    autoResize = false,
 				    allowToggleVisibility = false,
 				    userData = -1,

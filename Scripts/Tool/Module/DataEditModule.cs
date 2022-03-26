@@ -109,10 +109,20 @@ namespace Yorozu.DB
             // Extend
             if (index >= _data.Define.Fields.Count)
             {
+                index -= _data.Define.Fields.Count;
+                var fields = YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
+                var widthIndex = _data.Define.ExtendFieldWidths.FindIndex(v => v.Name == fields[index].Name);
+                if (widthIndex >= 0)
+                {
+                    if (Math.Abs(_data.Define.ExtendFieldWidths[widthIndex].Width - width) > 10f)
+                    {
+                        _data.Define.ExtendFieldWidths[widthIndex].Width = width;
+                    }
+                }
                 return;
             }
 
-            if (Math.Abs(_data.Define.Fields[index].GUIWidth - width) > 1f)
+            if (Math.Abs(_data.Define.Fields[index].GUIWidth - width) > 10f)
             {
                 _data.Define.Fields[index].GUIWidth = width;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -35,6 +36,23 @@ namespace Yorozu.DB
         internal DataField KeyField => Fields.FirstOrDefault(IsKeyField);
         
 #if UNITY_EDITOR
+
+        [Serializable]
+        internal class ExtendFieldWidth
+        {
+            [SerializeField]
+            internal string Name;
+
+            [SerializeField]
+            internal float Width = 150;
+        }
+
+        /// <summary>
+        /// 拡張オブジェクトの幅をキャッシュ
+        /// </summary>
+        [SerializeField]
+        internal List<ExtendFieldWidth> ExtendFieldWidths = new List<ExtendFieldWidth>();
+
         /// <summary>
         /// Primary を変更
         /// </summary>
