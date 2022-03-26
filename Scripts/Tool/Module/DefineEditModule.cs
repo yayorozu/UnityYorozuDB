@@ -1,7 +1,9 @@
 #if UNITY_EDITOR
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -60,23 +62,26 @@ namespace Yorozu.DB
         private static readonly string EditorField = "EditorField";
 
         private ReorderableList _reorderableList;
+        private ReorderableList _extendReorderableList;
+        private int _relativeDataCount;
         
         internal void SetData(YorozuDBDataDefineObject data)
         {
             _data = data;
             _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
             _reorderableList = null;
+            _extendReorderableList = null;
+            var dataAssets= YorozuDBEditorUtility.LoadAllDataAsset(_data);
+            _relativeDataCount = dataAssets.Length;
         }
 
         internal override bool OnGUI()
         {
             if (_data == null)
                 return false;
-
-            if (_reorderableList == null)
-            {
-                _reorderableList = CreateReorderableList(_data);
-            }
+            
+            _reorderableList ??= CreateReorderableList(_data);
+            _extendReorderableList ??= CreateExtendReorderableList(_data);
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -105,7 +110,7 @@ namespace Yorozu.DB
                         }
                     }
                 }
-
+                
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     // enumなら候補を表示
@@ -141,6 +146,25 @@ namespace Yorozu.DB
             }
 
             _reorderableList.DoLayoutList();
+            
+            GUILayout.Space(20);
+            // 複数データがあれば許可しない\
+            using (new EditorGUI.DisabledScope(_relativeDataCount > 1))
+            {
+                if (_relativeDataCount > 1)
+                {
+                    EditorGUILayout.HelpBox("To Use The Extend, The Number Of Data Must Be Set To 1", MessageType.Info);
+                }
+                _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Extend Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
+            }
+            if (_extendReorderableList.count > 0)
+            {
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    _extendReorderableList.DoLayoutList();
+                }
+            }
+
             if (_repaint)
             {
                 _repaint = false;
@@ -247,6 +271,38 @@ namespace Yorozu.DB
                             _data.RemoveField(field.ID);
                             _repaint = true;
                         }
+                    }
+                },
+     
+                drawFooterCallback = rect => { },
+                footerHeight = 0f,
+            };
+        }
+
+        private ReorderableList CreateExtendReorderableList(YorozuDBDataDefineObject data)
+        {
+            var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+            if (fields.Count <= 0)
+                return new ReorderableList(new List<int>(), typeof(int));
+            
+            return new ReorderableList(fields, typeof(DataField), true, true, false, false)
+            {
+                headerHeight = 0f,
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    if (fields.Count <= index)
+                        return;
+
+                    rect.x += 20;
+                    rect.width = 130;
+                    EditorGUI.LabelField(rect, fields[index].Name);
+
+                    rect.x += rect.width;
+                    rect.width = 140;
+                    rect.y += 2;
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        EditorGUI.LabelField(rect, fields[index].FieldType.GetArrayType().ConvertGenerateString(false), EditorStyles.popup);
                     }
                 },
      

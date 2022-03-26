@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -140,6 +141,18 @@ namespace Yorozu.DB
                 }
                 builder.AppendLine("");
             }
+
+            if (data.ExtendFieldsObject != null)
+            {
+                var extendType = data.ExtendFieldsObject.GetType(); 
+                builder.AppendLine($"        // Extend Fields");
+                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                foreach (var field in fields)
+                {
+                    builder.AppendLine($"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name} => Extend<{extendType.FullName}>().{field.Name}[row];");
+                    builder.AppendLine("");
+                }
+            }
             
             builder.AppendLine("        public override string ToString()");
             builder.AppendLine("        {");
@@ -160,6 +173,16 @@ namespace Yorozu.DB
                         break;
                 }
             }
+
+            if (data.ExtendFieldsObject != null)
+            {
+                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                foreach (var field in fields)
+                {
+                    builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");   
+                }
+            }
+
             builder.AppendLine("            return builder.ToString();");
             builder.AppendLine("        }");
             builder.AppendLine("    }");
@@ -259,6 +282,49 @@ namespace Yorozu.DB
                 DataType.Color => "Color",
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
+        }
+        
+        
+        /// <summary>
+        /// 生成用の名前に変換
+        /// </summary>
+        internal static string ConvertGenerateString(this Type type, bool isFull = true)
+        {
+            if (type == typeof(bool))
+                return "bool";
+            if (type == typeof(byte))
+                return "byte";
+            if (type == typeof(char))
+                return "char";
+            if (type == typeof(decimal))
+                return "decimal";
+            if (type == typeof(double))
+                return "double";
+            if (type == typeof(float))
+                return "float";
+            if (type == typeof(int))
+                return "int";
+            if (type == typeof(long))
+                return "long";
+            if (type == typeof(object))
+                return "object";
+            if (type == typeof(sbyte))
+                return "sbyte";
+            if (type == typeof(short))
+                return "short";
+            if (type == typeof(string))
+                return "string";
+            if (type == typeof(uint))
+                return "uint";
+            if (type == typeof(ulong))
+                return "ulong";
+            if (type == typeof(ushort))
+                return "ushort";
+            
+            if (isFull)
+                return type.FullName.Replace("+", ".");
+            
+            return type.Name.Replace("+", ".");
         }
     }
 }
