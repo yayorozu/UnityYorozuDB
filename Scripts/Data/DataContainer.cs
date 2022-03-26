@@ -68,6 +68,9 @@ namespace Yorozu.DB
             }
         }
 
+        [NonSerialized]
+        private Editor _editor;
+        
         internal void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
             switch (field.DataType)
@@ -85,6 +88,9 @@ namespace Yorozu.DB
                     _bool = EditorGUI.Toggle(rect, content, _bool);
                     break;
                 case DataType.Sprite:
+                    // 18以上あるとUI変わってしまうので大きかったら小さくする
+                    if (rect.height >= 18)
+                        rect.height = 17.9f;
                     _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(Sprite), false);
                     break;
                 case DataType.GameObject:

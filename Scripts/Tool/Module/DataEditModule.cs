@@ -26,6 +26,14 @@ namespace Yorozu.DB
         private bool _Initialized;
 
         private YorozuDBEditorDataTreeView _treeView;
+        private int _fieldCount;
+        
+        internal void SetData(object param)
+        {
+            _data = param as YorozuDBDataObject;
+            Reload();
+            InitIfNeeded();
+        }
 
         internal override bool OnGUI()
         {
@@ -40,11 +48,11 @@ namespace Yorozu.DB
                 
                 GUILayout.FlexibleSpace();
 
-                using (new EditorGUI.DisabledScope(_data.Define.Fields.Count <= 0))
+                using (new EditorGUI.DisabledScope(_fieldCount <= 0))
                 {
                     if (GUILayout.Button("Add Row", EditorStyles.toolbarButton))
                     {
-                        _data.Add();
+                        _data.AddRow();
                         Reload();
                         return true;
                     }
@@ -58,13 +66,6 @@ namespace Yorozu.DB
         }
 
         private void Reload() => _Initialized = false;
-
-        internal void SetData(object param)
-        {
-            _data = param as YorozuDBDataObject;
-            Reload();
-            InitIfNeeded();
-        }
 
         void InitIfNeeded()
         {
@@ -91,6 +92,12 @@ namespace Yorozu.DB
             _treeView.SortEvent += InsertItems;
             _treeView.AutoIdEvent += SetAutoId;
             _treeView.SameIdEvent += SetSameId;
+            
+            var fields =YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
+            _fieldCount = _data.Define.Fields.Count + fields.Count;
+            
+            // 足りない分の補充
+            YorozuDBExtendUtility.FitFieldsSize(_data.Define.ExtendFieldsObject, _data.DataCount);
 
             _Initialized = true;
         }
@@ -182,12 +189,7 @@ namespace Yorozu.DB
             var text = string.Join(',', indexes);
             if (EditorUtility.DisplayDialog("Warning", $"Can Delete row [{text}]?", "YES", "NO"))
             {
-                // 降順にして消す
-                foreach (var index in indexes.OrderByDescending(v => v))
-                {
-                    _data.RemoveRow(index);
-                }
-
+                _data.RemoveRows(indexes.OrderByDescending(v => v));
                 Reload();
             }
         }

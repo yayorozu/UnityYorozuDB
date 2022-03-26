@@ -74,7 +74,11 @@ namespace Yorozu.DB
             get
             {
                 if (_fields == null || !_fields.Any())
-                    return 0;
+                {
+                    // こっちの定義がない場合は拡張側を見る
+                    var extendCount = YorozuDBExtendUtility.DataCount(Define.ExtendFieldsObject);
+                    return extendCount;
+                }
 
                 return _fields[0].Data.Count;
             }
@@ -130,12 +134,18 @@ namespace Yorozu.DB
         /// <summary>
         /// データの追加
         /// </summary>
-        internal void Add()
+        internal void AddRow()
         {
             foreach (var field in _fields)
             {
                 var targetField = Define.Fields.First(f => f.ID == field.ID);
                 field.Data.Add(targetField.DefaultValue.Copy());
+            }
+
+            // 対象のフィールド追加
+            if (Define.ExtendFieldsObject != null)
+            {
+                YorozuDBExtendUtility.AddFields(Define.ExtendFieldsObject);
             }
             this.Dirty();
         }
@@ -143,12 +153,17 @@ namespace Yorozu.DB
         /// <summary>
         /// データの削除
         /// </summary>
-        internal void RemoveRow(int index)
+        internal void RemoveRows(IOrderedEnumerable<int> descIndexes)
         {
             foreach (var g in _fields)
             {
-                g.Data.RemoveAt(index);
+                foreach (var index in descIndexes)
+                {
+                    g.Data.RemoveAt(index);
+                }
             }
+            
+            YorozuDBExtendUtility.RemoveFields(Define.ExtendFieldsObject, descIndexes);
             this.Dirty();
         }
 
@@ -182,20 +197,13 @@ namespace Yorozu.DB
         internal TreeViewItem CreateTree(YorozuDBEnumDataObject enumData)
         {
             var root = new TreeViewItem(-1, -1, "root");
-            if (Define.Fields.Any())
+            
+            for (var i = 0; i < DataCount; i++)
             {
-                for (var i = 0; i < DataCount; i++)
-                {
-                    var item = new YorozuDBEditorTreeViewItem(i, enumData);
-                    foreach (var f in Define.Fields)
-                    {
-                        item.AddData(f, GetData(f.ID, i));
-                    }
-                    
-                    root.AddChild(item);
-                }
+                var item = new YorozuDBEditorTreeViewItem(i, this, enumData);
+                root.AddChild(item);
             }
-
+            
             return root;
         }
 #endif

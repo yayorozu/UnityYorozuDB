@@ -48,19 +48,7 @@ namespace Yorozu.DB
             return enumData;
         }
 
-        internal static void Dirty(this YorozuDBDataDefineObject asset)
-        {
-            EditorUtility.SetDirty(asset);
-            AssetDatabase.SaveAssets();
-        }
-        
-        internal static void Dirty(this YorozuDBDataObject asset)
-        {
-            EditorUtility.SetDirty(asset);
-            AssetDatabase.SaveAssets();
-        }
-        
-        internal static void Dirty(this YorozuDBEnumDataObject asset)
+        internal static void Dirty(this ScriptableObject asset)
         {
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssets();

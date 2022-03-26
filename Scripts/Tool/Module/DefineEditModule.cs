@@ -1,7 +1,9 @@
 #if UNITY_EDITOR
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -60,23 +62,26 @@ namespace Yorozu.DB
         private static readonly string EditorField = "EditorField";
 
         private ReorderableList _reorderableList;
+        private int _relativeDataCount;
+        private List<FieldInfo> _additionalFields;
         
         internal void SetData(YorozuDBDataDefineObject data)
         {
             _data = data;
             _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
             _reorderableList = null;
+            _additionalFields = null;
+            var dataAssets= YorozuDBEditorUtility.LoadAllDataAsset(_data);
+            _relativeDataCount = dataAssets.Length;
         }
 
         internal override bool OnGUI()
         {
             if (_data == null)
                 return false;
-
-            if (_reorderableList == null)
-            {
-                _reorderableList = CreateReorderableList(_data);
-            }
+            
+            _additionalFields ??= YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
+            _reorderableList ??= CreateReorderableList(_data);
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -105,7 +110,7 @@ namespace Yorozu.DB
                         }
                     }
                 }
-
+                
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     // enumなら候補を表示
@@ -141,6 +146,18 @@ namespace Yorozu.DB
             }
 
             _reorderableList.DoLayoutList();
+            
+            // 複数データがあれば許可しない\
+            using (new EditorGUI.DisabledScope(_relativeDataCount > 1))
+            {
+                _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Custom Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
+            }
+
+            foreach (var fieldInfo in _additionalFields)
+            {
+                EditorGUILayout.LabelField($"{fieldInfo.Name} {fieldInfo.FieldType.GetArrayType()}");
+            }
+            
             if (_repaint)
             {
                 _repaint = false;

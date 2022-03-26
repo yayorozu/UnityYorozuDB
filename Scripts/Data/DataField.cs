@@ -21,7 +21,6 @@ namespace Yorozu.DB
         /// <summary>
         /// Enum のときにどれと紐付いているのか判定するよう
         /// </summary>
-        [FormerlySerializedAs("DataTypeId")]
         [SerializeField]
         internal int EnumDefineId;
 
@@ -30,6 +29,12 @@ namespace Yorozu.DB
         /// </summary>
         [SerializeField]
         internal int ID;
+
+        /// <summary>
+        /// GUIで利用するカラムの幅
+        /// </summary>
+        [SerializeField]
+        internal float GUIWidth = 150;
         
         /// <summary>
         /// Keyとして有効かどうか
@@ -45,32 +50,7 @@ namespace Yorozu.DB
         {
             EnumDefineId = typeId;
         }
-
-        internal float GetRectWidth()
-        {
-            switch (DataType)
-            {
-                case DataType.Int:
-                case DataType.Float:
-                case DataType.Bool:
-                    return 100;
-                case DataType.String:
-                case DataType.Sprite:
-                case DataType.GameObject:
-                case DataType.ScriptableObject:
-                case DataType.UnityObject:
-                case DataType.Enum:
-                    return 150;
-                case DataType.Vector2:
-                case DataType.Vector3:
-                case DataType.Vector2Int:
-                case DataType.Vector3Int:
-                case DataType.Color:
-                    return 200;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        
 #endif
     }
 }

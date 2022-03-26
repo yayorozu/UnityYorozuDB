@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Yorozu.DB
 {
@@ -12,8 +13,15 @@ namespace Yorozu.DB
         [SerializeField]
         private List<DataField> _fields = new List<DataField>();
 
-        internal List<DataField> Fields => _fields;
+        /// <summary>
+        /// 追加でここに定義されている IList のフィールドをそのまま利用できるようにする
+        /// その際には複数のデータを作成することはできない
+        /// </summary>
+        [SerializeField]
+        internal ScriptableObject ExtendFieldsObject;
 
+        internal List<DataField> Fields => _fields;
+        
         internal string ClassName => name.Replace("Define", "");
         
         /// <summary>
