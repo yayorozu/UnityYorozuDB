@@ -10,8 +10,9 @@ namespace Yorozu.DB
     /// </summary>
     internal class YorozuDBDataDefineObject : ScriptableObject
     {
+        [FormerlySerializedAs("_fields")]
         [SerializeField]
-        private List<DataField> _fields = new List<DataField>();
+        internal List<DataField> Fields = new List<DataField>();
 
         /// <summary>
         /// 追加でここに定義されている IList のフィールドをそのまま利用できるようにする
@@ -20,8 +21,6 @@ namespace Yorozu.DB
         [SerializeField]
         internal ScriptableObject ExtendFieldsObject;
 
-        internal List<DataField> Fields => _fields;
-        
         internal string ClassName => name.Replace("Define", "");
         
         /// <summary>
@@ -54,13 +53,13 @@ namespace Yorozu.DB
         /// </summary>
         internal void AddField(string name, DataType dataType, string enumName)
         {
-            if (!YorozuDBEditorUtility.NameValidator(_fields, name, out name))
+            if (!YorozuDBEditorUtility.NameValidator(Fields, name, out name))
                 return;
 
             var fieldId = 1;
-            if (_fields.Any())
+            if (Fields.Any())
             {
-                fieldId = _fields.Max(f => f.ID) + 1;
+                fieldId = Fields.Max(f => f.ID) + 1;
             }
 
             var typeId = 0;
@@ -81,7 +80,7 @@ namespace Yorozu.DB
                 DataType = dataType,
             };
 
-            _fields.Add(field);
+            Fields.Add(field);
 
             // 依存するデータにフィールド追加
             var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
@@ -98,13 +97,13 @@ namespace Yorozu.DB
         /// </summary>
         internal void RenameField(int fieldId, string newName)
         {
-            if (!YorozuDBEditorUtility.NameValidator(_fields, newName, out newName))
+            if (!YorozuDBEditorUtility.NameValidator(Fields, newName, out newName))
                 return;
             
-            var index = _fields.FindIndex(f => f.ID == fieldId);
+            var index = Fields.FindIndex(f => f.ID == fieldId);
             if (index >= 0)
             {
-                _fields[index].Name = newName;
+                Fields[index].Name = newName;
             }
             
             this.Dirty();
@@ -116,7 +115,7 @@ namespace Yorozu.DB
         internal void RemoveField(int fieldId)
         {
             // 削除
-            _fields.RemoveAll(g => g.ID == fieldId);
+            Fields.RemoveAll(g => g.ID == fieldId);
             var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
             foreach (var asset in assets)
             {
