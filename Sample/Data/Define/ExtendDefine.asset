@@ -10,42 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6006ac978ac407492d83659d60675fd, type: 3}
-  m_Name: SampleDataDefine
+  m_Name: ExtendDefine
   m_EditorClassIdentifier: 
   Fields:
-  - Name: Key
+  - Name: Id
     DataType: 0
     EnumDefineId: 0
     ID: 1
-    GUIWidth: 100
+    GUIWidth: 116
     DefaultValue:
       _string: 
-      _int: 0
+      _int: 1
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  - Name: Name
-    DataType: 1
-    EnumDefineId: 0
-    ID: 2
-    GUIWidth: 100
-    DefaultValue:
-      _string: 
-      _int: 0
-      _float: 0
-      _bool: 0
-      _unityObject: {fileID: 0}
-  - Name: Fruits
-    DataType: 8
-    EnumDefineId: 2
-    ID: 6
-    GUIWidth: 100
-    DefaultValue:
-      _string: 
-      _int: 0
-      _float: 0
-      _bool: 0
-      _unityObject: {fileID: 0}
-  ExtendFieldsObject: {fileID: 0}
+  ExtendFieldsObject: {fileID: 11400000, guid: a31300e7700974b9494d6fecea98bf35, type: 2}
   _keyID: 1
-  ExtendFieldWidths: []
+  ExtendFieldWidths:
+  - Name: IntArray
+    Width: 150
+  - Name: StringList
+    Width: 113
+  - Name: ClassList
+    Width: 269

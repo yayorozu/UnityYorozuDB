@@ -1,6 +1,6 @@
 namespace Yorozu.DB
 {
-    public partial class SampleData
+    public partial class Extend
     {
     }
 }
