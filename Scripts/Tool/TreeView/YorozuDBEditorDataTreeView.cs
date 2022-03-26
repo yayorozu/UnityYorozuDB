@@ -171,16 +171,17 @@ namespace Yorozu.DB.TreeView
 			    minWidth = 28,
 			    maxWidth = 28,
 		    };
-            
+		    
 		    foreach (var (field, i) in fields.Select((v, i) => (v, i)))
 		    {
+			    var width = MathF.Max(field.GUIWidth, 50);
 			    columns[i + 1] = new MultiColumnHeaderState.Column()
 			    {
 				    headerContent = data.Define.IsKeyField(field) ? new GUIContent($"★ {field.Name}") : new GUIContent($"    {field.Name}"),
 				    headerTextAlignment = TextAlignment.Left,
 				    sortedAscending = true,
 				    sortingArrowAlignment = TextAlignment.Right,
-				    width = field.GUIWidth,
+				    width = width,
 				    minWidth = 50,
 				    maxWidth = 500,
 				    autoResize = false,
@@ -214,6 +215,7 @@ namespace Yorozu.DB.TreeView
     internal class YorozuDBEditorMultiColumnHeader : MultiColumnHeader
     {
 	    internal event Action<MultiColumnHeaderState.Column> DeleteEvent;
+	    internal event Action<int, float> ChangeWidthEvent;
 	    
 	    internal YorozuDBEditorMultiColumnHeader(MultiColumnHeaderState state) : base(state)
         {
@@ -227,6 +229,8 @@ namespace Yorozu.DB.TreeView
 	        
 	        if (columnIndex <= 0)
 		        return;
+	        
+	        ChangeWidthEvent?.Invoke(columnIndex - 1, column.width);
 	        
 	        var width = 16;
 	        headerRect.y += 1;
@@ -275,7 +279,7 @@ namespace Yorozu.DB.TreeView
 		    container.DrawField(rect, field, GUIContent.none, _enumData);
 	    }
 
-	    internal bool DrawExtend(Rect rect, int index)
+	    internal void DrawExtend(Rect rect, int index)
 	    {
 		    _editor.serializedObject.UpdateIfRequiredOrScript();
 			var prop = _editor.serializedObject.FindProperty(_extendFieldInfos[index].Name);

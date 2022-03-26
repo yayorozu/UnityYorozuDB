@@ -84,6 +84,8 @@ namespace Yorozu.DB
 
             var multiColumnHeader = new YorozuDBEditorMultiColumnHeader(_columnHeaderState);
             multiColumnHeader.DeleteEvent += DeleteColumn;
+            multiColumnHeader.ChangeWidthEvent += ColumnChangeWidth;
+            
             multiColumnHeader.ResizeToFit();
 
             _treeView = new YorozuDBEditorDataTreeView(_state, multiColumnHeader, _data);
@@ -100,6 +102,20 @@ namespace Yorozu.DB
             YorozuDBExtendUtility.FitFieldsSize(_data.Define.ExtendFieldsObject, _data.DataCount);
 
             _Initialized = true;
+        }
+
+        private void ColumnChangeWidth(int index, float width)
+        {
+            // Extend
+            if (index >= _data.Define.Fields.Count)
+            {
+                return;
+            }
+
+            if (Math.Abs(_data.Define.Fields[index].GUIWidth - width) > 1f)
+            {
+                _data.Define.Fields[index].GUIWidth = width;
+            }
         }
 
         /// <summary>
