@@ -103,6 +103,7 @@ namespace Yorozu.DB
             builder.AppendLine("// Auto Generate Code.  //"); 
             builder.AppendLine("// Do not edit!!!       //"); 
             builder.AppendLine("// -------------------- //");
+            builder.AppendLine("#pragma warning disable");
             builder.AppendLine("using UnityEngine;");
             builder.AppendLine("");
             
