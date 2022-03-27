@@ -277,7 +277,7 @@ namespace Yorozu.DB
                 DataType.UnityObject => "UnityEngine.Object",
                 DataType.Vector2 => "Vector2",
                 DataType.Vector3 => "Vector3",
-                DataType.Vector2Int => "Vector3Int",
+                DataType.Vector2Int => "Vector2Int",
                 DataType.Vector3Int => "Vector3Int",
                 DataType.Enum => "int",
                 DataType.Color => "Color",
