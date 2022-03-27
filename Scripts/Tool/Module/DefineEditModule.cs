@@ -155,7 +155,15 @@ namespace Yorozu.DB
                 {
                     EditorGUILayout.HelpBox("To Use The Extend, The Number Of Data Must Be Set To 1", MessageType.Info);
                 }
-                _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Extend Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
+
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Extend Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
+                    if (check.changed)
+                    {
+                        _extendReorderableList = null;
+                    }
+                }
             }
             if (_extendReorderableList.count > 0)
             {
