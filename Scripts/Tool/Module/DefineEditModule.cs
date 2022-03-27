@@ -162,6 +162,7 @@ namespace Yorozu.DB
                     if (check.changed)
                     {
                         _extendReorderableList = null;
+                        GUIUtility.ExitGUI();
                     }
                 }
             }
