@@ -67,9 +67,6 @@ namespace Yorozu.DB
                 OpenButton = EditorGUIUtility.TrIconContent("d_UnityEditor.InspectorWindow", "Open Properties");
             }
         }
-
-        [NonSerialized]
-        private Editor _editor;
         
         internal void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
