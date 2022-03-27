@@ -69,10 +69,10 @@ namespace Yorozu.DB
         /// <summary>
         /// データの追加
         /// </summary>
-        internal void AddField(string name, DataType dataType, string enumName)
+        internal int AddField(string name, DataType dataType, string enumName)
         {
             if (!YorozuDBEditorUtility.NameValidator(Fields, name, out name))
-                return;
+                return -1;
 
             var fieldId = 1;
             if (Fields.Any())
@@ -108,6 +108,17 @@ namespace Yorozu.DB
             }
             
             this.Dirty();
+
+            return fieldId;
+        }
+        
+        internal void UpdateDefaultValue(int fieldId, DataContainer src)
+        {
+            var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
+            foreach (var asset in assets)
+            {
+                asset.UpdateDefaultValue(fieldId, src);
+            }
         }
 
         /// <summary>

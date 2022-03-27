@@ -55,6 +55,9 @@ namespace Yorozu.DB
 
         [NonSerialized]
         private bool _repaint;
+
+        [NonSerialized]
+        private List<int> _addFieldIds = new List<int>();
         
         private int _renameID = -1;
         private string _temp;
@@ -73,6 +76,7 @@ namespace Yorozu.DB
             _extendReorderableList = null;
             var dataAssets= YorozuDBEditorUtility.LoadAllDataAsset(_data);
             _relativeDataCount = dataAssets.Length;
+            _addFieldIds.Clear();
         }
 
         internal override bool OnGUI()
@@ -137,9 +141,11 @@ namespace Yorozu.DB
                     {
                         if (GUILayout.Button("Add", Style.ButtonWidth))
                         {
-                            _data.AddField(_name, _dataType, _enumName);
+                            var id = _data.AddField(_name, _dataType, _enumName);
                             _name = "";
                             _dataType = default;
+                            if (id >= 0)
+                                _addFieldIds.Add(id);
                         }
                     }
                 }
@@ -266,7 +272,18 @@ namespace Yorozu.DB
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     
                     rect.width = 200;
-                    field.DefaultValue.DrawField(rect, field, GUIContent.none, _enumData);
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        field.DefaultValue.DrawField(rect, field, GUIContent.none, _enumData);
+                        if (check.changed)
+                        {
+                            // 直近で追加したフィールドなら初期値を反映
+                            if (_addFieldIds.Contains(field.ID))
+                            {
+                                _data.UpdateDefaultValue(field.ID, field.DefaultValue);
+                            }
+                        }
+                    }
                     
                     rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth, rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);
 

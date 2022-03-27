@@ -209,6 +209,23 @@ namespace Yorozu.DB
             
             return root;
         }
+        
+        /// <summary>
+        /// フィールドの値更新
+        /// </summary>
+        internal void UpdateDefaultValue(int fieldId, DataContainer src)
+        {
+            var index = _fields.FindIndex(f => f.ID == fieldId);
+            if (index < 0)
+                return;
+
+            for (var i = 0; i < _fields[index].Data.Count; i++)
+            {
+                _fields[index].Data[i] = src.Copy();
+            }
+            
+            this.Dirty();
+        }
 #endif
     }
 
