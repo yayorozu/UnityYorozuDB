@@ -75,8 +75,16 @@ namespace Yorozu.DB
         /// </summary>
         protected Vector2 Vector2(int fieldId) => Data(fieldId).GetFromString<Vector2>();
         protected Vector3 Vector3(int fieldId) => Data(fieldId).GetFromString<Vector3>();
-        protected Vector2Int Vector2Int(int fieldId) => Data(fieldId).GetFromString<Vector2Int>();
-        protected Vector3Int Vector3Int(int fieldId) => Data(fieldId).GetFromString<Vector3Int>();
+        protected Vector2Int Vector2Int(int fieldId)
+        {
+            var array = Data(fieldId).GetFromString<SerializableIntArray>(); 
+            return new Vector2Int(array.IntArray[0], array.IntArray[1]);
+        }
+        protected Vector3Int Vector3Int(int fieldId)
+        {
+            var array = Data(fieldId).GetFromString<SerializableIntArray>(); 
+            return new Vector3Int(array.IntArray[0], array.IntArray[1], array.IntArray[2]);
+        }
         protected Color Color(int fieldId) => Data(fieldId).GetFromString<Color>();
     }
 }

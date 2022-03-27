@@ -68,6 +68,19 @@ namespace Yorozu.DB
             }
         }
         
+        private static GUIContent[] Vector2IntContents = new GUIContent[]
+        {
+            new GUIContent("x"),
+            new GUIContent("y"),
+        };
+        
+        private static GUIContent[] Vector3IntContents = new GUIContent[]
+        {
+            new GUIContent("x"),
+            new GUIContent("y"),
+            new GUIContent("z"),
+        };
+        
         internal void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
             switch (field.DataType)
@@ -131,24 +144,34 @@ namespace Yorozu.DB
                     }
                     break;
                 case DataType.Vector2Int:
-                    var vector2Int = GetFromString<Vector2Int>();
+                    if (string.IsNullOrEmpty(_string))
+                    {
+                        _string = JsonUtility.ToJson(new SerializableIntArray(2));
+                    }
+                        
+                    var v2Array = GetFromString<SerializableIntArray>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector2Int = EditorGUI.Vector2IntField(rect, content, vector2Int);
+                        EditorGUI.MultiIntField(rect, Vector2IntContents, v2Array.IntArray);
                         if (check.changed)
                         {
-                            SetToString(vector2Int);
+                            SetToString(v2Array);
                         }
                     }
                     break;
                 case DataType.Vector3Int:
-                    var vector3Int = GetFromString<Vector3Int>();
+                    if (string.IsNullOrEmpty(_string))
+                    {
+                        _string = JsonUtility.ToJson(new SerializableIntArray(3));
+                    }
+                        
+                    var v3Array = GetFromString<SerializableIntArray>();
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        vector3Int = EditorGUI.Vector3IntField(rect, content, vector3Int);
+                        EditorGUI.MultiIntField(rect, Vector3IntContents, v3Array.IntArray);
                         if (check.changed)
                         {
-                            SetToString(vector3Int);
+                            SetToString(v3Array);
                         }
                     }
                     break;
