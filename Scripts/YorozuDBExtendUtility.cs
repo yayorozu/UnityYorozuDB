@@ -195,7 +195,40 @@ namespace Yorozu.DB
 
             return max;
         }
-#endif
+
+        /// <summary>
+        /// 並べ替え
+        /// </summary>
+        internal static void Insert(ScriptableObject scriptableObject, int insertIndex, IOrderedEnumerable<int> targetIndexes)
+        {
+            if (scriptableObject == null)
+                return;
+            
+            var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
+            var fields = FindFields(scriptableObject);
+            
+            editor.serializedObject.UpdateIfRequiredOrScript();
+            foreach (var field in fields)
+            {
+                var backInsertedCount = 0;
+                var frontInsertedCount = 0;
+                var prop = editor.serializedObject.FindProperty(field.Name);
+                foreach (var index in targetIndexes)
+                {
+                    if (index > insertIndex)
+                    {
+                        prop.MoveArrayElement(index + backInsertedCount++, insertIndex);
+                    }
+                    else
+                    {
+                        prop.MoveArrayElement(index, insertIndex - ++frontInsertedCount);
+                    }
+                }
+            }
+            editor.serializedObject.ApplyModifiedProperties();
+        }
         
+#endif
+
     }
 }

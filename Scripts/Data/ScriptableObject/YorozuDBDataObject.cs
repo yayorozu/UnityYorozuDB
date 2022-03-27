@@ -188,6 +188,9 @@ namespace Yorozu.DB
             {
                 g.Insert(insertIndex, targetIndexes);   
             }
+
+            // 拡張分も入れ替え
+            YorozuDBExtendUtility.Insert(Define.ExtendFieldsObject, insertIndex, targetIndexes);
             this.Dirty();
         }
         
