@@ -172,7 +172,7 @@ namespace Yorozu.DB
         /// <summary>
         /// 各フィールドの最大サイズを計算
         /// </summary>
-        internal static float ItemHeight(ScriptableObject scriptableObject)
+        internal static float ItemHeight(ScriptableObject scriptableObject, int row)
         {
             if (scriptableObject == null)
                 return 0;
@@ -187,8 +187,10 @@ namespace Yorozu.DB
                 var prop = editor.serializedObject.FindProperty(field.Name);
                 if (prop.arraySize <= 0)
                     continue;
+                if (row >= prop.arraySize)
+                    continue;
                 
-                var elementProp = prop.GetArrayElementAtIndex(0);
+                var elementProp = prop.GetArrayElementAtIndex(row);
                 elementProp.isExpanded = true;
                 max = Mathf.Max(EditorGUI.GetPropertyHeight(elementProp), max);
             }

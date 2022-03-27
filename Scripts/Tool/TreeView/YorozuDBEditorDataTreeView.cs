@@ -30,7 +30,6 @@ namespace Yorozu.DB.TreeView
             columnIndexForTreeFoldouts = 0;
             showAlternatingRowBackgrounds = true;
             showBorder = true;
-            rowHeight = YorozuDBExtendUtility.ItemHeight(_data.Define.ExtendFieldsObject);
             
             Reload();
         }
@@ -123,8 +122,17 @@ namespace Yorozu.DB.TreeView
                 CellGUI(args.GetCellRect(i), item, args.GetColumn(i));
             }
         }
-        
-	    private void CellGUI(Rect cellRect, YorozuDBEditorTreeViewItem item, int columnIndex)
+
+        protected override float GetCustomRowHeight(int row, TreeViewItem item)
+        {
+	        var i = item as YorozuDBEditorTreeViewItem;
+	        if (i.Height > 0)
+		        return i.Height;
+	        
+	        return base.GetCustomRowHeight(row, item);
+        }
+
+        private void CellGUI(Rect cellRect, YorozuDBEditorTreeViewItem item, int columnIndex)
 		{
 			// Rect を真ん中にする処理
 			//CenterRectUsingSingleLineHeight(ref cellRect);
@@ -278,6 +286,7 @@ namespace Yorozu.DB.TreeView
 	    private YorozuDBEnumDataObject _enumData;
 	    private List<FieldInfo> _extendFieldInfos;
 	    private Editor _editor;
+	    internal float Height;
 
 	    internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
 	    {
@@ -287,6 +296,7 @@ namespace Yorozu.DB.TreeView
 		    {
 			    _editor = Editor.CreateEditor(_data.Define.ExtendFieldsObject);
 			    _extendFieldInfos = YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
+			    Height = YorozuDBExtendUtility.ItemHeight(_data.Define.ExtendFieldsObject, id);
 		    }
 	    }
 
