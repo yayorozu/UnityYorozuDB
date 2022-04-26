@@ -98,8 +98,15 @@ namespace Yorozu.DB
                 {
                     if (_data.IsFxKey)
                     {
-                        var rect = GUILayoutUtility.GetRect(0, 100000, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
-                        _data.FixKeyData.DrawField(rect, keyField, new GUIContent("Fix Key"),  _enum);
+                        using (var check = new EditorGUI.ChangeCheckScope())
+                        {
+                            var rect = GUILayoutUtility.GetRect(0, 100000, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
+                            _data.FixKeyData.DrawField(rect, keyField, new GUIContent("Fix Key"), _enum);
+                            if (check.changed)
+                            {
+                                _data.Dirty();
+                            }
+                        }
                     }
                 }
             }
@@ -111,6 +118,7 @@ namespace Yorozu.DB
                     _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("ExtendObject", _data.ExtendFieldsObject, _data.Define.ExtendFieldsType, false);
                     if (check.changed)
                     {
+                        _data.Dirty();
                         Reload();   
                     }
                 }
