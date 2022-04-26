@@ -41,6 +41,7 @@ namespace Yorozu.DB
         {
             ExtendFieldsTypeName = typeName;
             _extendFieldsTypeCache = null;
+            this.Dirty();
         }
         
         private Type _extendFieldsTypeCache;

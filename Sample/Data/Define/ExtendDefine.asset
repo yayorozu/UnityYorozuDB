@@ -18,13 +18,14 @@ MonoBehaviour:
     EnumDefineId: 0
     ID: 1
     GUIWidth: 116
+    Memo: 
     DefaultValue:
       _string: 
       _int: 1
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  ExtendFieldsObject: {fileID: 11400000, guid: a31300e7700974b9494d6fecea98bf35, type: 2}
+  ExtendFieldsTypeName: ExtendScriptableObject
   _keyID: 1
   ExtendFieldWidths:
   - Name: IntArray

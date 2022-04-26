@@ -77,7 +77,12 @@ namespace Yorozu.DB
             _extendReorderableList = null;
             _addFieldIds.Clear();
             // 存在するScriptableObjectを取得
-            _typeNames = new List<string>(){ExtendNone}
+
+        }
+
+        private string[] GetTypes()
+        {
+            return new List<string>(){ExtendNone}
                 .Concat(AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a => a.GetTypes())
                     .Where(t => t.IsSubclassOf(typeof(ScriptableObject))
@@ -105,6 +110,7 @@ namespace Yorozu.DB
             
             _reorderableList ??= CreateReorderableList(_data);
             _extendReorderableList ??= CreateExtendReorderableList(_data);
+            _typeNames ??= GetTypes();
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -176,7 +182,7 @@ namespace Yorozu.DB
             
             // 拡張フィールド
             EditorGUILayout.LabelField("Extend Fields", string.IsNullOrEmpty(_data.ExtendFieldsTypeName) ? "None" : _data.ExtendFieldsTypeName, EditorStyles.boldLabel);
-            
+
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 var popup = EditorGUILayout.Popup("Change Extend Type", -1, _typeNames);
