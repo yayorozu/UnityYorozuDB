@@ -189,7 +189,7 @@ namespace Yorozu.DB
                     }
                     else
                     {
-                        _data.ExtendFieldsTypeName = "";
+                        _data.SetExtendFieldsTypeName("");
                         _extendReorderableList = null;
                     }
 
