@@ -316,6 +316,14 @@ namespace Yorozu.DB
                             }
                         }
                     }
+
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing * 2;
+                    rect.width = width - rect.x + rect.width + 16;
+                    field.Memo = EditorGUI.TextField(rect, GUIContent.none, field.Memo);
+                    if (string.IsNullOrEmpty(field.Memo))
+                    {
+                        EditorGUI.LabelField(rect, "memo", EditorStyles.centeredGreyMiniLabel);
+                    }
                     
                     rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth, rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);
 

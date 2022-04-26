@@ -184,7 +184,7 @@ namespace Yorozu.DB.TreeView
 			    var width = MathF.Max(field.GUIWidth, 50);
 			    columns.Add(new MultiColumnHeaderState.Column()
 			    {
-				    headerContent = data.Define.IsKeyField(field) ? new GUIContent($"★ {field.Name}") : new GUIContent($"    {field.Name}"),
+				    headerContent = data.Define.IsKeyField(field) ? new GUIContent($"★ {field.Name}", field.Memo) : new GUIContent($"    {field.Name}", field.Memo),
 				    headerTextAlignment = TextAlignment.Left,
 				    sortedAscending = true,
 				    sortingArrowAlignment = TextAlignment.Right,
@@ -205,7 +205,6 @@ namespace Yorozu.DB.TreeView
 			    // 今定義されてないやつは全部消す
 			    data.Define.ExtendFieldWidths.RemoveAll(v => !addFields.Select(f => f.Name).Contains(v.Name));
 			    
-			    var index = fields.Count + 1;
 			    foreach (var (value, i) in addFields.Select((v, i) => (v, i)))
 			    {
 				    var widthIndex = data.Define.ExtendFieldWidths.FindIndex(v => v.Name == value.Name);

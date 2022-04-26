@@ -128,6 +128,13 @@ namespace Yorozu.DB
 
             foreach (var field in data.Fields)
             {
+                if (!string.IsNullOrEmpty(field.Memo))
+                {
+                    builder.AppendLine("        /// <summary>");
+                    builder.AppendLine($"        /// {field.Memo}");
+                    builder.AppendLine("        /// </summary>");
+                }
+                
                 if (field.DataType == DataType.Enum)
                 {
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);

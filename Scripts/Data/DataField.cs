@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Yorozu.DB
 {
@@ -35,6 +34,12 @@ namespace Yorozu.DB
         /// </summary>
         [SerializeField]
         internal float GUIWidth = 150;
+
+        /// <summary>
+        /// コメント
+        /// </summary>
+        [SerializeField]
+        internal string Memo;
         
         /// <summary>
         /// Keyとして有効かどうか

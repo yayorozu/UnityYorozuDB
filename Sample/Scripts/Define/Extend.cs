@@ -11,6 +11,9 @@ namespace Yorozu.DB
     {
         int IIntKey.Key => fixKey ? GetFixKeyInt : (int)Id;
 
+        /// <summary>
+        /// メモのテスト
+        /// </summary>
         public int Id => Int(1);
 
         // Extend Fields
