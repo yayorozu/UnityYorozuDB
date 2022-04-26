@@ -63,10 +63,11 @@ namespace Yorozu.DB
         private string _temp;
         
         private static readonly string EditorField = "EditorField";
+        private static readonly string ExtendNone = "--None--";
 
         private ReorderableList _reorderableList;
         private ReorderableList _extendReorderableList;
-        private int _relativeDataCount;
+        private string[] _typeNames;
         
         internal void SetData(YorozuDBDataDefineObject data)
         {
@@ -74,9 +75,27 @@ namespace Yorozu.DB
             _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
             _reorderableList = null;
             _extendReorderableList = null;
-            var dataAssets= YorozuDBEditorUtility.LoadAllDataAsset(_data);
-            _relativeDataCount = dataAssets.Length;
             _addFieldIds.Clear();
+            // 存在するScriptableObjectを取得
+            _typeNames = new List<string>(){ExtendNone}
+                .Concat(AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.IsSubclassOf(typeof(ScriptableObject))
+                                && !t.IsSubclassOf(typeof(EditorWindow))
+                                && !t.IsSubclassOf(typeof(ScriptableSingleton<>))
+                                && !t.IsSubclassOf(typeof(UnityEditor.EditorTools.EditorTool))
+                                && !t.IsSubclassOf(typeof(Editor))
+                                && t != typeof(EditorWindow)
+                                && t != typeof(Editor)
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro"))
+                                && !t.IsAbstract
+                                && !t.IsGenericType
+                    )
+                    .Select(t => t.FullName)
+                    .OrderBy(t => t)
+                ).ToArray();
         }
 
         internal override bool OnGUI()
@@ -154,24 +173,37 @@ namespace Yorozu.DB
             _reorderableList.DoLayoutList();
             
             GUILayout.Space(20);
-            // 複数データがあれば許可しない\
-            using (new EditorGUI.DisabledScope(_relativeDataCount > 1))
+            
+            // 拡張フィールド
+            EditorGUILayout.LabelField("Extend Fields", string.IsNullOrEmpty(_data.ExtendFieldsTypeName) ? "None" : _data.ExtendFieldsTypeName, EditorStyles.boldLabel);
+            
+            using (var check = new EditorGUI.ChangeCheckScope())
             {
-                if (_relativeDataCount > 1)
+                var popup = EditorGUILayout.Popup("Change Extend Type", -1, _typeNames);
+                if (check.changed)
                 {
-                    EditorGUILayout.HelpBox("To Use The Extend, The Number Of Data Must Be Set To 1", MessageType.Info);
-                }
-
-                using (var check = new EditorGUI.ChangeCheckScope())
-                {
-                    _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("Extend Fields", _data.ExtendFieldsObject, typeof(ScriptableObject), false);
-                    if (check.changed)
+                    if (popup > 0)
                     {
-                        _extendReorderableList = null;
-                        GUIUtility.ExitGUI();
+                        _data.SetExtendFieldsTypeName(_typeNames[popup]);
+                        _extendReorderableList = CreateExtendReorderableList(_data);
                     }
+                    else
+                    {
+                        _data.ExtendFieldsTypeName = "";
+                        _extendReorderableList = null;
+                    }
+
+                    // 更新したら関連データを初期化する
+                    var data = YorozuDBEditorUtility.LoadAllDataAsset(_data);
+                    foreach (var d in data)
+                    {
+                        d.ExtendFieldsObject = null;
+                    }
+
+                    GUIUtility.ExitGUI();
                 }
             }
+
             if (_extendReorderableList.count > 0)
             {
                 using (new EditorGUI.DisabledScope(true))
@@ -307,7 +339,11 @@ namespace Yorozu.DB
 
         private ReorderableList CreateExtendReorderableList(YorozuDBDataDefineObject data)
         {
-            var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+            var type = data.ExtendFieldsType;
+            if (type == null)
+                return new ReorderableList(new List<int>(), typeof(int));
+            
+            var fields = YorozuDBExtendUtility.FindFields(type);
             if (fields.Count <= 0)
                 return new ReorderableList(new List<int>(), typeof(int));
             

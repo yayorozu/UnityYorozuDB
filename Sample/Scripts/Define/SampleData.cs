@@ -2,13 +2,14 @@
 // Auto Generate Code.  //
 // Do not edit!!!       //
 // -------------------- //
+#pragma warning disable
 using UnityEngine;
 
 namespace Yorozu.DB
 {
     public partial class SampleData : DataAbstract, IIntKey
     {
-        int IIntKey.Key => (int)Key;
+        int IIntKey.Key => fixKey ? GetFixKeyInt : (int)Key;
 
         public int Key => Int(1);
 

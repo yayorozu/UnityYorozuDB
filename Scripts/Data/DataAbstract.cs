@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -17,7 +16,10 @@ namespace Yorozu.DB
         /// </summary>
         protected T Extend<T>() where T : ScriptableObject
         {
-            return _data.Define.ExtendFieldsObject as T;
+            if (_data.ExtendFieldsObject == null)
+                return default;
+            
+            return _data.ExtendFieldsObject as T;
         }
 
         private YorozuDBEnumDataObject _enumData => YorozuDB.EnumData;
@@ -27,6 +29,9 @@ namespace Yorozu.DB
         private int _row;
 
         protected int row => _row;
+        protected bool fixKey => _data.IsFxKey;
+        protected int GetFixKeyInt => _data.FixKeyData.Int;
+        protected string GetFixKeyString => _data.FixKeyData.String;
         
         internal void SetUp(YorozuDBDataObject data, int row)
         {

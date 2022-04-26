@@ -2,13 +2,14 @@
 // Auto Generate Code.  //
 // Do not edit!!!       //
 // -------------------- //
+#pragma warning disable
 using UnityEngine;
 
 namespace Yorozu.DB
 {
     public partial class Extend : DataAbstract, IIntKey
     {
-        int IIntKey.Key => (int)Id;
+        int IIntKey.Key => fixKey ? GetFixKeyInt : (int)Id;
 
         public int Id => Int(1);
 

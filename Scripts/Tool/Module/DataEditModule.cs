@@ -27,10 +27,13 @@ namespace Yorozu.DB
 
         private YorozuDBEditorDataTreeView _treeView;
         private int _fieldCount;
+        private bool _settingMode;
+        private YorozuDBEnumDataObject _enum;
         
         internal void SetData(object param)
         {
             _data = param as YorozuDBDataObject;
+            _settingMode = false;
             Reload();
             InitIfNeeded();
         }
@@ -46,7 +49,19 @@ namespace Yorozu.DB
             {
                 EditorGUILayout.LabelField($"Data Editor: 【{_data.name}】", EditorStyles.boldLabel);
                 
+                // 拡張設定ありでセットされてないならWarning表示
+                if (!string.IsNullOrEmpty(_data.Define.ExtendFieldsTypeName) && _data.ExtendFieldsObject == null)
+                {
+                    EditorGUILayout.LabelField($"Extend Data is none", EditorStyles.label);
+                }
+                
                 GUILayout.FlexibleSpace();
+
+                // Mode Change
+                if (GUILayout.Button(!_settingMode ? "Additional Setting" : "Back", EditorStyles.toolbarButton))
+                {
+                    _settingMode = !_settingMode;
+                }
 
                 using (new EditorGUI.DisabledScope(_fieldCount <= 0))
                 {
@@ -59,10 +74,47 @@ namespace Yorozu.DB
                 }
             }
 
-            var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
-            _treeView.OnGUI(rect);
-            
+            if (_settingMode)
+            {
+                DrawSetting();
+            }
+            else
+            {
+                var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
+                _treeView.OnGUI(rect);
+            }
+
             return false;
+        }
+
+        private void DrawSetting()
+        {
+            var keyField = _data.Define.KeyField;
+            if (keyField != null)
+            {
+                // データ内でKey固定
+                _data.IsFxKey = EditorGUILayout.Toggle("Fix Key Value in this Data", _data.IsFxKey);
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    if (_data.IsFxKey)
+                    {
+                        var rect = GUILayoutUtility.GetRect(0, 100000, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
+                        _data.FixKeyData.DrawField(rect, keyField, new GUIContent("Fix Key"),  _enum);
+                    }
+                }
+            }
+
+            using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_data.Define.ExtendFieldsTypeName)))
+            {
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("ExtendObject", _data.ExtendFieldsObject, _data.Define.ExtendFieldsType, false);
+                    if (check.changed)
+                    {
+                        Reload();   
+                    }
+                }
+            }
         }
 
         private void Reload() => _Initialized = false;
@@ -95,11 +147,13 @@ namespace Yorozu.DB
             _treeView.AutoIdEvent += SetAutoId;
             _treeView.SameIdEvent += SetSameId;
             
-            var fields =YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
+            var fields =YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
             _fieldCount = _data.Define.Fields.Count + fields.Count;
             
             // 足りない分の補充
-            YorozuDBExtendUtility.FitFieldsSize(_data.Define.ExtendFieldsObject, _data.DataCount);
+            YorozuDBExtendUtility.FitFieldsSize(_data.ExtendFieldsObject, _data.DataCount);
+            
+            _enum = YorozuDBEditorUtility.LoadEnumDataAsset();
 
             _Initialized = true;
         }
@@ -110,7 +164,7 @@ namespace Yorozu.DB
             if (index >= _data.Define.Fields.Count)
             {
                 index -= _data.Define.Fields.Count;
-                var fields = YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
+                var fields = YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
                 var widthIndex = _data.Define.ExtendFieldWidths.FindIndex(v => v.Name == fields[index].Name);
                 if (widthIndex >= 0)
                 {

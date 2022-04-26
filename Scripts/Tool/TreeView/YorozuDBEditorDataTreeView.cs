@@ -169,21 +169,20 @@ namespace Yorozu.DB.TreeView
 	    internal static MultiColumnHeaderState CreateMultiColumnHeaderState(YorozuDBDataObject data)
 	    {
 		    var fields = data.Define.Fields;
-		    var addFields = YorozuDBExtendUtility.FindFields(data.Define.ExtendFieldsObject);
-		    var columns = new MultiColumnHeaderState.Column[fields.Count + addFields.Count + 1];
+		    var columns = new List<MultiColumnHeaderState.Column>();
 		    // 制御用に1フィールド用意する
-		    columns[0] = new MultiColumnHeaderState.Column()
+		    columns.Add(new MultiColumnHeaderState.Column()
 		    {
 			    headerContent = new GUIContent(""),
 			    width = 28,
 			    minWidth = 28,
 			    maxWidth = 28,
-		    };
+		    });
 		    
 		    foreach (var (field, i) in fields.Select((v, i) => (v, i)))
 		    {
 			    var width = MathF.Max(field.GUIWidth, 50);
-			    columns[i + 1] = new MultiColumnHeaderState.Column()
+			    columns.Add(new MultiColumnHeaderState.Column()
 			    {
 				    headerContent = data.Define.IsKeyField(field) ? new GUIContent($"★ {field.Name}") : new GUIContent($"    {field.Name}"),
 				    headerTextAlignment = TextAlignment.Left,
@@ -195,46 +194,52 @@ namespace Yorozu.DB.TreeView
 				    autoResize = false,
 				    allowToggleVisibility = false,
 				    userData = field.ID,
-			    };
+			    });
 		    }
 		    
-		    // 今定義されてないやつは全部消す
-		    data.Define.ExtendFieldWidths.RemoveAll(v => !addFields.Select(f => f.Name).Contains(v.Name));
-		    
-		    var index = fields.Count + 1;
-		    foreach (var (value, i) in addFields.Select((v, i) => (v, i)))
+		    if (data.Define.ExtendFieldsType != null &&
+		        data.ExtendFieldsObject != null &&
+		        data.ExtendFieldsObject.GetType() == data.Define.ExtendFieldsType)
 		    {
-			    var widthIndex = data.Define.ExtendFieldWidths.FindIndex(v => v.Name == value.Name);
-			    var width = 150f;
-			    if (widthIndex < 0)
+			    var addFields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+			    // 今定義されてないやつは全部消す
+			    data.Define.ExtendFieldWidths.RemoveAll(v => !addFields.Select(f => f.Name).Contains(v.Name));
+			    
+			    var index = fields.Count + 1;
+			    foreach (var (value, i) in addFields.Select((v, i) => (v, i)))
 			    {
-				    data.Define.ExtendFieldWidths.Add(new YorozuDBDataDefineObject.ExtendFieldWidth()
+				    var widthIndex = data.Define.ExtendFieldWidths.FindIndex(v => v.Name == value.Name);
+				    var width = 150f;
+				    if (widthIndex < 0)
 				    {
-					    Name = value.Name,
-					    Width = width,
+					    data.Define.ExtendFieldWidths.Add(new YorozuDBDataDefineObject.ExtendFieldWidth()
+					    {
+						    Name = value.Name,
+						    Width = width,
+					    });
+				    }
+				    else
+				    {
+					    width = data.Define.ExtendFieldWidths[widthIndex].Width;
+				    }
+
+				    columns.Add(new MultiColumnHeaderState.Column()
+				    {
+					    headerContent = new GUIContent($"    {value.Name}"),
+					    headerTextAlignment = TextAlignment.Left,
+					    sortedAscending = true,
+					    sortingArrowAlignment = TextAlignment.Right,
+					    width = width,
+					    minWidth = 50,
+					    maxWidth = 500,
+					    autoResize = false,
+					    allowToggleVisibility = false,
+					    userData = -1,
 				    });
 			    }
-			    else
-			    {
-					width = data.Define.ExtendFieldWidths[widthIndex].Width;
-			    }
-			    
-			    columns[index + i] = new MultiColumnHeaderState.Column()
-			    {
-				    headerContent = new GUIContent($"    {value.Name}"),
-				    headerTextAlignment = TextAlignment.Left,
-				    sortedAscending = true,
-				    sortingArrowAlignment = TextAlignment.Right,
-				    width = width,
-				    minWidth = 50,
-				    maxWidth = 500,
-				    autoResize = false,
-				    allowToggleVisibility = false,
-				    userData = -1,
-			    };
 		    }
-            
-		    return new MultiColumnHeaderState(columns);
+
+		    return new MultiColumnHeaderState(columns.ToArray());
 	    }
     }
 
@@ -292,19 +297,23 @@ namespace Yorozu.DB.TreeView
 	    {
 		    _data = data;
 		    _enumData = enumData;
-		    if (_data.Define.ExtendFieldsObject != null)
+		    if (_data.ExtendFieldsObject != null)
 		    {
-			    _editor = Editor.CreateEditor(_data.Define.ExtendFieldsObject);
-			    _extendFieldInfos = YorozuDBExtendUtility.FindFields(_data.Define.ExtendFieldsObject);
-			    Height = YorozuDBExtendUtility.ItemHeight(_data.Define.ExtendFieldsObject, id);
+			    _editor = Editor.CreateEditor(_data.ExtendFieldsObject);
+			    _extendFieldInfos = YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
+			    Height = YorozuDBExtendUtility.ItemHeight(_data.ExtendFieldsObject, id);
 		    }
 	    }
 
 	    internal void Draw(Rect rect, int index)
 	    {
 		    var field = _data.Define.Fields[index];
-		    var container = _data.GetData(field.ID, id);
-		    container.DrawField(rect, field, GUIContent.none, _enumData);
+		    var isFix = _data.IsFxKey && _data.Define.IsKeyField(field);
+		    using (new EditorGUI.DisabledScope(isFix))
+		    {
+			    var container = isFix ? _data.FixKeyData : _data.GetData(field.ID, id);
+				container.DrawField(rect, field, GUIContent.none, _enumData);
+		    }
 	    }
 
 	    internal void DrawExtend(Rect rect, int index)

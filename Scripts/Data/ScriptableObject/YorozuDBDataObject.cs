@@ -63,8 +63,22 @@ namespace Yorozu.DB
         [SerializeField]
         internal YorozuDBDataDefineObject Define;
 
+        /// <summary>
+        /// 拡張データ
+        /// </summary>
+        [SerializeField]
+        internal ScriptableObject ExtendFieldsObject;
+        
         [SerializeField]
         private List<Field> _fields = new List<Field>();
+
+        /// <summary>
+        /// このデータ内ではKeyを固定する
+        /// </summary>
+        [SerializeField]
+        internal bool IsFxKey;
+        [SerializeField]
+        internal DataContainer FixKeyData;
 
         /// <summary>
         /// データ数
@@ -76,7 +90,7 @@ namespace Yorozu.DB
                 if (_fields == null || !_fields.Any())
                 {
                     // こっちの定義がない場合は拡張側を見る
-                    var extendCount = YorozuDBExtendUtility.DataCount(Define.ExtendFieldsObject);
+                    var extendCount = YorozuDBExtendUtility.DataCount(ExtendFieldsObject);
                     return extendCount;
                 }
 
@@ -143,9 +157,9 @@ namespace Yorozu.DB
             }
 
             // 対象のフィールド追加
-            if (Define.ExtendFieldsObject != null)
+            if (ExtendFieldsObject != null)
             {
-                YorozuDBExtendUtility.AddFields(Define.ExtendFieldsObject);
+                YorozuDBExtendUtility.AddFields(ExtendFieldsObject);
             }
             this.Dirty();
         }
@@ -163,7 +177,7 @@ namespace Yorozu.DB
                 }
             }
             
-            YorozuDBExtendUtility.RemoveFields(Define.ExtendFieldsObject, descIndexes);
+            YorozuDBExtendUtility.RemoveFields(ExtendFieldsObject, descIndexes);
             this.Dirty();
         }
 
@@ -190,7 +204,7 @@ namespace Yorozu.DB
             }
 
             // 拡張分も入れ替え
-            YorozuDBExtendUtility.Insert(Define.ExtendFieldsObject, insertIndex, targetIndexes);
+            YorozuDBExtendUtility.Insert(ExtendFieldsObject, insertIndex, targetIndexes);
             this.Dirty();
         }
         

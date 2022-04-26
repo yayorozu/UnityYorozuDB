@@ -20,7 +20,7 @@ namespace Yorozu.DB
         /// その際には複数のデータを作成することはできない
         /// </summary>
         [SerializeField]
-        internal ScriptableObject ExtendFieldsObject;
+        internal string ExtendFieldsTypeName;
 
         internal string ClassName => name.Replace("Define", "");
         
@@ -36,6 +36,27 @@ namespace Yorozu.DB
         internal DataField KeyField => Fields.FirstOrDefault(IsKeyField);
         
 #if UNITY_EDITOR
+
+        public void SetExtendFieldsTypeName(string typeName)
+        {
+            ExtendFieldsTypeName = typeName;
+            _extendFieldsTypeCache = null;
+        }
+        
+        private Type _extendFieldsTypeCache;
+        
+        internal Type ExtendFieldsType
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ExtendFieldsTypeName))
+                    return null;
+
+                return _extendFieldsTypeCache ??= AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .FirstOrDefault(t => t.FullName == ExtendFieldsTypeName);
+            }
+        }
 
         [Serializable]
         internal class ExtendFieldWidth

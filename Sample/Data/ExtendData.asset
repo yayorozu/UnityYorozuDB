@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ExtendData
   m_EditorClassIdentifier: 
   Define: {fileID: 11400000, guid: b5278d41df1cb4c42b88fc10677a9951, type: 2}
+  ExtendFieldsObject: {fileID: 11400000, guid: a31300e7700974b9494d6fecea98bf35, type: 2}
   _fields:
   - ID: 1
     Data:

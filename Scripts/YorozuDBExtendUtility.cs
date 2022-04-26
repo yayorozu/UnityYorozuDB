@@ -37,10 +37,29 @@ namespace Yorozu.DB
             });
         }
         
-        private static Dictionary<int, List<FieldInfo>> _fieldCache = new Dictionary<int, List<FieldInfo>>();
+        private static Dictionary<string, List<FieldInfo>> _fieldCache = new Dictionary<string, List<FieldInfo>>();
         
 #if UNITY_EDITOR
-        
+
+        internal static List<FieldInfo> FindFields(Type type)
+        {
+            var fullName = type.FullName;
+            if (!_fieldCache.ContainsKey(fullName))
+            {
+                var targetFields = new List<FieldInfo>();
+                var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                foreach (var field in fields)
+                {
+                    if (!field.IsSerializableIList())
+                        continue;
+
+                    targetFields.Add(field);
+                }
+                _fieldCache.Add(fullName, targetFields);
+            }
+
+            return _fieldCache[fullName];
+        }
         /// <summary>
         /// 対象となるフィールドを探す
         /// </summary>
@@ -48,29 +67,10 @@ namespace Yorozu.DB
         {
             if (scriptableObject == null)
                 return new List<FieldInfo>();
-            
-            var id = scriptableObject.GetInstanceID();
-            
-            if (!_fieldCache.ContainsKey(id))
-            {
-                var targetFields = new List<FieldInfo>();
-                var type = scriptableObject.GetType();
-                var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                foreach (var field in fields)
-                {
-                    if (!field.IsSerializableIList())
-                        continue;
-                    
-                    targetFields.Add(field);
-                }
-                
-                _fieldCache.Add(id, targetFields);
-            }
-            
-            return _fieldCache[id];
+
+            return FindFields(scriptableObject.GetType());
         }
 
-        
         /// <summary>
         /// 対象となるフィールドか判定
         /// </summary>

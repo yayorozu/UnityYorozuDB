@@ -25,6 +25,7 @@ namespace Yorozu.DB
             showAlternatingRowBackgrounds = true;
             showBorder = true;
             Reload();
+            ExpandAll();
         }
 
         protected override TreeViewItem BuildRoot()

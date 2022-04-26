@@ -122,7 +122,7 @@ namespace Yorozu.DB
 
             if (keyField != null)
             {
-                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
+                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => fixKey ? {GetFixName(keyField.DataType)} : ({keyField.DataType.ConvertString()}){keyField.Name};");
                 builder.AppendLine("");
             }
 
@@ -143,11 +143,11 @@ namespace Yorozu.DB
                 builder.AppendLine("");
             }
 
-            if (data.ExtendFieldsObject != null)
+            var extendType = data.ExtendFieldsType; 
+            if (extendType != null)
             {
-                var extendType = data.ExtendFieldsObject.GetType(); 
                 builder.AppendLine($"        // Extend Fields");
-                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                var fields = YorozuDBExtendUtility.FindFields(extendType);
                 foreach (var field in fields)
                 {
                     builder.AppendLine($"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name} => Extend<{extendType.FullName}>().{field.Name}[row];");
@@ -175,9 +175,9 @@ namespace Yorozu.DB
                 }
             }
 
-            if (data.ExtendFieldsObject != null)
+            if (extendType != null)
             {
-                var fields = YorozuDBExtendUtility.FindFields(data.ExtendFieldsObject);
+                var fields = YorozuDBExtendUtility.FindFields(extendType);
                 foreach (var field in fields)
                 {
                     builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");   
@@ -198,6 +198,20 @@ namespace Yorozu.DB
                     case DataType.Int:
                     case DataType.Enum:
                         return nameof(IIntKey);
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                }
+            }
+            
+            string GetFixName(DataType type)
+            {
+                switch (type)
+                {
+                    case DataType.String:
+                        return "GetFixKeyString";
+                    case DataType.Int:
+                    case DataType.Enum:
+                        return "GetFixKeyInt";
                     default:
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }

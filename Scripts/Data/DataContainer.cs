@@ -185,7 +185,7 @@ namespace Yorozu.DB
                     var index = enumData.GetEnumIndex(field.EnumDefineId, _int);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        index = EditorGUI.Popup(rect, index, enums);
+                        index = EditorGUI.Popup(rect, content.text, index, enums);
                         if (check.changed)
                         {
                             var key = enumData.GetEnumKey(field.EnumDefineId, enums[index]);

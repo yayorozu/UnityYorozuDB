@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
@@ -12,6 +13,16 @@ namespace Yorozu.DB
     [Serializable]
     internal class ListModule : YorozuDBEditorModule
     {
+        private static class Styles
+        {
+            internal static Texture2D TextureRefresh;
+            
+            static Styles()
+            {
+                TextureRefresh = EditorResources.Load<Texture2D>("d_Refresh");
+            }
+        }
+        
         internal event Action<int> SelectEvent;
 
         [SerializeField]
@@ -44,14 +55,22 @@ namespace Yorozu.DB
         internal override bool OnGUI()
         {
             Initialize();
-
+            
             // データ定義を作成
-            if (GUILayout.Button("Create Data Define Asset"))
+            using (new GUILayout.HorizontalScope())
             {
-                if (YorozuDBEditorUtility.CreateDefineAsset())
+                if (GUILayout.Button("Create Data Define Asset"))
+                {
+                    if (YorozuDBEditorUtility.CreateDefineAsset())
+                    {
+                        _treeView.Reload();
+                    }
+                }
+
+                if (GUILayout.Button(Styles.TextureRefresh))
                 {
                     _treeView.Reload();
-                }
+                }                
             }
 
             if (!_hasEnum)
@@ -65,7 +84,7 @@ namespace Yorozu.DB
                     }
                 }
             }
-
+            
             EditorGUILayout.Space(1);
             
             EditorGUILayout.LabelField("Define, Data, Enum", EditorStyles.boldLabel);

@@ -46,6 +46,6 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
-  ExtendFieldsObject: {fileID: 0}
+  ExtendFieldsTypeName: 
   _keyID: 1
   ExtendFieldWidths: []
