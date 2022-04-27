@@ -32,7 +32,8 @@ namespace Yorozu.DB
         protected bool fixKey => _data.IsFxKey;
         protected int GetFixKeyInt => _data.FixKeyData.Int;
         protected string GetFixKeyString => _data.FixKeyData.String;
-        
+        protected int GetFixKeyEnum(int enumDefineId) => GetEnumValue(enumDefineId, _data.FixKeyData.Int);
+
         internal void SetUp(YorozuDBDataObject data, int row)
         {
             _data = data;
@@ -41,15 +42,7 @@ namespace Yorozu.DB
 
         private DataContainer Data(int fieldId) => _data.GetData(fieldId, _row);
         
-        /// <summary>
-        /// primitive
-        /// </summary>
-        /// <returns></returns>
-        protected string String(int fieldId) => Data(fieldId).String;
-        protected float Float(int fieldId) => Data(fieldId).Float;
-        protected int Int(int fieldId) => Data(fieldId).Int;
-
-        protected int Enum(int fieldId, int enumDefineId)
+        private int GetEnumValue(int enumDefineId, int key)
         {
             if (_enumData == null)
             {
@@ -61,11 +54,19 @@ namespace Yorozu.DB
                 Debug.LogError("Enum Data is not Define");
                 return 0;
             }
-
-            var key = Int(fieldId);
             var index = Mathf.Max(findDefine.KeyValues.FindIndex(kv => kv.Key == key), 0);
             return index;
-        } 
+        }
+        
+        /// <summary>
+        /// primitive
+        /// </summary>
+        /// <returns></returns>
+        protected string String(int fieldId) => Data(fieldId).String;
+        protected float Float(int fieldId) => Data(fieldId).Float;
+        protected int Int(int fieldId) => Data(fieldId).Int;
+
+        protected int Enum(int fieldId, int enumDefineId) => GetEnumValue(enumDefineId, Int(fieldId));
         
         /// <summary>
         /// UnityEngin.Object

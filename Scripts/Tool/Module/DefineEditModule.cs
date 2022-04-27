@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -63,11 +64,9 @@ namespace Yorozu.DB
         private string _temp;
         
         private static readonly string EditorField = "EditorField";
-        private static readonly string ExtendNone = "--None--";
-
+        
         private ReorderableList _reorderableList;
         private ReorderableList _extendReorderableList;
-        private string[] _typeNames;
         
         internal void SetData(YorozuDBDataDefineObject data)
         {
@@ -80,29 +79,6 @@ namespace Yorozu.DB
 
         }
 
-        private string[] GetTypes()
-        {
-            return new List<string>(){ExtendNone}
-                .Concat(AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => t.IsSubclassOf(typeof(ScriptableObject))
-                                && !t.IsSubclassOf(typeof(EditorWindow))
-                                && !t.IsSubclassOf(typeof(ScriptableSingleton<>))
-                                && !t.IsSubclassOf(typeof(UnityEditor.EditorTools.EditorTool))
-                                && !t.IsSubclassOf(typeof(Editor))
-                                && t != typeof(EditorWindow)
-                                && t != typeof(Editor)
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro"))
-                                && !t.IsAbstract
-                                && !t.IsGenericType
-                    )
-                    .Select(t => t.FullName)
-                    .OrderBy(t => t)
-                ).ToArray();
-        }
-
         internal override bool OnGUI()
         {
             if (_data == null)
@@ -110,8 +86,7 @@ namespace Yorozu.DB
             
             _reorderableList ??= CreateReorderableList(_data);
             _extendReorderableList ??= CreateExtendReorderableList(_data);
-            _typeNames ??= GetTypes();
-
+            
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUILayout.LabelField($"Define Editor: 【{_data.name}】", EditorStyles.boldLabel);
@@ -182,31 +157,36 @@ namespace Yorozu.DB
             
             // 拡張フィールド
             EditorGUILayout.LabelField("Extend Fields", string.IsNullOrEmpty(_data.ExtendFieldsTypeName) ? "None" : _data.ExtendFieldsTypeName, EditorStyles.boldLabel);
-
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using (new EditorGUILayout.HorizontalScope())
             {
-                var popup = EditorGUILayout.Popup("Change Extend Type", -1, _typeNames);
-                if (check.changed)
+                if (GUILayout.Button("Set None"))
                 {
-                    if (popup > 0)
-                    {
-                        _data.SetExtendFieldsTypeName(_typeNames[popup]);
-                        _extendReorderableList = CreateExtendReorderableList(_data);
-                    }
-                    else
-                    {
-                        _data.SetExtendFieldsTypeName("");
-                        _extendReorderableList = null;
-                    }
-
+                    _data.SetExtendFieldsTypeName("");
+                    _extendReorderableList = CreateExtendReorderableList(_data);
                     // 更新したら関連データを初期化する
                     var data = YorozuDBEditorUtility.LoadAllDataAsset(_data);
                     foreach (var d in data)
                     {
                         d.ExtendFieldsObject = null;
                     }
+                }
 
-                    GUIUtility.ExitGUI();
+                var content = new GUIContent("Change Extend Type");
+                var rect = GUILayoutUtility.GetRect(content, GUI.skin.button);
+                if (GUI.Button(rect, content))
+                {
+                    new TypeDropdown(rect, fullname =>
+                    {
+                        _data.SetExtendFieldsTypeName(fullname);
+                        _extendReorderableList = CreateExtendReorderableList(_data);
+                        // 更新したら関連データを初期化する
+                        var data = YorozuDBEditorUtility.LoadAllDataAsset(_data);
+                        foreach (var d in data)
+                        {
+                            d.ExtendFieldsObject = null;
+                        }
+
+                    });
                 }
             }
 
@@ -385,6 +365,55 @@ namespace Yorozu.DB
                 drawFooterCallback = rect => { },
                 footerHeight = 0f,
             };
+        }
+    }
+
+    
+    internal class TypeDropdown : AdvancedDropdown
+    {
+        private event Action<string> _select;
+        public TypeDropdown(Rect rect, Action<string> action) : base(new AdvancedDropdownState())
+        {
+            _select = action;
+            Show(rect);
+        }
+        
+        protected override AdvancedDropdownItem BuildRoot()
+        {
+            var root = new AdvancedDropdownItem("ScriptableObjectTypes");
+            foreach (var typeName in Types())
+            {
+                var item = new AdvancedDropdownItem(typeName);
+                root.AddChild(item);
+            }
+            return root;
+        }
+
+        protected override void ItemSelected(AdvancedDropdownItem item)
+        {
+            _select?.Invoke(item.name);
+        }
+
+        private IEnumerable<string> Types()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.IsSubclassOf(typeof(ScriptableObject))
+                                && !t.IsSubclassOf(typeof(EditorWindow))
+                                && !t.IsSubclassOf(typeof(ScriptableSingleton<>))
+                                && !t.IsSubclassOf(typeof(UnityEditor.EditorTools.EditorTool))
+                                && !t.IsSubclassOf(typeof(Editor))
+                                && t != typeof(EditorWindow)
+                                && t != typeof(Editor)
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro"))
+                                && !t.IsAbstract
+                                && !t.IsGenericType
+                    )
+                    .Select(t => t.FullName)
+                    .OrderBy(t => t)
+                ;
         }
     }
 }

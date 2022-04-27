@@ -122,7 +122,7 @@ namespace Yorozu.DB
 
             if (keyField != null)
             {
-                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => fixKey ? {GetFixName(keyField.DataType)} : ({keyField.DataType.ConvertString()}){keyField.Name};");
+                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => fixKey ? {GetFixName(keyField, enumData)} : ({keyField.DataType.ConvertString()}){keyField.Name};");
                 builder.AppendLine("");
             }
 
@@ -210,18 +210,23 @@ namespace Yorozu.DB
                 }
             }
             
-            string GetFixName(DataType type)
+            string GetFixName(DataField field, YorozuDBEnumDataObject enumData)
             {
-                switch (type)
+                switch (field.DataType)
                 {
                     case DataType.String:
                         return "GetFixKeyString";
                     case DataType.Int:
-                    case DataType.Enum:
                         return "GetFixKeyInt";
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    case DataType.Enum:
+                        var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
+                        if (enumDefine != null)
+                        {
+                            return $"GetFixKeyEnum({field.EnumDefineId})";
+                        }
+                        break;
                 }
+                throw new ArgumentOutOfRangeException(nameof(field.DataType), field.DataType, null);
             }
 
             return builder.ToString();
