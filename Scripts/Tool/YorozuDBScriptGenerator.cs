@@ -122,7 +122,7 @@ namespace Yorozu.DB
 
             if (keyField != null)
             {
-                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => fixKey ? {GetFixName(keyField, enumData)} : ({keyField.DataType.ConvertString()}){keyField.Name};");
+                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
                 builder.AppendLine("");
             }
 
@@ -140,12 +140,32 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                        if (data.IsKeyField(field))
+                        {
+                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => " +
+                                               $"(Yorozu.DB.{enumDefine.Name}) " +
+                                               $"(fixKey ? {GetFixName(keyField, enumData)} :" +
+                                               $"{field.DataType.ToString()}({field.ID}, {field.EnumDefineId})" +
+                                               $");");
+                        }
+                        else
+                        {
+                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                        }
                     }
+                    
+                     
                 }
                 else
                 {
-                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                    if (data.IsKeyField(field))
+                    {
+                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => fixKey ? {GetFixName(keyField, enumData)} : {field.DataType.ToString()}({field.ID});");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                    }
                 }
                 builder.AppendLine("");
             }
