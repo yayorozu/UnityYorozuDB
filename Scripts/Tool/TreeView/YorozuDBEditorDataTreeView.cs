@@ -17,6 +17,7 @@ namespace Yorozu.DB.TreeView
 	    internal event Action<IList<int>> AutoIdEvent;
 	    internal event Action<IList<int>> SameIdEvent;
 	    internal event Action<int, IList<int>> SortEvent;
+	    internal event Action<int> DuplicateEvent;
 	    
 	    private YorozuDBDataObject _data;
 	    
@@ -59,8 +60,13 @@ namespace Yorozu.DB.TreeView
 	        var menu = new GenericMenu();
 	        menu.AddItem(new GUIContent("Delete"), false, () => DeleteRowEvent?.Invoke(GetSelection()));
 	        menu.AddItem(new GUIContent("Reset Row Value"), false, () => ResetRowEvent?.Invoke(GetSelection()));
+	        if (GetSelection().Count == 1)
+	        {
+		        // 複製
+		        menu.AddItem(new GUIContent("Duplicate"), false, () => DuplicateEvent?.Invoke(GetSelection().First()));
+	        }
 	        // KeyがInt だったらAutoInc有効にする
-	        if (_data.Define.KeyField != null && _data.Define.KeyField.DataType == DataType.Int)
+	        if (GetSelection().Count > 1 && _data.Define.KeyField != null && _data.Define.KeyField.DataType == DataType.Int)
 	        {
 		        menu.AddItem(new GUIContent("Apply Sequential Number"), false, () => AutoIdEvent?.Invoke(GetSelection()));
 		        menu.AddItem(new GUIContent("Apply Same Number"), false, () => SameIdEvent?.Invoke(GetSelection()));

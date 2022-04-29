@@ -62,6 +62,8 @@ namespace Yorozu.DB
                 {
                     _settingMode = !_settingMode;
                 }
+                
+                GUILayout.Space(10);
 
                 using (new EditorGUI.DisabledScope(_fieldCount <= 0))
                 {
@@ -154,6 +156,7 @@ namespace Yorozu.DB
             _treeView.SortEvent += InsertItems;
             _treeView.AutoIdEvent += SetAutoId;
             _treeView.SameIdEvent += SetSameId;
+            _treeView.DuplicateEvent += Duplicate;
             
             var fields =YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
             _fieldCount = _data.Define.Fields.Count + fields.Count;
@@ -280,6 +283,15 @@ namespace Yorozu.DB
                 _data.RemoveRows(indexes.OrderByDescending(v => v));
                 Reload();
             }
+        }
+
+        /// <summary>
+        /// 複製
+        /// </summary>
+        private void Duplicate(int index)
+        {
+            _data.Duplicate(index);
+            Reload();
         }
     }
 }

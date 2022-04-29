@@ -106,7 +106,7 @@ namespace Yorozu.DB
         /// <summary>
         /// 追加定義のフィールドの中身を増やす
         /// </summary>
-        internal static void AddFields(ScriptableObject scriptableObject)
+        internal static void AddFields(ScriptableObject scriptableObject, int? copyIndex = null)
         {
             if (scriptableObject == null)
                 return;
@@ -119,6 +119,12 @@ namespace Yorozu.DB
             {
                 var prop = editor.serializedObject.FindProperty(field.Name);
                 prop.InsertArrayElementAtIndex(prop.arraySize);
+                // 値のコピー
+                if (copyIndex.HasValue)
+                {
+                    var list = field.GetValue(scriptableObject) as IList;
+                    list[prop.arraySize - 1] = list[copyIndex.Value];
+                }
             }
             editor.serializedObject.ApplyModifiedProperties();
         }
@@ -201,7 +207,7 @@ namespace Yorozu.DB
         /// <summary>
         /// 並べ替え
         /// </summary>
-        internal static void Insert(ScriptableObject scriptableObject, int insertIndex, IOrderedEnumerable<int> targetIndexes)
+        internal static void Insert(ScriptableObject scriptableObject, int insertIndex, IEnumerable<int> targetIndexes)
         {
             if (scriptableObject == null)
                 return;

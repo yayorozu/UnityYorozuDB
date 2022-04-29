@@ -37,7 +37,7 @@ namespace Yorozu.DB
             /// <summary>
             /// 入れ替え
             /// </summary>
-            internal void Insert(int insertIndex, IOrderedEnumerable<int> targetIndexes)
+            internal void Insert(int insertIndex, IEnumerable<int> targetIndexes)
             {
                 var cache = new List<DataContainer>();
                 foreach (var index in targetIndexes)
@@ -148,18 +148,22 @@ namespace Yorozu.DB
         /// <summary>
         /// データの追加
         /// </summary>
-        internal void AddRow()
+        internal void AddRow(int? copyIndex = null)
         {
             foreach (var field in _fields)
             {
                 var targetField = Define.Fields.First(f => f.ID == field.ID);
-                field.Data.Add(targetField.DefaultValue.Copy());
+                field.Data.Add(
+                    copyIndex.HasValue ? 
+                        field.Data[copyIndex.Value].Copy() : 
+                        targetField.DefaultValue.Copy()
+                );
             }
 
             // 対象のフィールド追加
             if (ExtendFieldsObject != null)
             {
-                YorozuDBExtendUtility.AddFields(ExtendFieldsObject);
+                YorozuDBExtendUtility.AddFields(ExtendFieldsObject, copyIndex);
             }
             this.Dirty();
         }
@@ -196,7 +200,7 @@ namespace Yorozu.DB
         /// <summary>
         /// 入れ替え
         /// </summary>
-        internal void Insert(int insertIndex, IOrderedEnumerable<int> targetIndexes)
+        internal void Insert(int insertIndex, IEnumerable<int> targetIndexes)
         {
             foreach (var g in _fields)
             {
@@ -239,6 +243,13 @@ namespace Yorozu.DB
             }
             
             this.Dirty();
+        }
+        
+        internal void Duplicate(int index)
+        {
+            AddRow(index);
+            // 入れ替え
+            Insert(index + 1, new int[]{DataCount - 1});
         }
 #endif
     }
