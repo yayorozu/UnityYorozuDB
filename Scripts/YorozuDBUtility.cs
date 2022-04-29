@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace Yorozu.DB
 {
+    internal interface IDBName
+    {
+        string Name { get; }
+    }
+    
     internal static class YorozuDBUtility
     {
         private static IEnumerable<Type> _types;

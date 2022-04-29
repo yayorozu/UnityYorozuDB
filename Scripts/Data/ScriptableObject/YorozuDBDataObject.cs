@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Yorozu.DB.TreeView;
 
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using Yorozu.DB.TreeView;
 #endif
 
 namespace Yorozu.DB
@@ -89,9 +89,13 @@ namespace Yorozu.DB
             {
                 if (_fields == null || !_fields.Any())
                 {
+#if UNITY_EDITOR
                     // こっちの定義がない場合は拡張側を見る
                     var extendCount = YorozuDBExtendUtility.DataCount(ExtendFieldsObject);
                     return extendCount;
+#else
+                    return 0;
+#endif
                 }
 
                 return _fields[0].Data.Count;

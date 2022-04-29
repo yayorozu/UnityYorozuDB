@@ -174,8 +174,10 @@ namespace Yorozu.DB
             }
             this.Dirty();
         }
+#endif
     }
     
+#if UNITY_EDITOR
     [UnityEditor.CustomEditor(typeof(YorozuDBDataDefineObject))]
     internal class YorozuDBDataDefineObjectEditor : UnityEditor.Editor
     {

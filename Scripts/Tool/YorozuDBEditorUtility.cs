@@ -9,11 +9,6 @@ using UnityEngine;
 
 namespace Yorozu.DB
 {
-    internal interface IDBName
-    {
-        string Name { get; }
-    }
-    
     internal static class YorozuDBEditorUtility
     {
         internal static YorozuDBDataDefineObject[] LoadAllDefineAsset()

@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,8 +41,6 @@ namespace Yorozu.DB
         
         private static Dictionary<string, List<FieldInfo>> _fieldCache = new Dictionary<string, List<FieldInfo>>();
         
-#if UNITY_EDITOR
-
         internal static List<FieldInfo> FindFields(Type type)
         {
             var fullName = type.FullName;
@@ -235,8 +235,6 @@ namespace Yorozu.DB
             }
             editor.serializedObject.ApplyModifiedProperties();
         }
-        
-#endif
-
     }
 }
+#endif
