@@ -11,7 +11,6 @@ namespace Yorozu.DB
         Bool,
         Sprite,
         GameObject,
-        AudioClip,
         ScriptableObject,
         /// <summary>
         /// その他の UnityEngine.Object
@@ -26,5 +25,6 @@ namespace Yorozu.DB
         Vector2Int,
         Vector3Int,
         Color,
+        AudioClip,
     }
 }
