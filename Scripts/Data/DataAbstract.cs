@@ -73,6 +73,7 @@ namespace Yorozu.DB
         /// </summary>
         protected Sprite Sprite(int fieldId) => Data(fieldId).UnityObject as Sprite;
         protected GameObject GameObject(int fieldId) => Data(fieldId).UnityObject as GameObject;
+        protected AudioClip AudioClip(int fieldId) => Data(fieldId).UnityObject as AudioClip;
         protected ScriptableObject ScriptableObject(int fieldId) => Data(fieldId).UnityObject as ScriptableObject;
         protected UnityEngine.Object UnityObject(int fieldId) => Data(fieldId).UnityObject;
         

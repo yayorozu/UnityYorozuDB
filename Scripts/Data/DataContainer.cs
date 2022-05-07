@@ -106,6 +106,9 @@ namespace Yorozu.DB
                 case DataType.GameObject:
                     _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(GameObject), false);
                     break;
+                case DataType.AudioClip:
+                    _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(AudioClip), false);
+                    break;
                 case DataType.UnityObject:
                     _unityObject = EditorGUI.ObjectField(rect, content, _unityObject, typeof(UnityEngine.Object), false);
                     break;

@@ -192,6 +192,7 @@ namespace Yorozu.DB
                 {
                     case DataType.Sprite:
                     case DataType.GameObject:
+                    case DataType.AudioClip:
                     case DataType.ScriptableObject:
                     case DataType.UnityObject:
                         builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{({field.Name} == null ? \"null\" : {field.Name}.ToString())}}\");");
@@ -319,6 +320,7 @@ namespace Yorozu.DB
                 DataType.Bool => "bool",
                 DataType.Sprite => "Sprite",
                 DataType.GameObject => "GameObject",
+                DataType.AudioClip => "AudioClip",
                 DataType.ScriptableObject => "ScriptableObject",
                 DataType.UnityObject => "UnityEngine.Object",
                 DataType.Vector2 => "Vector2",

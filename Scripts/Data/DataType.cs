@@ -11,6 +11,7 @@ namespace Yorozu.DB
         Bool,
         Sprite,
         GameObject,
+        AudioClip,
         ScriptableObject,
         /// <summary>
         /// その他の UnityEngine.Object
