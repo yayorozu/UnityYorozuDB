@@ -25,6 +25,9 @@ namespace Yorozu.DB
         {
             foreach (var d in data)
             {
+                if (d == null)
+                    continue;
+                
                 var type = YorozuDBUtility.GetType(d);
                 if (!_data.ContainsKey(type))
                 {
