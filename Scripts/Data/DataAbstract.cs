@@ -64,6 +64,7 @@ namespace Yorozu.DB
         /// <returns></returns>
         protected string String(int fieldId) => Data(fieldId).String;
         protected float Float(int fieldId) => Data(fieldId).Float;
+        protected bool Bool(int fieldId) => Data(fieldId).Bool;
         protected int Int(int fieldId) => Data(fieldId).Int;
 
         protected int Enum(int fieldId, int enumDefineId) => GetEnumValue(enumDefineId, Int(fieldId));
