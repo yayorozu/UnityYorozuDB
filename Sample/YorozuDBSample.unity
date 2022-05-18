@@ -1312,10 +1312,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _loader:
-    _enum: {fileID: 11400000, guid: 9a9968159aa454056a89b1544f9a14e9, type: 2}
-    _data:
-    - {fileID: 11400000, guid: 77df16f8a91de47abbf6972e0b550339, type: 2}
-    - {fileID: 11400000, guid: 88944c4c9821145e598fbba79e88e4ea, type: 2}
+    _enum: {fileID: 0}
+    _data: []
   _button: {fileID: 482981052}
   _inputField: {fileID: 1156494229}
   _toggle: {fileID: 483880486}

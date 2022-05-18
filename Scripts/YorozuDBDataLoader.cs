@@ -13,8 +13,27 @@ namespace Yorozu.DB
 
         public void Load()
         {
-            YorozuDB.SetEnum(_enum);
+            if (_enum != null)
+            {
+                YorozuDB.SetEnum(_enum);
+            }
+            else
+            {
+                var enumData = Resources.LoadAll<YorozuDBEnumDataObject>("YorozuDB/Define/");
+                if (enumData != null && enumData.Length > 0)
+                {
+                    YorozuDB.SetEnum(enumData[0]);
+                }
+            }
+
             YorozuDB.SetData(_data);
+            
+            // 指定のフォルダよりロード
+            var resourcesData = Resources.LoadAll<YorozuDBDataObject>("YorozuDB/Data/");
+            if (resourcesData != null && resourcesData.Length > 0)
+            {
+                YorozuDB.SetData(resourcesData);
+            }
         }
     }
 }
