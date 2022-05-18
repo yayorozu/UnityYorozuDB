@@ -9,11 +9,8 @@ namespace Yorozu.DB
 {
     public partial class Extend : DataAbstract, IIntKey
     {
-        int IIntKey.Key => fixKey ? GetFixKeyInt : (int)Id;
+        int IIntKey.Key => (int)Id;
 
-        /// <summary>
-        /// メモのテスト
-        /// </summary>
         public int Id => Int(1);
 
         // Extend Fields

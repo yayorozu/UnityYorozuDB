@@ -140,32 +140,12 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        if (data.IsKeyField(field))
-                        {
-                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => " +
-                                               $"(Yorozu.DB.{enumDefine.Name}) " +
-                                               $"(fixKey ? {GetFixName(keyField, enumData)} :" +
-                                               $"{field.DataType.ToString()}({field.ID}, {field.EnumDefineId})" +
-                                               $");");
-                        }
-                        else
-                        {
-                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
-                        }
+                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
                     }
-                    
-                     
                 }
                 else
                 {
-                    if (data.IsKeyField(field))
-                    {
-                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => fixKey ? {GetFixName(keyField, enumData)} : {field.DataType.ToString()}({field.ID});");
-                    }
-                    else
-                    {
-                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
-                    }
+                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
                 }
                 builder.AppendLine("");
             }

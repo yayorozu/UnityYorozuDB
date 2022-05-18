@@ -9,7 +9,7 @@ namespace Yorozu.DB
 {
     public partial class SampleData : DataAbstract, IIntKey
     {
-        int IIntKey.Key => fixKey ? GetFixKeyInt : (int)Key;
+        int IIntKey.Key => (int)Key;
 
         public int Key => Int(1);
 

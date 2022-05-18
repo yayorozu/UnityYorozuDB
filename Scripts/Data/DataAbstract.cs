@@ -29,11 +29,7 @@ namespace Yorozu.DB
         private int _row;
 
         protected int row => _row;
-        protected bool fixKey => _data.IsFxKey;
-        protected int GetFixKeyInt => _data.FixKeyData.Int;
-        protected string GetFixKeyString => _data.FixKeyData.String;
-        protected int GetFixKeyEnum(int enumDefineId) => GetEnumValue(enumDefineId, _data.FixKeyData.Int);
-
+        
         internal void SetUp(YorozuDBDataObject data, int row)
         {
             _data = data;

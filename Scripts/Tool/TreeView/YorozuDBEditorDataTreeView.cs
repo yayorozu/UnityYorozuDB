@@ -313,10 +313,10 @@ namespace Yorozu.DB.TreeView
 	    internal void Draw(Rect rect, int index)
 	    {
 		    var field = _data.Define.Fields[index];
-		    var isFix = _data.IsFxKey && _data.Define.IsKeyField(field);
+		    var isFix = _data.IsFixField(field.ID);
 		    using (new EditorGUI.DisabledScope(isFix))
 		    {
-			    var container = isFix ? _data.FixKeyData : _data.GetData(field.ID, id);
+			    var container = _data.GetData(field.ID, id);
 				container.DrawField(rect, field, GUIContent.none, _enumData);
 		    }
 	    }

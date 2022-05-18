@@ -26,6 +26,12 @@ namespace Yorozu.DB
             internal int ID;
             
             [SerializeField]
+            internal bool IsFix;
+            
+            [SerializeField]
+            internal DataContainer FixData;
+            
+            [SerializeField]
             internal List<DataContainer> Data = new List<DataContainer>();
 
             internal Field(int fieldId)
@@ -73,14 +79,6 @@ namespace Yorozu.DB
         private List<Field> _fields = new List<Field>();
 
         /// <summary>
-        /// このデータ内ではKeyを固定する
-        /// </summary>
-        [SerializeField]
-        internal bool IsFxKey;
-        [SerializeField]
-        internal DataContainer FixKeyData;
-
-        /// <summary>
         /// データ数
         /// </summary>
         internal int DataCount
@@ -109,11 +107,47 @@ namespace Yorozu.DB
         {
             return _fields
                 .Where(f => f.ID == fieldId)
-                .Select(f => f.Data[row])
+                .Select(f => f.IsFix ? f.FixData : f.Data[row])
                 .First();
         }
 
 #if UNITY_EDITOR
+
+        internal bool IsFixField(int fieldId) => _fields.First(f => f.ID == fieldId).IsFix;
+        
+        /// <summary>
+        /// 固定の設定を行えるように
+        /// </summary>
+        internal void DrawFixFields(YorozuDBEnumDataObject enumData)
+        {
+            var fields = Define.Fields;
+            EditorGUILayout.LabelField("Fix Fields", EditorStyles.boldLabel);
+            foreach (var field in fields)
+            {
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        var f = _fields.First(f => f.ID == field.ID);
+                        f.IsFix = EditorGUILayout.ToggleLeft(field.Name, f.IsFix);
+                        if (f.IsFix)
+                        {
+                            var rect = GUILayoutUtility.GetRect(0, 100000, EditorGUIUtility.singleLineHeight,
+                                EditorGUIUtility.singleLineHeight);
+                            using (var check = new EditorGUI.ChangeCheckScope())
+                            {
+                                f.FixData.DrawField(rect, field, GUIContent.none, enumData);
+                                if (check.changed)
+                                {
+                                    this.Dirty();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// フィールドの追加
         /// </summary>

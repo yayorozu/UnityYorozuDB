@@ -91,28 +91,6 @@ namespace Yorozu.DB
 
         private void DrawSetting()
         {
-            var keyField = _data.Define.KeyField;
-            if (keyField != null)
-            {
-                // データ内でKey固定
-                _data.IsFxKey = EditorGUILayout.Toggle("Fix Key Value in this Data", _data.IsFxKey);
-                using (new EditorGUI.IndentLevelScope())
-                {
-                    if (_data.IsFxKey)
-                    {
-                        using (var check = new EditorGUI.ChangeCheckScope())
-                        {
-                            var rect = GUILayoutUtility.GetRect(0, 100000, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
-                            _data.FixKeyData.DrawField(rect, keyField, new GUIContent("Fix Key"), _enum);
-                            if (check.changed)
-                            {
-                                _data.Dirty();
-                            }
-                        }
-                    }
-                }
-            }
-
             using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_data.Define.ExtendFieldsTypeName)))
             {
                 using (var check = new EditorGUI.ChangeCheckScope())
@@ -125,6 +103,8 @@ namespace Yorozu.DB
                     }
                 }
             }
+            
+            _data.DrawFixFields(_enum);
         }
 
         private void Reload() => _Initialized = false;
