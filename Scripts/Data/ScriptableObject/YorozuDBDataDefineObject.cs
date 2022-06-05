@@ -103,7 +103,7 @@ namespace Yorozu.DB
             }
 
             var typeId = 0;
-            if (dataType == DataType.Enum)
+            if (dataType == DataType.Enum || dataType == DataType.Flags)
             {
                 var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
                 var index = enumData.Defines.FindIndex(d => d.Name == enumName);

@@ -19,6 +19,7 @@ namespace Yorozu.DB
             internal static GUIContent SubContent;
             internal static GUIContent DeleteContent;
             internal const float ButtonWidth = 16f;
+            internal const float FlagsWidth = 50f;
             internal static GUILayoutOption AddButtonLabelWidth;
             internal static GUILayoutOption AddButtonWidth;
             
@@ -125,7 +126,7 @@ namespace Yorozu.DB
             {
                 drawHeaderCallback = rect =>
                 {
-                    rect.width -= Style.ButtonWidth * 2;
+                    rect.width -= (Style.ButtonWidth * 2) + Style.FlagsWidth;
                     if (_editId == define.ID)
                     {
                         GUI.SetNextControlName(EditorField);
@@ -155,8 +156,11 @@ namespace Yorozu.DB
                     }
                     
                     rect.x += rect.width;
-                    rect.width = Style.ButtonWidth;
+                    rect.width = Style.FlagsWidth;
+                    define.Flags = EditorGUI.ToggleLeft(rect, "Flags", define.Flags);
 
+                    rect.x += rect.width;
+                    rect.width = Style.ButtonWidth;
                     if (GUI.Button(rect, Style.DeleteContent, Style.AddStyle))
                     {
                         if (EditorUtility.DisplayDialog("Warning", $"Delete {define.Name} Enum Define?\nEnum field defined in the data is Deleted",

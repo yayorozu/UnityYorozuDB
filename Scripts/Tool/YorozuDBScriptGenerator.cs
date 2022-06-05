@@ -143,6 +143,14 @@ namespace Yorozu.DB
                         builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
                     }
                 }
+                else if (field.DataType == DataType.Flags)
+                {
+                    var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
+                    if (enumDefine != null)
+                    {
+                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID});");
+                    }
+                }
                 else
                 {
                     builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
@@ -211,25 +219,6 @@ namespace Yorozu.DB
                 }
             }
             
-            string GetFixName(DataField field, YorozuDBEnumDataObject enumData)
-            {
-                switch (field.DataType)
-                {
-                    case DataType.String:
-                        return "GetFixKeyString";
-                    case DataType.Int:
-                        return "GetFixKeyInt";
-                    case DataType.Enum:
-                        var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
-                        if (enumDefine != null)
-                        {
-                            return $"GetFixKeyEnum({field.EnumDefineId})";
-                        }
-                        break;
-                }
-                throw new ArgumentOutOfRangeException(nameof(field.DataType), field.DataType, null);
-            }
-
             return builder.ToString();
         }
         
@@ -270,11 +259,23 @@ namespace Yorozu.DB
                 
                 builder.AppendLine("namespace Yorozu.DB");
                 builder.AppendLine("{");
+                if (define.Flags)
+                {
+                    builder.AppendLine($"    [System.Flags]");    
+                }
                 builder.AppendLine($"    public enum {define.Name}");
                 builder.AppendLine("    {");
-                foreach (var kv in define.KeyValues)
+                for (var i = 0; i < define.KeyValues.Count; i++)
                 {
-                    builder.AppendLine($"       {kv.Value},");
+                    var kv = define.KeyValues[i];
+                    if (define.Flags)
+                    {
+                        builder.AppendLine($"       {kv.Value} = 1 << {i},");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"       {kv.Value},");
+                    }
                 }
                 builder.AppendLine("    }");
                 builder.AppendLine("}");

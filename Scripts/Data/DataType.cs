@@ -26,5 +26,6 @@ namespace Yorozu.DB
         Vector3Int,
         Color,
         AudioClip,
+        Flags,
     }
 }

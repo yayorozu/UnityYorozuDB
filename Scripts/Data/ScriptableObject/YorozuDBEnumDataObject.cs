@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace Yorozu.DB
@@ -18,6 +19,12 @@ namespace Yorozu.DB
             /// </summary>
             [SerializeField]
             internal string Name;
+
+            /// <summary>
+            /// Apply FlagsAttribute
+            /// </summary>
+            [SerializeField]
+            internal bool Flags;
 
             string IDBName.Name => Name;
 
@@ -189,6 +196,30 @@ namespace Yorozu.DB
             }
             
             return _valuesDictionary[id];
+        }
+
+        private static StringBuilder _builder = new StringBuilder();
+        internal string GetEnumFlagName(int id, int value)
+        {
+            if (value == 0)
+                return "None";
+            
+            var enums = GetEnums(id);
+            var all = (int) Mathf.Pow(2, enums.Length) - 1;
+            if (value == all)
+                return "All";
+            
+            _builder.Clear();
+            for (var i = 0; i < enums.Length; i++)
+            {
+                var v = (int) Mathf.Pow(2, i);
+                if ((value & v) == v)
+                {
+                    _builder.Append(_builder.Length > 1 ? $", {enums[i]}" : enums[i]);
+                }
+            }
+
+            return _builder.ToString();
         }
 
         internal int GetEnumIndex(int id, int key)

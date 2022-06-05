@@ -179,11 +179,13 @@ namespace Yorozu.DB
                     }
                     break;
                 case DataType.Enum:
+                {
                     if (enumData == null)
                     {
                         EditorGUI.LabelField(rect, "Enum Asset Not Found.");
                         return;
                     }
+
                     var enums = enumData.GetEnums(field.EnumDefineId);
                     var index = enumData.GetEnumIndex(field.EnumDefineId, _int);
                     using (var check = new EditorGUI.ChangeCheckScope())
@@ -198,6 +200,7 @@ namespace Yorozu.DB
                             }
                         }
                     }
+                }
                     break;
                 case DataType.Color:
                     var color = string.IsNullOrEmpty(_string) ? Color.white : GetFromString<Color>();
@@ -209,6 +212,18 @@ namespace Yorozu.DB
                             SetToString(color);
                         }
                     }
+                    break;
+                case DataType.Flags:
+                {
+                    var name = enumData.GetEnumFlagName(field.EnumDefineId, _int);
+                    if (GUI.Button(rect, name))
+                    {
+                        var enums = enumData.GetEnums(field.EnumDefineId);
+                        var popup = new EnumFlagsPopup(enums, _int);
+                        popup.FlagsChange += v => _int = v;
+                        PopupWindow.Show(rect, popup);
+                    }
+                }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

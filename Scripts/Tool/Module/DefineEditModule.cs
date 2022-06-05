@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
@@ -103,12 +102,15 @@ namespace Yorozu.DB
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
-                        if (check.changed && _dataType == DataType.Enum)
+                        if (check.changed && (_dataType == DataType.Enum || _dataType == DataType.Flags))
                         {
                             var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
                             if (enumData != null)
                             {
-                                _enums = enumData.Defines.Select(d => d.Name).ToArray();
+                                _enums = enumData.Defines
+                                    .Where(d => d.Flags == (_dataType == DataType.Flags) || _dataType == DataType.Enum)
+                                    .Select(d => d.Name)
+                                    .ToArray();
                                 _enumName = _enums.Length > 0 ? _enums[0] : "";
                             }
                         }
@@ -118,7 +120,7 @@ namespace Yorozu.DB
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     // enumなら候補を表示
-                    if (_dataType == DataType.Enum && _enums != null && _enums.Length > 0)
+                    if ((_dataType == DataType.Enum || _dataType == DataType.Flags) && _enums != null && _enums.Length > 0)
                     {
                         var index = Array.IndexOf(_enums, _enumName);
                         using (var check = new EditorGUI.ChangeCheckScope())
@@ -136,7 +138,9 @@ namespace Yorozu.DB
                     using (new EditorGUI.DisabledScope(
                                string.IsNullOrEmpty(_name) || 
                                (_dataType == DataType.Enum && (_enums == null || _enums.Length <= 0)) ||
-                               (_dataType == DataType.Enum && _enumData == null)
+                               (_dataType == DataType.Enum && _enumData == null) ||
+                               (_dataType == DataType.Flags && (_enums == null || _enums.Length <= 0)) ||
+                               (_dataType == DataType.Flags && _enumData == null)
                         ))
                     {
                         if (GUILayout.Button("Add", Style.ButtonWidth))
@@ -275,11 +279,13 @@ namespace Yorozu.DB
                     rect.width = 140;
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        if (field.DataType == DataType.Enum && _enumData != null)
+                        if (_enumData != null && (field.DataType == DataType.Enum || field.DataType == DataType.Flags))
                         {
                             var enumIndex = _enumData.Defines.FindIndex(d => d.ID == field.EnumDefineId);
                             if (enumIndex >= 0)
-                                EditorGUI.LabelField(rect, $"Enum ({_enumData.Defines[enumIndex].Name})", EditorStyles.popup);
+                            {
+                                EditorGUI.LabelField(rect, $"{field.DataType} ({_enumData.Defines[enumIndex].Name})", EditorStyles.popup);
+                            }
                         }
                         else
                         {
