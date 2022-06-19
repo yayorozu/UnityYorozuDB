@@ -218,8 +218,11 @@ namespace Yorozu.DB
                     AutoIncrementKey && 
                     keyField.DataType == DataType.Int)
                 {
-                    var max = field.Data.Max(d => d.Int) + 1;
-                    addData.UpdateInt(max);
+                    var maxId = 1;
+                    if (field.Data != null && field.Data.Count > 0)
+                        maxId = field.Data.Max(d => d.Int) + 1;
+                    
+                    addData.UpdateInt(maxId);
                 }
                 
                 field.Data.Add(addData);
