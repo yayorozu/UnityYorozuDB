@@ -79,6 +79,12 @@ namespace Yorozu.DB
         private List<Field> _fields = new List<Field>();
 
         /// <summary>
+        /// Key が Int 際にデータを追加時に前の値+1するか
+        /// </summary>
+        [SerializeField]
+        internal bool AutoIncrementKey;
+        
+        /// <summary>
         /// データ数
         /// </summary>
         internal int DataCount
@@ -182,20 +188,41 @@ namespace Yorozu.DB
             this.Dirty();
         }
 
+        internal int MaxKey()
+        {
+            var key = Define.KeyField;
+            if (key == null)
+                return 0;
+
+            var keyField = _fields.FirstOrDefault(f => f.ID == key.ID);
+            if (keyField == null)
+                return 0;
+
+            return keyField.Data.Max(d => d.Int);
+        }
 
         /// <summary>
         /// データの追加
         /// </summary>
         internal void AddRow(int? copyIndex = null)
         {
+            var keyField = Define.KeyField;
             foreach (var field in _fields)
             {
                 var targetField = Define.Fields.First(f => f.ID == field.ID);
-                field.Data.Add(
-                    copyIndex.HasValue ? 
-                        field.Data[copyIndex.Value].Copy() : 
-                        targetField.DefaultValue.Copy()
-                );
+                var addData = copyIndex.HasValue ? field.Data[copyIndex.Value].Copy() : targetField.DefaultValue.Copy(); 
+
+                if (keyField != null &&
+                    keyField.ID == field.ID && 
+                    !copyIndex.HasValue &&
+                    AutoIncrementKey && 
+                    keyField.DataType == DataType.Int)
+                {
+                    var max = field.Data.Max(d => d.Int) + 1;
+                    addData.UpdateInt(max);
+                }
+                
+                field.Data.Add(addData);
             }
 
             // 対象のフィールド追加

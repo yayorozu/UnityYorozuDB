@@ -103,6 +103,12 @@ namespace Yorozu.DB
                     }
                 }
             }
+
+            var key = _data.Define.KeyField;
+            using (new EditorGUI.DisabledScope(key == null || key.DataType != DataType.Int))
+            {
+                _data.AutoIncrementKey = EditorGUILayout.Toggle("Auto Increment Id", _data.AutoIncrementKey);
+            }
             
             _data.DrawFixFields(_enum);
         }
