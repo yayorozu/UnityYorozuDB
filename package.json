@@ -1,0 +1,21 @@
+{
+  "name": "yorozu.database",
+  "version": "1.0.0",
+  "displayName": "Yorozu DB",
+  "description": "Unity上で DB っぽくデータを管理できるツール",
+  "keywords": [
+    "Yorozu"
+  ],
+  "author": {
+    "name": "Yorozu",
+    "email": "hatch.tech.eng@gmail.com",
+    "url": "https://github.com/yayorozu"
+  },
+  "samples": [
+    {
+      "displayName": "DB Sample",
+      "description": "",
+      "path": "Samples~/DBSample"
+    }
+  ]
+}

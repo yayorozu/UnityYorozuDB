@@ -74,6 +74,21 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
+    - _string: 
+      _int: 11
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 12
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
   - ID: 2
     IsFix: 1
     FixData:
@@ -129,6 +144,21 @@ MonoBehaviour:
       _bool: 0
       _unityObject: {fileID: 0}
     - _string: remon
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
       _int: 0
       _float: 0
       _bool: 0
@@ -192,3 +222,19 @@ MonoBehaviour:
       _float: 0
       _bool: 0
       _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+    - _string: 
+      _int: 0
+      _float: 0
+      _bool: 0
+      _unityObject: {fileID: 0}
+  AutoIncrementKey: 0
