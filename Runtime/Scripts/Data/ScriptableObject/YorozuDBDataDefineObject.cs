@@ -93,7 +93,7 @@ namespace Yorozu.DB
         /// </summary>
         internal int AddField(string name, DataType dataType, string enumName)
         {
-            if (!YorozuDBEditorUtility.NameValidator(Fields, name, out name))
+            if (!YorozuDBEditorInternalUtility.NameValidator(Fields, name, out name))
                 return -1;
 
             var fieldId = 1;
@@ -105,7 +105,7 @@ namespace Yorozu.DB
             var typeId = 0;
             if (dataType == DataType.Enum || dataType == DataType.Flags)
             {
-                var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+                var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
                 var index = enumData.Defines.FindIndex(d => d.Name == enumName);
                 if (index >= 0)
                 {
@@ -123,7 +123,7 @@ namespace Yorozu.DB
             Fields.Add(field);
 
             // 依存するデータにフィールド追加
-            var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
+            var assets = YorozuDBEditorInternalUtility.LoadAllDataAsset(this);
             foreach (var asset in assets)
             {
                 asset.AddField(field.ID);
@@ -136,7 +136,7 @@ namespace Yorozu.DB
         
         internal void UpdateDefaultValue(int fieldId, DataContainer src)
         {
-            var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
+            var assets = YorozuDBEditorInternalUtility.LoadAllDataAsset(this);
             foreach (var asset in assets)
             {
                 asset.UpdateDefaultValue(fieldId, src);
@@ -148,7 +148,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void RenameField(int fieldId, string newName)
         {
-            if (!YorozuDBEditorUtility.NameValidator(Fields, newName, out newName))
+            if (!YorozuDBEditorInternalUtility.NameValidator(Fields, newName, out newName))
                 return;
             
             var index = Fields.FindIndex(f => f.ID == fieldId);
@@ -167,7 +167,7 @@ namespace Yorozu.DB
         {
             // 削除
             Fields.RemoveAll(g => g.ID == fieldId);
-            var assets = YorozuDBEditorUtility.LoadAllDataAsset(this);
+            var assets = YorozuDBEditorInternalUtility.LoadAllDataAsset(this);
             foreach (var asset in assets)
             {
                 asset.RemoveField(fieldId);

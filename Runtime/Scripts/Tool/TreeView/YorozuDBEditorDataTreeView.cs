@@ -37,7 +37,7 @@ namespace Yorozu.DB.TreeView
 
         protected override TreeViewItem BuildRoot()
         {
-	        var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+	        var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 	        var root = _data.CreateTree(enumData);
 	        return root;
         }
@@ -245,92 +245,6 @@ namespace Yorozu.DB.TreeView
 		    }
 
 		    return new MultiColumnHeaderState(columns.ToArray());
-	    }
-    }
-
-    internal class YorozuDBEditorMultiColumnHeader : MultiColumnHeader
-    {
-	    internal event Action<MultiColumnHeaderState.Column> DeleteEvent;
-	    internal event Action<int, float> ChangeWidthEvent;
-	    
-	    internal YorozuDBEditorMultiColumnHeader(MultiColumnHeaderState state) : base(state)
-        {
-            canSort = false;
-            height = 24f;
-        }
-
-        protected override void ColumnHeaderGUI(MultiColumnHeaderState.Column column, Rect headerRect, int columnIndex)
-        {
-	        base.ColumnHeaderGUI(column, headerRect, columnIndex);
-	        
-	        if (columnIndex <= 0)
-		        return;
-	        
-	        ChangeWidthEvent?.Invoke(columnIndex - 1, column.width);
-	        
-	        var width = 16;
-	        headerRect.y += 1;
-			headerRect.x += headerRect.width - width - EditorGUIUtility.standardVerticalSpacing * 2;
-	        headerRect.width = width;
-	        headerRect.height = EditorGUIUtility.singleLineHeight;
-	        
-	        // 削除ボタン
-	        if (GUI.Button(headerRect, EditorGUIUtility.TrIconContent("Toolbar minus"), EditorStyles.label))
-	        {
-		        DeleteEvent?.Invoke(column);
-		        GUIUtility.ExitGUI();
-	        }
-        }
-
-        protected override void AddColumnHeaderContextMenuItems(GenericMenu menu)
-        {
-        }
-    }
-
-    /// <summary>
-    /// 1行分のデータをもたせる
-    /// </summary>
-    internal class YorozuDBEditorTreeViewItem : TreeViewItem
-    {
-	    private YorozuDBDataObject _data;
-	    private YorozuDBEnumDataObject _enumData;
-	    private List<FieldInfo> _extendFieldInfos;
-	    private Editor _editor;
-	    internal float Height;
-
-	    internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
-	    {
-		    _data = data;
-		    _enumData = enumData;
-		    if (_data.ExtendFieldsObject != null)
-		    {
-			    _editor = Editor.CreateEditor(_data.ExtendFieldsObject);
-			    _extendFieldInfos = YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
-			    Height = YorozuDBExtendUtility.ItemHeight(_data.ExtendFieldsObject, id);
-		    }
-	    }
-
-	    internal void Draw(Rect rect, int index)
-	    {
-		    var field = _data.Define.Fields[index];
-		    var isFix = _data.IsFixField(field.ID);
-		    using (new EditorGUI.DisabledScope(isFix))
-		    {
-			    var container = _data.GetData(field.ID, id);
-				container.DrawField(rect, field, GUIContent.none, _enumData);
-		    }
-	    }
-
-	    internal void DrawExtend(Rect rect, int index)
-	    {
-		    _editor.serializedObject.UpdateIfRequiredOrScript();
-			var prop = _editor.serializedObject.FindProperty(_extendFieldInfos[index].Name);
-			var elementProp = prop.GetArrayElementAtIndex(id);
-			if (!elementProp.isExpanded)
-				elementProp.isExpanded = true;
-			
-		    EditorGUI.PropertyField(rect, elementProp, GUIContent.none, true);
-		    _editor.serializedObject.ApplyModifiedProperties();
 	    }
     }
 }

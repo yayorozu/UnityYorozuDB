@@ -76,7 +76,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void AddDefine(string name)
         {
-            if (!YorozuDBEditorUtility.NameValidator(Defines, name, out name))
+            if (!YorozuDBEditorInternalUtility.NameValidator(Defines, name, out name))
                 return;
             
             var id = !Defines.Any() ? 1 : Defines.Max(v => v.ID) + 1;
@@ -90,7 +90,7 @@ namespace Yorozu.DB
         /// </summary>
         internal void Rename(int defineId, string newName)
         {
-            if (!YorozuDBEditorUtility.NameValidator(Defines, newName, out newName))
+            if (!YorozuDBEditorInternalUtility.NameValidator(Defines, newName, out newName))
                 return;
             
             var index = Defines.FindIndex(d => d.ID == defineId);
@@ -107,7 +107,7 @@ namespace Yorozu.DB
         internal void RemoveDefine(int enumDefineId)
         {
             // 関連するデータのフィールドも削除する
-            var defines = YorozuDBEditorUtility.LoadAllDefineAsset();
+            var defines = YorozuDBEditorInternalUtility.LoadAllDefineAsset();
             foreach (var d in defines)
             {
                 var targetFieldIds = d.Fields.Where(f => f.DataType == DataType.Enum && f.EnumDefineId == enumDefineId)

@@ -30,8 +30,8 @@ namespace Yorozu.DB
 
         protected override TreeViewItem BuildRoot()
         {
-            var defineAssets = YorozuDBEditorUtility.LoadAllDefineAsset();
-            var dataAssets = YorozuDBEditorUtility.LoadAllDataAsset();
+            var defineAssets = YorozuDBEditorInternalUtility.LoadAllDefineAsset();
+            var dataAssets = YorozuDBEditorInternalUtility.LoadAllDataAsset();
             var root = new TreeViewItem(-1, -1, "root");
             
             foreach (var asset in defineAssets)
@@ -49,7 +49,7 @@ namespace Yorozu.DB
             }
             
             // Enum追加
-            var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+            var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
             if (enumData != null)
             {
                 root.AddChild(new TreeViewItem(enumData.GetInstanceID(), 0, "Enum"));

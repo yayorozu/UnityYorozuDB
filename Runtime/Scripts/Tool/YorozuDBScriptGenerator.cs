@@ -41,7 +41,7 @@ namespace Yorozu.DB
                 savePath = Path.GetDirectoryName(path);
             }
 
-            var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+            var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 
             CreateDefineScript(savePath, enumData);
             
@@ -57,7 +57,7 @@ namespace Yorozu.DB
         /// </summary>
         private static void CreateDefineScript(string savePath, YorozuDBEnumDataObject enumData)
         {
-            var assets = YorozuDBEditorUtility.LoadAllDefineAsset();
+            var assets = YorozuDBEditorInternalUtility.LoadAllDefineAsset();
             var definePath = Path.Combine(savePath, "Define");
             // ディレクトリ作成
             if (!AssetDatabase.IsValidFolder(definePath))

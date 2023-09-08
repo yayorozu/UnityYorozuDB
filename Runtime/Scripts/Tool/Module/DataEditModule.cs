@@ -150,7 +150,7 @@ namespace Yorozu.DB
             // 足りない分の補充
             YorozuDBExtendUtility.FitFieldsSize(_data.ExtendFieldsObject, _data.DataCount);
             
-            _enum = YorozuDBEditorUtility.LoadEnumDataAsset();
+            _enum = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 
             _Initialized = true;
         }
@@ -192,7 +192,7 @@ namespace Yorozu.DB
             var incId = Mathf.Max(_data.GetData(keyField.ID, minIndex).Int, 1);
             foreach (var index in indexes)
             {
-                _data.GetData(keyField.ID, index).UpdateInt(incId++); 
+                _data.GetData(keyField.ID, index).Int = incId++; 
             }
             _data.Dirty();
             Reload();
@@ -211,7 +211,7 @@ namespace Yorozu.DB
             var replaceId = _data.GetData(keyField.ID, minIndex).Int;
             foreach (var index in indexes)
             {
-                _data.GetData(keyField.ID, index).UpdateInt(replaceId); 
+                _data.GetData(keyField.ID, index).Int = replaceId; 
             }
             _data.Dirty();
             Reload();

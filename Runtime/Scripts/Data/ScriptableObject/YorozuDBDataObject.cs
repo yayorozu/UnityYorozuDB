@@ -221,8 +221,8 @@ namespace Yorozu.DB
                     var maxId = 1;
                     if (field.Data != null && field.Data.Count > 0)
                         maxId = field.Data.Max(d => d.Int) + 1;
-                    
-                    addData.UpdateInt(maxId);
+
+                    addData.Int = maxId;
                 }
                 
                 field.Data.Add(addData);

@@ -54,7 +54,7 @@ namespace Yorozu.DB
             if (!force && _list != null)
                 return;
 
-            _data = YorozuDBEditorUtility.LoadEnumDataAsset();
+            _data = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
             if (_data == null)
                 return;
 

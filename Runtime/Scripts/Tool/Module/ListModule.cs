@@ -48,7 +48,7 @@ namespace Yorozu.DB
                 _treeView.DeleteItemsEvent += DeleteAssets;
                 _treeView.CreateDataEvent += CreateDataAsset;
 
-                _hasEnum = YorozuDBEditorUtility.LoadEnumDataAsset() != null;
+                _hasEnum = YorozuDBEditorInternalUtility.LoadEnumDataAsset() != null;
             }
         }
 
@@ -61,7 +61,7 @@ namespace Yorozu.DB
             {
                 if (GUILayout.Button("Create Data Define Asset"))
                 {
-                    if (YorozuDBEditorUtility.CreateDefineAsset())
+                    if (YorozuDBEditorInternalUtility.CreateDefineAsset())
                     {
                         _treeView.Reload();
                     }
@@ -77,7 +77,7 @@ namespace Yorozu.DB
             {
                 if (GUILayout.Button("Create Enum Data Asset"))
                 {
-                    if (YorozuDBEditorUtility.CreateEnumAsset())
+                    if (YorozuDBEditorInternalUtility.CreateEnumAsset())
                     {
                         _treeView.Reload();
                         _hasEnum = true;
@@ -110,7 +110,7 @@ namespace Yorozu.DB
             var define= EditorUtility.InstanceIDToObject(parentId);
             var path = AssetDatabase.GetAssetPath(define);
             var parentPath = System.IO.Path.GetDirectoryName(path);
-            if (YorozuDBEditorUtility.CreateDataAsset(define as YorozuDBDataDefineObject, parentPath))
+            if (YorozuDBEditorInternalUtility.CreateDataAsset(define as YorozuDBDataDefineObject, parentPath))
             {
                 _treeView?.Reload();
             }   
@@ -138,7 +138,7 @@ namespace Yorozu.DB
                 if (obj.GetType() != typeof(YorozuDBDataDefineObject)) 
                     continue;
                 
-                var dependencyAssets = YorozuDBEditorUtility.LoadAllDataAsset(obj as YorozuDBDataDefineObject);
+                var dependencyAssets = YorozuDBEditorInternalUtility.LoadAllDataAsset(obj as YorozuDBDataDefineObject);
                 deletes = deletes.Concat(dependencyAssets);
             }
 

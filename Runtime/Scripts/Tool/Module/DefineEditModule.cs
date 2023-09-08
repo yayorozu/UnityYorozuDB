@@ -70,7 +70,7 @@ namespace Yorozu.DB
         internal void SetData(YorozuDBDataDefineObject data)
         {
             _data = data;
-            _enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+            _enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
             _reorderableList = null;
             _extendReorderableList = null;
             _addFieldIds.Clear();
@@ -104,7 +104,7 @@ namespace Yorozu.DB
                         _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
                         if (check.changed && (_dataType == DataType.Enum || _dataType == DataType.Flags))
                         {
-                            var enumData = YorozuDBEditorUtility.LoadEnumDataAsset();
+                            var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
                             if (enumData != null)
                             {
                                 _enums = enumData.Defines
@@ -168,7 +168,7 @@ namespace Yorozu.DB
                     _data.SetExtendFieldsTypeName("");
                     _extendReorderableList = CreateExtendReorderableList(_data);
                     // 更新したら関連データを初期化する
-                    var data = YorozuDBEditorUtility.LoadAllDataAsset(_data);
+                    var data = YorozuDBEditorInternalUtility.LoadAllDataAsset(_data);
                     foreach (var d in data)
                     {
                         d.ExtendFieldsObject = null;
@@ -184,7 +184,7 @@ namespace Yorozu.DB
                         _data.SetExtendFieldsTypeName(fullname);
                         _extendReorderableList = CreateExtendReorderableList(_data);
                         // 更新したら関連データを初期化する
-                        var data = YorozuDBEditorUtility.LoadAllDataAsset(_data);
+                        var data = YorozuDBEditorInternalUtility.LoadAllDataAsset(_data);
                         foreach (var d in data)
                         {
                             d.ExtendFieldsObject = null;
