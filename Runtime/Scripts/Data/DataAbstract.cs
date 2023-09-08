@@ -2,6 +2,10 @@ using System;
 using System.Linq;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Yorozu.DB
 {
     public abstract class DataAbstract
@@ -73,7 +77,6 @@ namespace Yorozu.DB
         protected AudioClip AudioClip(int fieldId) => Data(fieldId).UnityObject as AudioClip;
         protected ScriptableObject ScriptableObject(int fieldId) => Data(fieldId).UnityObject as ScriptableObject;
         protected UnityEngine.Object UnityObject(int fieldId) => Data(fieldId).UnityObject;
-        
         /// <summary>
         /// TODO キャストしてるため、アクセス頻度が高いとGCが無駄にでるのでキャッシュする
         /// </summary>
@@ -90,5 +93,41 @@ namespace Yorozu.DB
             return new Vector3Int(array.IntArray[0], array.IntArray[1], array.IntArray[2]);
         }
         protected Color Color(int fieldId) => Data(fieldId).GetFromString<Color>();
+        
+#if UNITY_EDITOR
+        protected void Set(int fieldId, string value) => Data(fieldId).String = value;
+        protected void Set(int fieldId, float value) => Data(fieldId).Float = value;
+        protected void Set(int fieldId, bool value) => Data(fieldId).Bool = value;
+        protected void Set(int fieldId, int value) => Data(fieldId).Int = value;
+        protected void Set(int fieldId, int enumDefineId, Enum value)
+        {
+            var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
+            if (guids.Length <= 0)
+                throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not attach.");
+
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
+            var findDefine = enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
+            if (findDefine == null)
+            {
+                Debug.LogError("Enum Data is not Define");
+                return;
+            }
+
+            var key = enumData.GetEnumKey(enumDefineId, value.ToString());
+            if (key.HasValue)
+            {
+                Set(fieldId, key.Value);
+            }
+        }
+        
+        protected void Set(int fieldId, UnityEngine.Object value) => Data(fieldId).UnityObject = value;
+        protected void Set(int fieldId, Vector2 value) => Data(fieldId).SetToString(value);
+        protected void Set(int fieldId, Vector3 value) => Data(fieldId).SetToString(value);
+        protected void Set(int fieldId, Vector2Int value) => Data(fieldId).SetToString(value);
+        protected void Set(int fieldId, Vector3Int value) => Data(fieldId).SetToString(value);
+        protected void Set(int fieldId, Color value) => Data(fieldId).SetToString(value);
+        
+#endif
     }
 }

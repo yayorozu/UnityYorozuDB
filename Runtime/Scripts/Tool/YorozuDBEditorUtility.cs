@@ -17,10 +17,10 @@ namespace Yorozu.DB
         public static T AddData<T>(this YorozuDBDataObject data) where T : DataAbstract
         {
             var dataCount = data.DataCount;
-            Debug.Log(dataCount);
             data.AddRow();
             var instance = Activator.CreateInstance(typeof(T)) as DataAbstract;            
             instance.SetUp(data, dataCount);
+            
             return instance as T;
         }
         

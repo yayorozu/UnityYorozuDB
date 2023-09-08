@@ -140,7 +140,13 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId});");
+                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
+                        builder.AppendLine($"        {{");
+                        builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId}); }}");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"            set {{ Set({field.ID}, {field.EnumDefineId}, value); }}");
+                        builder.AppendLine($"#endif");
+                        builder.AppendLine($"        }}");
                     }
                 }
                 else if (field.DataType == DataType.Flags)
@@ -148,12 +154,24 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name} => (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID});");
+                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
+                        builder.AppendLine($"        {{");
+                        builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                        builder.AppendLine($"#endif");
+                        builder.AppendLine($"        }}");
                     }
                 }
                 else
                 {
-                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name} => {field.DataType.ToString()}({field.ID});");
+                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name}");
+                    builder.AppendLine($"        {{");
+                    builder.AppendLine($"            get {{ return {field.DataType.ToString()}({field.ID}); }}");
+                    builder.AppendLine($"#if UNITY_EDITOR");
+                    builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                    builder.AppendLine($"#endif");
+                    builder.AppendLine($"        }}");
                 }
                 builder.AppendLine("");
             }
@@ -165,7 +183,13 @@ namespace Yorozu.DB
                 var fields = YorozuDBExtendUtility.FindFields(extendType);
                 foreach (var field in fields)
                 {
-                    builder.AppendLine($"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name} => Extend<{extendType.FullName}>().{field.Name}[row];");
+                    builder.AppendLine($"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name}");
+                    builder.AppendLine($"        {{");
+                    builder.AppendLine($"            get {{ return Extend<{extendType.FullName}>().{field.Name}[row]; }}");
+                    builder.AppendLine($"#if UNITY_EDITOR");
+                    builder.AppendLine($"            set {{ Extend<{extendType.FullName}>().{field.Name}[row] = value; }}");
+                    builder.AppendLine($"#endif");
+                    builder.AppendLine($"        }}");
                     builder.AppendLine("");
                 }
             }

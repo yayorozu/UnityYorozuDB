@@ -12,19 +12,53 @@ namespace Yorozu.DB
     {
         [SerializeField]
         private string _string;
-        internal string String => _string;
+        internal string String
+        {
+            get { return _string; }
+#if UNITY_EDITOR
+            set { _string = value; }
+#endif
+        }
+
         [SerializeField]
         private int _int;
-        internal int Int => _int;
+        internal int Int
+        {
+            get => _int;
+#if UNITY_EDITOR
+            set { _int = value; }
+#endif
+        }
+
         [SerializeField]
         private float _float;
-        internal float Float => _float;
+        internal float Float
+        {
+            get { return _float; }
+#if UNITY_EDITOR
+            set { _float = value;  }
+#endif
+        }
+
         [SerializeField]
         private bool _bool;
-        internal bool Bool => _bool;
+        internal bool Bool
+        {
+            get { return _bool; }
+#if UNITY_EDITOR
+            set { _bool = value; }
+#endif
+        }
+
         [SerializeField]
         private UnityEngine.Object _unityObject;
-        internal UnityEngine.Object UnityObject => _unityObject;
+        internal UnityEngine.Object UnityObject
+        {
+            get { return _unityObject; }
+#if UNITY_EDITOR
+            set { _unityObject = value; }
+#endif
+        }
 
         internal DataContainer Copy()
         {
@@ -37,11 +71,6 @@ namespace Yorozu.DB
             return copy;
         }
 
-        internal void UpdateInt(int value)
-        {
-            _int = value;
-        }
-        
         internal T GetFromString<T>()
         {
             if (string.IsNullOrEmpty(_string))
