@@ -158,7 +158,7 @@ namespace Yorozu.DB
                         builder.AppendLine($"        {{");
                         builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
                         builder.AppendLine($"#if UNITY_EDITOR");
-                        builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                        builder.AppendLine($"            set {{ Set({field.ID}, (int)value); }}");
                         builder.AppendLine($"#endif");
                         builder.AppendLine($"        }}");
                     }
