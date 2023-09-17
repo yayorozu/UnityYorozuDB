@@ -49,7 +49,13 @@ namespace Yorozu.DB
             }
 
             // 同じ名前を探す
-            return _types.First(t => t.Name == data.Define.ClassName);
+            var findType = _types.FirstOrDefault(t => t.Name == data.Define.ClassName);
+            if (findType == null)
+            {
+                Debug.LogError("Not Found Type : " + data.Define.ClassName);
+            }
+
+            return findType;
         }
     }
 }
