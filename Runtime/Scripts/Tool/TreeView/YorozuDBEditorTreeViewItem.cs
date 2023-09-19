@@ -1,10 +1,10 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-
-#if UNITY_EDITOR
 
 namespace Yorozu.DB.TreeView
 {

@@ -1,9 +1,9 @@
+#if UNITY_EDITOR
+
 using System;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-
-#if UNITY_EDITOR
 
 namespace Yorozu.DB.TreeView
 {

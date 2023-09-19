@@ -23,6 +23,11 @@ namespace Yorozu.DB
             
             return instance as T;
         }
+
+        public static void Clear(this YorozuDBDataObject data)
+        {
+            data.Clear();
+        }
         
         public static YorozuDBDataObject LoadDataObject(string path)
         {

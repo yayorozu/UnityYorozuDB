@@ -237,6 +237,19 @@ namespace Yorozu.DB
         }
 
         /// <summary>
+        /// 初期化
+        /// </summary>
+        internal void Clear()
+        {
+            var indexes = new List<int>();
+            for (var i = 0; i < DataCount; i++)
+            {
+                indexes.Add(i);
+            }
+            RemoveRows(indexes.OrderByDescending(v => v));
+        }
+
+        /// <summary>
         /// データの削除
         /// </summary>
         internal void RemoveRows(IOrderedEnumerable<int> descIndexes)
