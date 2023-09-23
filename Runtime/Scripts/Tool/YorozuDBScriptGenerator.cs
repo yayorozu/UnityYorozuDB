@@ -134,7 +134,7 @@ namespace Yorozu.DB
                     builder.AppendLine($"        /// {field.Memo}");
                     builder.AppendLine("        /// </summary>");
                 }
-                
+
                 if (field.DataType == DataType.Enum)
                 {
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
@@ -165,13 +165,23 @@ namespace Yorozu.DB
                 }
                 else
                 {
-                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name}");
-                    builder.AppendLine($"        {{");
-                    builder.AppendLine($"            get {{ return {field.DataType.ToString()}({field.ID}); }}");
-                    builder.AppendLine($"#if UNITY_EDITOR");
-                    builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
-                    builder.AppendLine($"#endif");
-                    builder.AppendLine($"        }}");
+                    if (field.IsArray)
+                    {
+                        builder.AppendLine($"        public IEnumerable<{field.DataType.ConvertString()}> {field.Name} => {field.DataType.ToString()}s({field.ID});");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"        public void Add{field.Name}({field.DataType.ConvertString()} value) => Add({field.ID}, value);");
+                        builder.AppendLine($"#endif");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name}");
+                        builder.AppendLine($"        {{");
+                        builder.AppendLine($"            get {{ return {field.DataType.ToString()}({field.ID}); }}");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                        builder.AppendLine($"#endif");
+                        builder.AppendLine($"        }}");
+                    }
                 }
                 builder.AppendLine("");
             }

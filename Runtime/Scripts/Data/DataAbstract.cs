@@ -106,10 +106,13 @@ namespace Yorozu.DB
         protected IEnumerable<Color> Colors(int fieldId) => Data(fieldId).Colors;
 
 #if UNITY_EDITOR
-        protected void Set(int fieldId, string value, int index = 0) => Data(fieldId)._strings[index] = value;
-        protected void Set(int fieldId, float value, int index = 0) => Data(fieldId)._floats[index] = value;
-        protected void Set(int fieldId, bool value, int index = 0) => Data(fieldId)._bools[index] = value;
-        protected void Set(int fieldId, int value, int index = 0) => Data(fieldId)._ints[index] = value;
+        /// <summary>
+        /// データ上書き
+        /// </summary>
+        protected void Set(int fieldId, string value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, float value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, bool value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, int value, int index = 0) => Data(fieldId).Set(value, index);
         protected void Set(int fieldId, int enumDefineId, Enum value, int index = 0)
         {
             var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
@@ -131,13 +134,49 @@ namespace Yorozu.DB
                 Set(fieldId, key.Value, index);
             }
         }
-        
-        protected void Set(int fieldId, UnityEngine.Object value, int index = 0) => Data(fieldId)._unityObjects[index] = value;
-        protected void Set(int fieldId, Vector2 value, int index = 0) => Data(fieldId).SetToString(value, index);
-        protected void Set(int fieldId, Vector3 value, int index = 0) => Data(fieldId).SetToString(value, index);
-        protected void Set(int fieldId, Vector2Int value, int index = 0) => Data(fieldId).SetToString(value, index);
-        protected void Set(int fieldId, Vector3Int value, int index = 0) => Data(fieldId).SetToString(value, index);
-        protected void Set(int fieldId, Color value, int index = 0) => Data(fieldId).SetToString(value, index);
+
+        protected void Set(int fieldId, UnityEngine.Object value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, Vector2 value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, Vector3 value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, Vector2Int value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, Vector3Int value, int index = 0) => Data(fieldId).Set(value, index);
+        protected void Set(int fieldId, Color value, int index = 0) => Data(fieldId).Set(value, index);
+
+        /// <summary>
+        /// 追加
+        /// </summary>
+        protected void Add(int fieldId, string value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, float value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, bool value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, int value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, int enumDefineId, Enum value)
+        {
+            var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
+            if (guids.Length <= 0)
+                throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not attach.");
+
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
+            var findDefine = enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
+            if (findDefine == null)
+            {
+                Debug.LogError("Enum Data is not Define");
+                return;
+            }
+
+            var key = enumData.GetEnumKey(enumDefineId, value.ToString());
+            if (key.HasValue)
+            {
+                Add(fieldId, key.Value);
+            }
+        }
+
+        protected void Add(int fieldId, UnityEngine.Object value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, Vector2 value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, Vector3 value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, Vector2Int value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, Vector3Int value) => Data(fieldId).Add(value);
+        protected void Add(int fieldId, Color value) => Data(fieldId).Add(value);
 #endif
     }
 }

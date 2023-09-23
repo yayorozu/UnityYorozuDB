@@ -16,7 +16,7 @@ namespace Yorozu.DB
         internal int Size => Mathf.Max(_strings.Length, _ints.Length, _floats.Length, _bools.Length, _unityObjects.Length);
 
         [SerializeField]
-        internal string[] _strings;
+        internal string[] _strings = Array.Empty<string>();
         internal string String
         {
             get { return _strings.Length <= 0 ? default : _strings[0]; }
@@ -32,7 +32,7 @@ namespace Yorozu.DB
         }
 
         [SerializeField]
-        internal int[] _ints;
+        internal int[] _ints = Array.Empty<int>();
         internal int Int
         {
             get { return _ints.Length <= 0 ? default : _ints[0]; }
@@ -48,7 +48,7 @@ namespace Yorozu.DB
         }
 
         [SerializeField]
-        internal float[] _floats;
+        internal float[] _floats = Array.Empty<float>();
         internal float Float
         {
             get { return _floats.Length <= 0 ? default : _floats[0]; }
@@ -64,7 +64,7 @@ namespace Yorozu.DB
         }
 
         [SerializeField]
-        internal bool[] _bools;
+        internal bool[] _bools = Array.Empty<bool>();
         internal bool Bool
         {
             get { return _bools.Length <= 0 ? default : _bools[0]; }
@@ -80,7 +80,7 @@ namespace Yorozu.DB
         }
 
         [SerializeField]
-        internal UnityEngine.Object[] _unityObjects;
+        internal UnityEngine.Object[] _unityObjects = Array.Empty<UnityEngine.Object>();
         internal UnityEngine.Object UnityObject
         {
             get { return _unityObjects.Length <= 0 ? default : _unityObjects[0]; }
@@ -124,26 +124,41 @@ namespace Yorozu.DB
         internal DataContainer Copy()
         {
             var copy = new DataContainer();
-            copy._strings = new string[_strings.Length];
-            for (var i = 0; i < _strings.Length; i++)
-                copy._strings[i] = _strings[i];
-            
-            copy._ints = new int[_ints.Length];
-            for (var i = 0; i < _ints.Length; i++)
-                copy._ints[i] = _ints[i];
-            
-            copy._floats = new float[_floats.Length];
-            for (var i = 0; i < _floats.Length; i++)
-                copy._floats[i] = _floats[i];
-            
-            copy._bools = new bool[_bools.Length];
-            for (var i = 0; i < _bools.Length; i++)
-                copy._bools[i] = _bools[i];
-            
-            copy._unityObjects = new UnityEngine.Object[_unityObjects.Length];
-            for (var i = 0; i < _unityObjects.Length; i++)
-                copy._unityObjects[i] = _unityObjects[i];
-            
+            if (_strings != null && _strings.Length > 0)
+            {
+                copy._strings = new string[_strings.Length];
+                for (var i = 0; i < _strings.Length; i++)
+                    copy._strings[i] = _strings[i];
+            }
+
+            if (_ints != null && _ints.Length > 0)
+            {
+                copy._ints = new int[_ints.Length];
+                for (var i = 0; i < _ints.Length; i++)
+                    copy._ints[i] = _ints[i];
+            }
+
+            if (_floats != null && _floats.Length > 0)
+            {
+                copy._floats = new float[_floats.Length];
+                for (var i = 0; i < _floats.Length; i++)
+                    copy._floats[i] = _floats[i];
+            }
+
+            if (_bools != null && _bools.Length > 0)
+            {
+                copy._bools = new bool[_bools.Length];
+                for (var i = 0; i < _bools.Length; i++)
+                    copy._bools[i] = _bools[i];
+            }
+
+            if (_unityObjects != null && _unityObjects.Length > 0)
+            {
+                copy._unityObjects = new UnityEngine.Object[_unityObjects.Length];
+                for (var i = 0; i < _unityObjects.Length; i++)
+                    copy._unityObjects[i] = _unityObjects[i];
+            }
+
             return copy;
         }
 
@@ -163,8 +178,22 @@ namespace Yorozu.DB
         
 #if UNITY_EDITOR
         
-        private float ArrayControlWidth = 18f;
+        internal static float ArrayControlWidth = 18f;
 
+        internal void Set(int value, int index) => _ints[index] = value;
+        internal void Set(float value, int index) => _floats[index] = value;
+        internal void Set(bool value, int index) => _bools[index] = value;
+        internal void Set(string value, int index) => _strings[index] = value;
+        internal void Set(UnityEngine.Object value, int index) => _unityObjects[index] = value;
+        internal void Set(object value, int index) => _strings[index] = JsonUtility.ToJson(value);
+        
+        internal void Add(int value) => ArrayUtility.Add(ref _ints, value);
+        internal void Add(float value) => ArrayUtility.Add(ref _floats, value);
+        internal void Add(bool value) => ArrayUtility.Add(ref _bools, value);
+        internal void Add(string value) => ArrayUtility.Add(ref _strings, value);
+        internal void Add(UnityEngine.Object value) => ArrayUtility.Add(ref _unityObjects, value);
+        internal void Add(object value) => ArrayUtility.Add(ref _strings, JsonUtility.ToJson(value));
+        
         private static class Style
         {
             internal static GUIContent OpenButton;
@@ -208,7 +237,7 @@ namespace Yorozu.DB
             rect.width = ArrayControlWidth;
             if (GUI.Button(rect, "+"))
             {
-                this.Add(field.DataType);
+                this.AddElement(field.DataType);
                 return true;
             }
             rect.x += ArrayControlWidth;
@@ -237,6 +266,7 @@ namespace Yorozu.DB
         
         private void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData, int index)
         {
+            this.CheckSize(field.DataType, index);
             switch (field.DataType)
             {
                 case DataType.String:

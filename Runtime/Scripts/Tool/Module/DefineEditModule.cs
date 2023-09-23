@@ -218,6 +218,14 @@ namespace Yorozu.DB
                 {
                     EditorGUI.LabelField(rect, "Fields", EditorStyles.boldLabel);
                 },
+                elementHeightCallback = index =>
+                {
+                    if (data.Fields.Count <= index)
+                        return DataContainer.ArrayControlWidth;
+
+                    var filed = data.Fields[index];
+                    return Mathf.Max(filed.DefaultValue.GetSize(filed.DataType), 1) * DataContainer.ArrayControlWidth;
+                },
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     if (data.Fields.Count <= index)

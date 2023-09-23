@@ -9,7 +9,7 @@ namespace Yorozu.DB
         /// <summary>
         /// 配列のサイズを変更する
         /// </summary>
-        internal static void Add(this DataContainer self, DataType dataType)
+        internal static void AddElement(this DataContainer self, DataType dataType)
         {
             switch (dataType)
             {
@@ -86,24 +86,24 @@ namespace Yorozu.DB
                 case DataType.Int:
                 case DataType.Enum:
                 case DataType.Flags:
-                    return self._ints.Length;
+                    return self._ints?.Length ?? 0;
                 case DataType.String:
                 case DataType.Vector2:
                 case DataType.Vector3:
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
-                    return self._strings.Length;
+                    return self._strings?.Length ?? 0;
                 case DataType.Float:
-                    return self._floats.Length;
+                    return self._floats?.Length ?? 0;
                 case DataType.Bool:
-                    return self._bools.Length;
+                    return self._bools?.Length ?? 0;
                 case DataType.Sprite:
                 case DataType.GameObject:
                 case DataType.ScriptableObject:
                 case DataType.UnityObject:
                 case DataType.AudioClip:
-                    return self._unityObjects.Length;
+                    return self._unityObjects?.Length ?? 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null);
             }
@@ -144,8 +144,57 @@ namespace Yorozu.DB
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
-        
+
+        internal static void CheckSize(this DataContainer self, DataType dataType, int index)
+        {
+            // 初期データを構築
+            switch (dataType)
+            {
+                case DataType.Int:
+                case DataType.Enum:
+                case DataType.Flags:
+                    for (var i = self._ints.Length; i <= index; i++)
+                    {
+                        ArrayUtility.Add(ref self._ints, 0);                        
+                    }
+                    break;
+                case DataType.String:
+                case DataType.Vector2:
+                case DataType.Vector3:
+                case DataType.Vector2Int:
+                case DataType.Vector3Int:
+                case DataType.Color:
+                    for (var i = self._strings.Length; i <= index; i++)
+                    {
+                        ArrayUtility.Add(ref self._strings, "");
+                    }
+                    break;
+                case DataType.Float:
+                    for (var i = self._floats.Length; i <= index; i++)
+                    {
+                        ArrayUtility.Add(ref self._floats, 0);                        
+                    }
+                    break;
+                case DataType.Bool:
+                    for (var i = self._bools.Length; i <= index; i++)
+                    {
+                        ArrayUtility.Add(ref self._bools, false);                        
+                    }
+                    break;
+                case DataType.Sprite:
+                case DataType.GameObject:
+                case DataType.ScriptableObject:
+                case DataType.UnityObject:
+                case DataType.AudioClip:
+                    for (var i = self._unityObjects.Length; i <= index; i++)
+                    {
+                        ArrayUtility.Add(ref self._unityObjects, null);                        
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         
     }
 }
