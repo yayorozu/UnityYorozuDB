@@ -127,8 +127,14 @@ namespace Yorozu.DB
         {
             if (f.Data == null || f.Data.Count <= 0)
                 return 1;
+
+            var find = Define.Fields.First(f2 => f2.ID == f.ID);
+            if (f.IsFix)
+            {
+                return f.FixData.GetSize(find.DataType);
+            }
             
-            return f.Data.Max(d => d.Size);
+            return f.Data.Max(d => d.GetSize(find.DataType));
         });
 
         internal bool IsFixField(int fieldId) => _fields.First(f => f.ID == fieldId).IsFix;

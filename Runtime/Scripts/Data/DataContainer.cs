@@ -162,29 +162,30 @@ namespace Yorozu.DB
         }
         
 #if UNITY_EDITOR
+        
+        private float ArrayControlWidth = 18f;
 
         private static class Style
         {
             internal static GUIContent OpenButton;
-
+            internal static GUIContent[] Vector2IntContents = new GUIContent[]
+            {
+                new GUIContent("x"),
+                new GUIContent("y"),
+            };
+            
+            internal static GUIContent[] Vector3IntContents = new GUIContent[]
+            {
+                new GUIContent("x"),
+                new GUIContent("y"),
+                new GUIContent("z"),
+            };
+            
             static Style()
             {
                 OpenButton = EditorGUIUtility.TrIconContent("d_UnityEditor.InspectorWindow", "Open Properties");
             }
         }
-        
-        private static GUIContent[] Vector2IntContents = new GUIContent[]
-        {
-            new GUIContent("x"),
-            new GUIContent("y"),
-        };
-        
-        private static GUIContent[] Vector3IntContents = new GUIContent[]
-        {
-            new GUIContent("x"),
-            new GUIContent("y"),
-            new GUIContent("z"),
-        };
         
         public DataContainer(){}
 
@@ -193,22 +194,45 @@ namespace Yorozu.DB
             this.Initialize(dataType);
         }
         
-        internal void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
+        internal bool DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
-            rect.height = YorozuDBEditorDataTreeView.RowHeight;
             if (!field.IsArray)
             {
                 rect.y += rect.height / 2f - YorozuDBEditorDataTreeView.RowHeight / 2f;
+                rect.height = YorozuDBEditorDataTreeView.RowHeight;
                 DrawField(rect, field, content, enumData, 0);
-                return;
+                return false;
             }
-
+            
+            var width = rect.width;
+            rect.width = ArrayControlWidth;
+            if (GUI.Button(rect, "+"))
+            {
+                this.Add(field.DataType);
+                return true;
+            }
+            rect.x += ArrayControlWidth;
+            var startX = rect.x;
+            rect.height = YorozuDBEditorDataTreeView.RowHeight;
             var size = this.GetSize(field.DataType);
             for (int i = 0; i < size; i++)
             {
-                DrawField(rect, field, content, enumData, i);        
+                rect.x = startX;
+                rect.width = width - ArrayControlWidth * 2;
+                
+                DrawField(rect, field, content, enumData, i);
+                rect.x += rect.width;
+                rect.width = ArrayControlWidth;
+                if (GUI.Button(rect, "-"))
+                {
+                    this.RemoveAt(field.DataType, i);
+                    GUI.FocusControl("");
+                    return true;
+                }
                 rect.y += rect.height;
             }
+            
+            return false;
         }
         
         private void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData, int index)
@@ -285,7 +309,7 @@ namespace Yorozu.DB
                     var v2Array = GetFromString<SerializableIntArray>(_strings[index]);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        EditorGUI.MultiIntField(rect, Vector2IntContents, v2Array.IntArray);
+                        EditorGUI.MultiIntField(rect, Style.Vector2IntContents, v2Array.IntArray);
                         if (check.changed)
                         {
                             SetToString(v2Array, index);
@@ -301,7 +325,7 @@ namespace Yorozu.DB
                     var v3Array = GetFromString<SerializableIntArray>(_strings[index]);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        EditorGUI.MultiIntField(rect, Vector3IntContents, v3Array.IntArray);
+                        EditorGUI.MultiIntField(rect, Style.Vector3IntContents, v3Array.IntArray);
                         if (check.changed)
                         {
                             SetToString(v3Array, index);

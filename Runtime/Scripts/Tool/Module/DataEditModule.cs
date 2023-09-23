@@ -61,6 +61,7 @@ namespace Yorozu.DB
                 if (GUILayout.Button(!_settingMode ? "Additional Setting" : "Back", EditorStyles.toolbarButton))
                 {
                     _settingMode = !_settingMode;
+                    _treeView.Reload();
                 }
                 
                 GUILayout.Space(10);

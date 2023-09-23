@@ -18,8 +18,7 @@ namespace Yorozu.DB.TreeView
         private List<FieldInfo> _extendFieldInfos;
         private Editor _editor;
         internal float Height;
-        private float ArrayWidth = 18f;
-
+        
         internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
         {
             _data = data;
@@ -39,39 +38,9 @@ namespace Yorozu.DB.TreeView
             using (new EditorGUI.DisabledScope(isFix))
             {
                 var container = _data.GetData(field.ID, id);
-                if (field.IsArray)
+                if (container.DrawField(rect, field, GUIContent.none, _enumData))
                 {
-                    var width = rect.width;
-                    rect.width = ArrayWidth;
-                    if (GUI.Button(rect, "+"))
-                    {
-                        container.Add(field.DataType);
-                        return true;
-                    }
-                    rect.x += ArrayWidth;
-                    rect.width = width - ArrayWidth * 2;
-                }
-                else
-                {
-                    rect.y += rect.height / 2f - YorozuDBEditorDataTreeView.RowHeight / 2f;
-                    rect.height = YorozuDBEditorDataTreeView.RowHeight;
-                }
-                container.DrawField(rect, field, GUIContent.none, _enumData);
-                if (field.IsArray)
-                {
-                    rect.height = YorozuDBEditorDataTreeView.RowHeight;
-                    rect.x += rect.width;
-                    rect.width = ArrayWidth; 
-                    var size = container.GetSize(field.DataType);
-                    for (int i = 0; i < size; i++)
-                    {
-                        if (GUI.Button(rect, "-"))
-                        {
-                            container.RemoveAt(field.DataType, i);
-                            return true;
-                        }
-                        rect.y += rect.height;
-                    }
+                    return true;
                 }
             }
 
