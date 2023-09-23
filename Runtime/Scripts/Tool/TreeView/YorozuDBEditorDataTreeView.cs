@@ -22,21 +22,24 @@ namespace Yorozu.DB.TreeView
 	    private YorozuDBDataObject _data;
 	    
         private readonly List<TreeViewItem> _rows = new List<TreeViewItem>(100);
+
+        internal static float RowHeight => EditorGUIUtility.singleLineHeight;
+
+        internal int MaxRowLength { get; private set; }
         
         internal YorozuDBEditorDataTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, YorozuDBDataObject data) : base(state, multiColumnHeader)
         {
             _data = data;
-            
-            rowHeight = EditorGUIUtility.singleLineHeight;
+            MaxRowLength = _data.MaxRowLength;
             columnIndexForTreeFoldouts = 0;
             showAlternatingRowBackgrounds = true;
             showBorder = true;
-            
             Reload();
         }
 
         protected override TreeViewItem BuildRoot()
         {
+	        rowHeight = EditorGUIUtility.singleLineHeight * _data.MaxRowLength;
 	        var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 	        var root = _data.CreateTree(enumData);
 	        return root;
@@ -125,6 +128,7 @@ namespace Yorozu.DB.TreeView
 
             for (var i = 0; i < args.GetNumVisibleColumns(); ++i)
             {
+	            args.rowRect.height /= 2;
                 CellGUI(args.GetCellRect(i), item, args.GetColumn(i));
             }
         }
@@ -140,10 +144,10 @@ namespace Yorozu.DB.TreeView
 
         private void CellGUI(Rect cellRect, YorozuDBEditorTreeViewItem item, int columnIndex)
 		{
-			// Rect を真ん中にする処理
-			//CenterRectUsingSingleLineHeight(ref cellRect);
 			if (columnIndex == 0)
 			{
+				cellRect.y += cellRect.height / 2f - RowHeight / 2f;
+				cellRect.height = RowHeight;
 				EditorGUI.LabelField(cellRect, item.displayName, DefaultStyles.labelRightAligned);
 				return;
 			}
@@ -158,7 +162,10 @@ namespace Yorozu.DB.TreeView
 				}
 				else
 				{
-					item.Draw(cellRect, columnIndex);
+					if (item.Draw(cellRect, columnIndex))
+					{
+						Reload();
+					}
 				}
 				if (check.changed)
 				{

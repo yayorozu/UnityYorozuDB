@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -66,8 +67,13 @@ namespace Yorozu.DB
         protected float Float(int fieldId) => Data(fieldId).Float;
         protected bool Bool(int fieldId) => Data(fieldId).Bool;
         protected int Int(int fieldId) => Data(fieldId).Int;
-
         protected int Enum(int fieldId, int enumDefineId) => GetEnumValue(enumDefineId, Int(fieldId));
+        
+        protected IEnumerable<string> Strings(int fieldId) => Data(fieldId)._strings;
+        protected IEnumerable<float> Floats(int fieldId) => Data(fieldId)._floats;
+        protected IEnumerable<bool> Bools(int fieldId) => Data(fieldId)._bools;
+        protected IEnumerable<int> Ints(int fieldId) => Data(fieldId)._ints;
+        protected IEnumerable<int> Enums(int fieldId, int enumDefineId) => Data(fieldId)._ints.Select(v => GetEnumValue(enumDefineId, v));
         
         /// <summary>
         /// UnityEngin.Object
@@ -77,29 +83,34 @@ namespace Yorozu.DB
         protected AudioClip AudioClip(int fieldId) => Data(fieldId).UnityObject as AudioClip;
         protected ScriptableObject ScriptableObject(int fieldId) => Data(fieldId).UnityObject as ScriptableObject;
         protected UnityEngine.Object UnityObject(int fieldId) => Data(fieldId).UnityObject;
+        
+        protected IEnumerable<Sprite> Sprites(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as Sprite);
+        protected IEnumerable<GameObject> GameObjects(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as GameObject);
+        protected IEnumerable<AudioClip> AudioClips(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as AudioClip);
+        protected IEnumerable<ScriptableObject> ScriptableObjects(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as ScriptableObject);
+        protected IEnumerable<UnityEngine.Object> UnityObjects(int fieldId) => Data(fieldId)._unityObjects;
+
         /// <summary>
         /// TODO キャストしてるため、アクセス頻度が高いとGCが無駄にでるのでキャッシュする
         /// </summary>
-        protected Vector2 Vector2(int fieldId) => Data(fieldId).GetFromString<Vector2>();
-        protected Vector3 Vector3(int fieldId) => Data(fieldId).GetFromString<Vector3>();
-        protected Vector2Int Vector2Int(int fieldId)
-        {
-            var array = Data(fieldId).GetFromString<SerializableIntArray>(); 
-            return new Vector2Int(array.IntArray[0], array.IntArray[1]);
-        }
-        protected Vector3Int Vector3Int(int fieldId)
-        {
-            var array = Data(fieldId).GetFromString<SerializableIntArray>(); 
-            return new Vector3Int(array.IntArray[0], array.IntArray[1], array.IntArray[2]);
-        }
-        protected Color Color(int fieldId) => Data(fieldId).GetFromString<Color>();
-        
+        protected Vector2 Vector2(int fieldId) => Data(fieldId).Vector2;
+        protected Vector3 Vector3(int fieldId) => Data(fieldId).Vector3;
+        protected Vector2Int Vector2Int(int fieldId) => Data(fieldId).Vector2Int;
+        protected Vector3Int Vector3Int(int fieldId) => Data(fieldId).Vector3Int;
+        protected Color Color(int fieldId) => Data(fieldId).Color;
+
+        protected IEnumerable<Vector2> Vector2s(int fieldId) => Data(fieldId).Vector2s;
+        protected IEnumerable<Vector3> Vector3s(int fieldId) => Data(fieldId).Vector3s;
+        protected IEnumerable<Vector2Int> Vector2Ints(int fieldId) => Data(fieldId).Vector2Ints;
+        protected IEnumerable<Vector3Int> Vector3Ints(int fieldId) => Data(fieldId).Vector3Ints;
+        protected IEnumerable<Color> Colors(int fieldId) => Data(fieldId).Colors;
+
 #if UNITY_EDITOR
-        protected void Set(int fieldId, string value) => Data(fieldId).String = value;
-        protected void Set(int fieldId, float value) => Data(fieldId).Float = value;
-        protected void Set(int fieldId, bool value) => Data(fieldId).Bool = value;
-        protected void Set(int fieldId, int value) => Data(fieldId).Int = value;
-        protected void Set(int fieldId, int enumDefineId, Enum value)
+        protected void Set(int fieldId, string value, int index = 0) => Data(fieldId)._strings[index] = value;
+        protected void Set(int fieldId, float value, int index = 0) => Data(fieldId)._floats[index] = value;
+        protected void Set(int fieldId, bool value, int index = 0) => Data(fieldId)._bools[index] = value;
+        protected void Set(int fieldId, int value, int index = 0) => Data(fieldId)._ints[index] = value;
+        protected void Set(int fieldId, int enumDefineId, Enum value, int index = 0)
         {
             var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
             if (guids.Length <= 0)
@@ -117,17 +128,16 @@ namespace Yorozu.DB
             var key = enumData.GetEnumKey(enumDefineId, value.ToString());
             if (key.HasValue)
             {
-                Set(fieldId, key.Value);
+                Set(fieldId, key.Value, index);
             }
         }
         
-        protected void Set(int fieldId, UnityEngine.Object value) => Data(fieldId).UnityObject = value;
-        protected void Set(int fieldId, Vector2 value) => Data(fieldId).SetToString(value);
-        protected void Set(int fieldId, Vector3 value) => Data(fieldId).SetToString(value);
-        protected void Set(int fieldId, Vector2Int value) => Data(fieldId).SetToString(value);
-        protected void Set(int fieldId, Vector3Int value) => Data(fieldId).SetToString(value);
-        protected void Set(int fieldId, Color value) => Data(fieldId).SetToString(value);
-        
+        protected void Set(int fieldId, UnityEngine.Object value, int index = 0) => Data(fieldId)._unityObjects[index] = value;
+        protected void Set(int fieldId, Vector2 value, int index = 0) => Data(fieldId).SetToString(value, index);
+        protected void Set(int fieldId, Vector3 value, int index = 0) => Data(fieldId).SetToString(value, index);
+        protected void Set(int fieldId, Vector2Int value, int index = 0) => Data(fieldId).SetToString(value, index);
+        protected void Set(int fieldId, Vector3Int value, int index = 0) => Data(fieldId).SetToString(value, index);
+        protected void Set(int fieldId, Color value, int index = 0) => Data(fieldId).SetToString(value, index);
 #endif
     }
 }

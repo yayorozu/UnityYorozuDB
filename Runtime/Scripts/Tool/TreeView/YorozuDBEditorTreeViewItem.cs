@@ -18,6 +18,7 @@ namespace Yorozu.DB.TreeView
         private List<FieldInfo> _extendFieldInfos;
         private Editor _editor;
         internal float Height;
+        private float ArrayWidth = 18f;
 
         internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
         {
@@ -31,15 +32,50 @@ namespace Yorozu.DB.TreeView
             }
         }
 
-        internal void Draw(Rect rect, int index)
+        internal bool Draw(Rect rect, int index)
         {
             var field = _data.Define.Fields[index];
             var isFix = _data.IsFixField(field.ID);
             using (new EditorGUI.DisabledScope(isFix))
             {
                 var container = _data.GetData(field.ID, id);
+                if (field.IsArray)
+                {
+                    var width = rect.width;
+                    rect.width = ArrayWidth;
+                    if (GUI.Button(rect, "+"))
+                    {
+                        container.Add(field.DataType);
+                        return true;
+                    }
+                    rect.x += ArrayWidth;
+                    rect.width = width - ArrayWidth * 2;
+                }
+                else
+                {
+                    rect.y += rect.height / 2f - YorozuDBEditorDataTreeView.RowHeight / 2f;
+                    rect.height = YorozuDBEditorDataTreeView.RowHeight;
+                }
                 container.DrawField(rect, field, GUIContent.none, _enumData);
+                if (field.IsArray)
+                {
+                    rect.height = YorozuDBEditorDataTreeView.RowHeight;
+                    rect.x += rect.width;
+                    rect.width = ArrayWidth; 
+                    var size = container.GetSize(field.DataType);
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (GUI.Button(rect, "-"))
+                        {
+                            container.RemoveAt(field.DataType, i);
+                            return true;
+                        }
+                        rect.y += rect.height;
+                    }
+                }
             }
+
+            return false;
         }
 
         internal void DrawExtend(Rect rect, int index)

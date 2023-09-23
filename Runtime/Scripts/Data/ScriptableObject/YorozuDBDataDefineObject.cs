@@ -23,18 +23,18 @@ namespace Yorozu.DB
         internal string ExtendFieldsTypeName;
 
         internal string ClassName => name.Replace("Define", "");
-        
+
         /// <summary>
         /// 検索時にKeyにする名前
         /// 重複は許可されない
         /// </summary>
         [SerializeField]
         private int _keyID;
-        
+
         internal bool IsKeyField(DataField field) => field.ID == _keyID;
 
         internal DataField KeyField => Fields.FirstOrDefault(IsKeyField);
-        
+
 #if UNITY_EDITOR
 
         public void SetExtendFieldsTypeName(string typeName)
@@ -43,9 +43,9 @@ namespace Yorozu.DB
             _extendFieldsTypeCache = null;
             this.Dirty();
         }
-        
+
         private Type _extendFieldsTypeCache;
-        
+
         internal Type ExtendFieldsType
         {
             get
@@ -84,7 +84,7 @@ namespace Yorozu.DB
                 _keyID = -1;
             else
                 _keyID = fieldID;
-            
+
             this.Dirty();
         }
 
@@ -113,12 +113,7 @@ namespace Yorozu.DB
                 }
             }
 
-            var field = new DataField(typeId)
-            {
-                Name = name,
-                ID = fieldId,
-                DataType = dataType,
-            };
+            var field = new DataField(typeId, name, fieldId, dataType);
 
             Fields.Add(field);
 

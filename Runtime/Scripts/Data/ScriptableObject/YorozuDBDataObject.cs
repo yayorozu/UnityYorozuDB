@@ -34,9 +34,10 @@ namespace Yorozu.DB
             [SerializeField]
             internal List<DataContainer> Data = new List<DataContainer>();
 
-            internal Field(int fieldId)
+            internal Field(int fieldId, DataType dataType)
             {
                 ID = fieldId;
+                FixData = new DataContainer(dataType);
             }
             
 #if UNITY_EDITOR
@@ -118,6 +119,17 @@ namespace Yorozu.DB
         }
 
 #if UNITY_EDITOR
+        
+        /// <summary>
+        /// 1行あたりに含まれる最大の数
+        /// </summary>
+        internal int MaxRowLength => _fields.Max(f =>
+        {
+            if (f.Data == null || f.Data.Count <= 0)
+                return 1;
+            
+            return f.Data.Max(d => d.Size);
+        });
 
         internal bool IsFixField(int fieldId) => _fields.First(f => f.ID == fieldId).IsFix;
         
@@ -159,19 +171,18 @@ namespace Yorozu.DB
         /// </summary>
         internal void AddField(int fieldId)
         {
-            var find = _fields.Any(g => g.ID == fieldId);
-            if (find)
-            {
+            var findIndex = _fields.FindIndex(g => g.ID == fieldId);
+            if (findIndex >= 0)
                 return;
-            }
 
-            var addField = new Field(fieldId);
+            var targetField = Define.Fields.First(f => f.ID == fieldId);
+            var addField = new Field(fieldId, targetField.DataType);
             // 既存のフィールドのデータ分だけ追加する必要がある
             if (DataCount > 0)
             {
                 for (var i = 0; i < DataCount; i++)
                 {
-                    addField.Data.Add(new DataContainer());
+                    addField.Data.Add(new DataContainer(targetField.DataType));
                 }
             }
 
@@ -273,7 +284,8 @@ namespace Yorozu.DB
         {
             foreach (var g in _fields)
             {
-                g.Data[index] = new DataContainer();
+                var targetField = Define.Fields.First(f => f.ID == g.ID);
+                g.Data[index] = new DataContainer(targetField.DataType);
             }
             this.Dirty();
         }

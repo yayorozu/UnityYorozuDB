@@ -227,12 +227,14 @@ namespace Yorozu.DB
                     var x = rect.x;
                     var field = data.Fields[index];
                     rect.width = 20;
+                    var isKey = _data.IsKeyField(field);
                     // Key として有効なのであればボタンを表示
                     if (field.ValidKey())
                     {
-                        var content = _data.IsKeyField(field) ? Style.Key : Style.UnKey;
+                        var content = isKey ? Style.Key : Style.UnKey;
                         if (GUI.Button(rect, content, EditorStyles.label))
                         {
+                            field.IsArray = false;
                             _data.SetKey(field.ID);
                         }
                     }
@@ -293,6 +295,14 @@ namespace Yorozu.DB
                         }
                     }
                     
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    
+                    // 配列とするか
+                    rect.width = 50;
+                    using (new EditorGUI.DisabledScope(isKey))
+                    {
+                        field.IsArray = EditorGUI.ToggleLeft(rect, "Array", field.IsArray);
+                    }
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     
                     rect.width = 200;
