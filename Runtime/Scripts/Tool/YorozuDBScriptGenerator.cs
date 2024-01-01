@@ -200,7 +200,7 @@ namespace Yorozu.DB
                     }
                     else
                     {
-                        builder.AppendLine($"        public {className} {field.Name} => Data<{className}>({field.ID}); }}");
+                        builder.AppendLine($"        public {className} {field.Name} => Data<{className}>({field.ID});");
                         builder.AppendLine($"");
                         builder.AppendLine($"        public string {field.Name}Key");
                         builder.AppendLine($"        {{");
