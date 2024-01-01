@@ -39,8 +39,8 @@ namespace Yorozu.DB
 #if UNITY_EDITOR
             set
             {
-                if (_strings.Length <= 0)
-                    throw new Exception("string is not set");
+                if (_ints.Length <= 0)
+                    throw new Exception("int is not set");
 
                 _ints[0] = value;
             }

@@ -69,7 +69,7 @@ namespace Yorozu.DB
         /// </summary>
         internal static bool CreateDataAsset(YorozuDBDataDefineObject define, string defaultPath)
         {
-            var path = EditorUtility.SaveFilePanelInProject("Select", "Data", "asset", "Select Create Path", defaultPath);
+            var path = EditorUtility.SaveFilePanelInProject("Select", $"{define.ClassName}Data", "asset", "Select Create Path", defaultPath);
             if (string.IsNullOrEmpty(path)) 
                 return false;
             

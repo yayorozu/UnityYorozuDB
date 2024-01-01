@@ -123,19 +123,27 @@ namespace Yorozu.DB
         /// <summary>
         /// 1行あたりに含まれる最大の数
         /// </summary>
-        internal int MaxRowLength => _fields.Max(f =>
+        internal int MaxRowLength
         {
-            if (f.Data == null || f.Data.Count <= 0)
-                return 1;
-
-            var find = Define.Fields.First(f2 => f2.ID == f.ID);
-            if (f.IsFix)
+            get
             {
-                return f.FixData.GetSize(find.DataType);
+                if (_fields == null || !_fields.Any())
+                    return 1;
+                return _fields.Max(f =>
+                {
+                    if (f.Data == null || f.Data.Count <= 0)
+                        return 1;
+
+                    var find = Define.Fields.First(f2 => f2.ID == f.ID);
+                    if (f.IsFix)
+                    {
+                        return f.FixData.GetSize(find.DataType);
+                    }
+
+                    return f.Data.Max(d => d.GetSize(find.DataType));
+                });
             }
-            
-            return f.Data.Max(d => d.GetSize(find.DataType));
-        });
+        }
 
         internal bool IsFixField(int fieldId) => _fields.First(f => f.ID == fieldId).IsFix;
         
