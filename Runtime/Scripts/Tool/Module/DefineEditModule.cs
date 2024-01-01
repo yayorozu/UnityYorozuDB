@@ -45,13 +45,15 @@ namespace Yorozu.DB
 
         [SerializeField]
         private string[] _enums;
+        [SerializeField]
+        private string[] _defineClasses;
 
         [NonSerialized]
         private string _name;
         [NonSerialized]
         private DataType _dataType;
         [NonSerialized]
-        private string _enumName;
+        private string _targetName;
 
         [NonSerialized]
         private bool _repaint;
@@ -111,8 +113,16 @@ namespace Yorozu.DB
                                     .Where(d => d.Flags == (_dataType == DataType.Flags) || _dataType == DataType.Enum)
                                     .Select(d => d.Name)
                                     .ToArray();
-                                _enumName = _enums.Length > 0 ? _enums[0] : "";
+                                _targetName = _enums.Length > 0 ? _enums[0] : "";
                             }
+                        }
+                        else if (check.changed && _dataType == DataType.DBClass)
+                        {
+                            _defineClasses = YorozuDBEditorInternalUtility.LoadAllDefineAsset()
+                                .Where(d => d.KeyField != null)
+                                .Select(d => d.ClassName)
+                                .ToArray();
+                            _targetName = _defineClasses.Length > 0 ? _defineClasses[0] : "";
                         }
                     }
                 }
@@ -122,15 +132,28 @@ namespace Yorozu.DB
                     // enumなら候補を表示
                     if ((_dataType == DataType.Enum || _dataType == DataType.Flags) && _enums != null && _enums.Length > 0)
                     {
-                        var index = Array.IndexOf(_enums, _enumName);
+                        var index = Array.IndexOf(_enums, _targetName);
                         using (var check = new EditorGUI.ChangeCheckScope())
                         {
                             index = EditorGUILayout.Popup("Enum Select", index, _enums, Style.EnumWidth);
                             if (check.changed)
                             {
-                                _enumName = _enums[index];
+                                _targetName = _enums[index];
                             }
                         }
+                    }
+                    // 内部定義データの場合
+                    else if (_dataType == DataType.DBClass)
+                    {
+                        var index = Array.IndexOf(_defineClasses, _targetName);
+                        using (var check = new EditorGUI.ChangeCheckScope())
+                        {
+                            index = EditorGUILayout.Popup("Class Select", index, _defineClasses, Style.EnumWidth);
+                            if (check.changed)
+                            {
+                                _targetName = _defineClasses[index];
+                            }
+                        }  
                     }
                     
                     GUILayout.FlexibleSpace();
@@ -140,12 +163,13 @@ namespace Yorozu.DB
                                (_dataType == DataType.Enum && (_enums == null || _enums.Length <= 0)) ||
                                (_dataType == DataType.Enum && _enumData == null) ||
                                (_dataType == DataType.Flags && (_enums == null || _enums.Length <= 0)) ||
-                               (_dataType == DataType.Flags && _enumData == null)
+                               (_dataType == DataType.Flags && _enumData == null) ||
+                               (_dataType == DataType.DBClass && (_defineClasses == null || _defineClasses.Length <= 0) && string.IsNullOrEmpty(_targetName))
                         ))
                     {
                         if (GUILayout.Button("Add", Style.ButtonWidth))
                         {
-                            var id = _data.AddField(_name, _dataType, _enumName);
+                            var id = _data.AddField(_name, _dataType, _targetName);
                             _name = "";
                             _dataType = default;
                             if (id >= 0)
@@ -297,6 +321,13 @@ namespace Yorozu.DB
                                 EditorGUI.LabelField(rect, $"{field.DataType} ({_enumData.Defines[enumIndex].Name})", EditorStyles.popup);
                             }
                         }
+                        else if (field.DataType == DataType.DBClass)
+                        {
+                            EditorGUI.LabelField(rect,
+                                field.ReferenceDefine != null
+                                    ? $"{field.DataType} ({field.ReferenceDefine.ClassName})"
+                                    : $"{field.DataType} (Not Exist)", EditorStyles.popup);
+                        }
                         else
                         {
                             EditorGUI.LabelField(rect, field.DataType.ToString(), EditorStyles.popup);
@@ -431,6 +462,8 @@ namespace Yorozu.DB
                                 && t != typeof(Editor)
                                 && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor"))
                                 && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Yorozu.DB"))
+                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Packages.Rider"))
                                 && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro"))
                                 && !t.IsAbstract
                                 && !t.IsGenericType

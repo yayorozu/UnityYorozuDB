@@ -104,7 +104,34 @@ namespace Yorozu.DB
         protected IEnumerable<Vector2Int> Vector2Ints(int fieldId) => Data(fieldId).Vector2Ints;
         protected IEnumerable<Vector3Int> Vector3Ints(int fieldId) => Data(fieldId).Vector3Ints;
         protected IEnumerable<Color> Colors(int fieldId) => Data(fieldId).Colors;
-
+        
+        /// <summary>
+        /// DB内部のデータを取得する
+        /// </summary>
+        protected T Data<T>(int fieldId) where T : DataAbstract
+        {
+            var type = typeof(T);
+            var key = String(fieldId);
+            return type.GetInterface(nameof(IIntKey)) != null
+                ? YorozuDB.Find<T>(int.Parse(key))
+                : YorozuDB.Find<T>(key);
+        }
+        
+        protected IEnumerable<T> MultiData<T>(int fieldId) where T : DataAbstract
+        {
+            var type = typeof(T);
+            if (type.GetInterface(nameof(IIntKey)) != null)
+            {
+                var keys = Ints(fieldId);
+                return YorozuDB.FindMany<T>(keys.ToArray());
+            }
+            else
+            {
+                var keys = Strings(fieldId);
+                return YorozuDB.FindMany<T>(keys.ToArray());
+            }
+        }
+        
 #if UNITY_EDITOR
         /// <summary>
         /// データ上書き

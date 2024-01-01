@@ -38,8 +38,11 @@ namespace Yorozu.DB
         [SerializeField]
         private Mode _mode;
 
+        private static YorozuDBEditorWindow _window;
+
         private void OnEnable()
         {
+            _window = this;
             if (_list == null)
             {
                 _list = new ListModule();
@@ -55,6 +58,24 @@ namespace Yorozu.DB
             
             if (_editEnum == null)
                 _editEnum = new EnumEditModule();
+        }
+
+        private void OnDisable()
+        {
+            _window = null;
+        }
+
+        /// <summary>
+        /// 対象のデータを開く
+        /// </summary>
+        internal static void ShowData(int instanceId, int row)
+        {
+            if (_window == null)
+                return;
+            
+            _window._list.SetSelection(instanceId);
+            _window.SelectDataEvent(instanceId);
+            _window._editData.SetSelection(row);
         }
 
         private void SelectDataEvent(int instanceId)

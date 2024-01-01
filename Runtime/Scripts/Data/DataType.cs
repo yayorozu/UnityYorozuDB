@@ -27,5 +27,9 @@ namespace Yorozu.DB
         Color,
         AudioClip,
         Flags,
+        /// <summary>
+        /// YorozuDB内で定義してあるKeyのあるクラス
+        /// </summary>
+        DBClass,
     }
 }

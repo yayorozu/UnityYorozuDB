@@ -186,6 +186,31 @@ namespace Yorozu.DB
                         }
                     }
                 }
+                else if (field.DataType == DataType.DBClass)
+                {
+                    var className = field.ReferenceDefine.ClassName;
+                    if (field.IsArray)
+                    {
+                        builder.AppendLine($"        public IEnumerable<{className}> {field.Name} => MultiData<{className}>({field.ID});");
+                        builder.AppendLine($"");
+                        builder.AppendLine($"        public IEnumerable<string> {field.Name}Keys => Strings({field.ID});");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"        public void Add{field.Name}Keys(string value) => Add({field.ID}, value);");
+                        builder.AppendLine($"#endif");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"        public {className} {field.Name} => Data<{className}>({field.ID}); }}");
+                        builder.AppendLine($"");
+                        builder.AppendLine($"        public string {field.Name}Key");
+                        builder.AppendLine($"        {{");
+                        builder.AppendLine($"            get {{ return String({field.ID}); }}");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                        builder.AppendLine($"#endif");
+                        builder.AppendLine($"        }}");
+                    }
+                }
                 else
                 {
                     if (field.IsArray)

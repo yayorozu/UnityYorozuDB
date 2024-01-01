@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -91,7 +92,7 @@ namespace Yorozu.DB
         /// <summary>
         /// データの追加
         /// </summary>
-        internal int AddField(string name, DataType dataType, string enumName)
+        internal int AddField(string name, DataType dataType, string targetName)
         {
             if (!YorozuDBEditorInternalUtility.NameValidator(Fields, name, out name))
                 return -1;
@@ -102,18 +103,27 @@ namespace Yorozu.DB
                 fieldId = Fields.Max(f => f.ID) + 1;
             }
 
-            var typeId = 0;
+            var targetId = "";
             if (dataType == DataType.Enum || dataType == DataType.Flags)
             {
                 var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
-                var index = enumData.Defines.FindIndex(d => d.Name == enumName);
+                var index = enumData.Defines.FindIndex(d => d.Name == targetName);
                 if (index >= 0)
                 {
-                    typeId = enumData.Defines[index].ID;
+                    targetId = enumData.Defines[index].ID.ToString();
+                }
+            }
+            else if (dataType == DataType.DBClass)
+            {
+                var defines = YorozuDBEditorInternalUtility.LoadAllDefineAsset();
+                var index = Array.FindIndex(defines, d => d.ClassName == targetName);
+                if (index >= 0)
+                {
+                    targetId = AssetDatabase.GetAssetPath(defines[index]);
                 }
             }
 
-            var field = new DataField(typeId, name, fieldId, dataType);
+            var field = new DataField(targetId, name, fieldId, dataType);
 
             Fields.Add(field);
 

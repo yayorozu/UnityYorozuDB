@@ -58,7 +58,7 @@ namespace Yorozu.DB
             return type.GetInterfaces().Contains(interfaceType);
         }
 
-        private static IEnumerable<T> FindMany<T>(string key, int limit) where T : DataAbstract
+        private static IEnumerable<T> FindMany<T>(int limit, params string[] keys) where T : DataAbstract
         {
             var type = typeof(T);
             if (!ValidData(typeof(T), typeof(IStringKey)))
@@ -68,14 +68,14 @@ namespace Yorozu.DB
                 .Where(v =>
                 {
                     var ikey = v as IStringKey;
-                    return ikey.Key == key;
+                    return keys.Contains(ikey.Key);
                 })
                 .Take(limit)
                 .Cast<T>()
             ;
         }
 
-        private static IEnumerable<T> FindMany<T>(int key, int limit) where T : DataAbstract
+        private static IEnumerable<T> FindMany<T>(int limit, params int[] keys) where T : DataAbstract
         {
             var type = typeof(T);
             if (!ValidData(typeof(T), typeof(IIntKey)))
@@ -85,13 +85,13 @@ namespace Yorozu.DB
                 .Where(v =>
                 {
                     var ikey = v as IIntKey;
-                    return ikey.Key == key;
+                    return keys.Contains(ikey.Key);
                 })
                 .Take(limit)
                 .Cast<T>()
             ;
         }
-
+        
         public static T Find<T>(int key) where T : DataAbstract
         {
             var finds = FindMany<T>(key, 1);
@@ -103,7 +103,7 @@ namespace Yorozu.DB
         
         public static T Find<T>(string key) where T : DataAbstract
         {
-            var finds = FindMany<T>(key, 1);
+            var finds = FindMany<T>(1, key);
             if (!finds.Any())
                 return null;
             
@@ -115,19 +115,19 @@ namespace Yorozu.DB
             return Find<T>(key.GetHashCode());
         }
         
-        public static IEnumerable<T> FindMany<T>(int key) where T : DataAbstract
+        public static IEnumerable<T> FindMany<T>(params int[] keys) where T : DataAbstract
         {
-            return FindMany<T>(key, int.MaxValue);
+            return FindMany<T>(int.MaxValue, keys);
         }
         
-        public static IEnumerable<T> FindMany<T>(string key) where T : DataAbstract
+        public static IEnumerable<T> FindMany<T>(params string[] keys) where T : DataAbstract
         {
-            return FindMany<T>(key, int.MaxValue);
+            return FindMany<T>(int.MaxValue, keys);
         }
         
         public static IEnumerable<T> FindMany<T>(Enum key) where T : DataAbstract
         {
-            return FindMany<T>(key.GetHashCode(), int.MaxValue);
+            return FindMany<T>(int.MaxValue, key.GetHashCode());
         }
 
         /// <summary>

@@ -44,6 +44,9 @@ namespace Yorozu.DB
         [SerializeField]
         internal bool IsArray;
         
+        [SerializeField]
+        internal YorozuDBDataDefineObject ReferenceDefine;
+        
         /// <summary>
         /// Keyとして有効かどうか
         /// </summary>
@@ -54,14 +57,21 @@ namespace Yorozu.DB
 
 #if UNITY_EDITOR
         
-        public DataField(int typeId, string name, int fieldId, DataType dataType)
+        public DataField(string typeId, string name, int fieldId, DataType dataType)
         {
-            EnumDefineId = typeId;
             Name = name;
             ID = fieldId;
             DataType = dataType;
-
+            
             DefaultValue = new DataContainer(dataType);
+            if (dataType is DataType.Enum or DataType.Flags)
+            {
+                EnumDefineId = int.Parse(typeId);
+            }
+            else if (dataType == DataType.DBClass)
+            {
+                ReferenceDefine = UnityEditor.AssetDatabase.LoadAssetAtPath<YorozuDBDataDefineObject>(typeId);
+            }
         }
 
 #endif

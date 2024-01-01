@@ -38,6 +38,11 @@ namespace Yorozu.DB
             InitIfNeeded();
         }
 
+        internal void SetSelection(int row)
+        {
+            _treeView.SetSelection(new List<int>(){row});
+        }
+
         internal override bool OnGUI()
         {
             if (_data == null)

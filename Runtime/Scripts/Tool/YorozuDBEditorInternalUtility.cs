@@ -129,6 +129,35 @@ namespace Yorozu.DB
             // 英数以外は許可しない
             return Regex.IsMatch(name, @"^[0-9a-zA-Z]+$");
         }
+        
+        internal static (YorozuDBDataObject, int) FindData(YorozuDBDataDefineObject define, string key)
+        {
+            var data = LoadAllDataAsset(define);
+            var keyField = define.KeyField;
+            int intValue = 0;
+            if (keyField.DataType == DataType.Int && !int.TryParse(key, out intValue))
+            {
+                Debug.LogError("Target Class Key is int");
+                return (null, -1);
+            }
+            
+            foreach (var dataObject in data)
+            {
+                for (int i = 0; i < dataObject.DataCount; i++)
+                {
+                    var keyData = dataObject.GetData(keyField.ID, i);
+                    if (
+                        (keyField.DataType == DataType.String && keyData.String == key) ||
+                        (keyField.DataType == DataType.Int && keyData.Int == intValue)
+                    )
+                    {
+                        return (dataObject, i);
+                    }
+                }
+            }
+            Debug.LogError($"Key Not found. {key}");
+            return (null, -1);
+        }
     }
 }
 

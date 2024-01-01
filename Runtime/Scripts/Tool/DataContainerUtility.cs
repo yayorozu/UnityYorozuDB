@@ -24,6 +24,7 @@ namespace Yorozu.DB
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
+                case DataType.DBClass:
                     ArrayUtility.Add(ref self._strings, "");
                     break;
                 case DataType.Float:
@@ -59,6 +60,7 @@ namespace Yorozu.DB
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
+                case DataType.DBClass:
                     ArrayUtility.RemoveAt(ref self._strings, index);
                     break;
                 case DataType.Float:
@@ -93,6 +95,7 @@ namespace Yorozu.DB
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
+                case DataType.DBClass:
                     return self._strings?.Length ?? 0;
                 case DataType.Float:
                     return self._floats?.Length ?? 0;
@@ -125,6 +128,7 @@ namespace Yorozu.DB
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
+                case DataType.DBClass:
                     self._strings = new []{""};
                     break;
                 case DataType.Float:
@@ -164,6 +168,7 @@ namespace Yorozu.DB
                 case DataType.Vector2Int:
                 case DataType.Vector3Int:
                 case DataType.Color:
+                case DataType.DBClass:
                     for (var i = self._strings.Length; i <= index; i++)
                     {
                         ArrayUtility.Add(ref self._strings, "");

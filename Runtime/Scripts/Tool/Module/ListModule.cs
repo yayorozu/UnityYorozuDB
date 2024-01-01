@@ -102,6 +102,11 @@ namespace Yorozu.DB
             return false;
         }
 
+        internal void SetSelection(int instanceId)
+        {
+            _treeView.SetSelection(new List<int>(){instanceId});
+        }
+
         /// <summary>
         /// Data を作成
         /// </summary>
