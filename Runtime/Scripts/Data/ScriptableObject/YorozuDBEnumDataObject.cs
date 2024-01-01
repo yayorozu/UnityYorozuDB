@@ -160,9 +160,9 @@ namespace Yorozu.DB
         /// DataEditor側で見る
         /// </summary>
         [NonSerialized]
-        private static Dictionary<int, string[]> _valuesDictionary = new Dictionary<int, string[]>();
+        private Dictionary<int, string[]> _valuesDictionary = new Dictionary<int, string[]>();
         [NonSerialized]
-        private static Dictionary<int, int[]> _keysDictionary = new Dictionary<int, int[]>();
+        private Dictionary<int, int[]> _keysDictionary = new Dictionary<int, int[]>();
 
         internal void ResetEnumCache()
         {

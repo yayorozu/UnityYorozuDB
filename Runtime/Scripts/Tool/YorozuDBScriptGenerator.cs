@@ -104,7 +104,10 @@ namespace Yorozu.DB
             builder.AppendLine("// Do not edit!!!       //"); 
             builder.AppendLine("// -------------------- //");
             builder.AppendLine("#pragma warning disable");
+            builder.AppendLine("");
+            builder.AppendLine("using System.Collections.Generic;");
             builder.AppendLine("using UnityEngine;");
+            builder.AppendLine("using System.Linq;");
             builder.AppendLine("");
             
             builder.AppendLine("namespace Yorozu.DB");
@@ -134,19 +137,29 @@ namespace Yorozu.DB
                     builder.AppendLine($"        /// {field.Memo}");
                     builder.AppendLine("        /// </summary>");
                 }
-                
+
                 if (field.DataType == DataType.Enum)
                 {
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
-                        builder.AppendLine($"        {{");
-                        builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId}); }}");
-                        builder.AppendLine($"#if UNITY_EDITOR");
-                        builder.AppendLine($"            set {{ Set({field.ID}, {field.EnumDefineId}, value); }}");
-                        builder.AppendLine($"#endif");
-                        builder.AppendLine($"        }}");
+                        if (field.IsArray)
+                        {
+                            builder.AppendLine($"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
+                            builder.AppendLine($"#if UNITY_EDITOR");
+                            builder.AppendLine($"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, {field.EnumDefineId}, value);");
+                            builder.AppendLine($"#endif");
+                        }
+                        else
+                        {
+                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
+                            builder.AppendLine($"        {{");
+                            builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId}); }}");
+                            builder.AppendLine($"#if UNITY_EDITOR");
+                            builder.AppendLine($"            set {{ Set({field.ID}, {field.EnumDefineId}, value); }}");
+                            builder.AppendLine($"#endif");
+                            builder.AppendLine($"        }}");
+                        }
                     }
                 }
                 else if (field.DataType == DataType.Flags)
@@ -154,24 +167,44 @@ namespace Yorozu.DB
                     var enumDefine = enumData.Defines.FirstOrDefault(d => d.ID == field.EnumDefineId);
                     if (enumDefine != null)
                     {
-                        builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
-                        builder.AppendLine($"        {{");
-                        builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
-                        builder.AppendLine($"#if UNITY_EDITOR");
-                        builder.AppendLine($"            set {{ Set({field.ID}, (int)value); }}");
-                        builder.AppendLine($"#endif");
-                        builder.AppendLine($"        }}");
+                        if (field.IsArray)
+                        {
+                            builder.AppendLine($"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
+                            builder.AppendLine($"#if UNITY_EDITOR");
+                            builder.AppendLine($"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, (int)value);");
+                            builder.AppendLine($"#endif");
+                        }
+                        else
+                        {
+                            builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
+                            builder.AppendLine($"        {{");
+                            builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
+                            builder.AppendLine($"#if UNITY_EDITOR");
+                            builder.AppendLine($"            set {{ Set({field.ID}, (int)value); }}");
+                            builder.AppendLine($"#endif");
+                            builder.AppendLine($"        }}");
+                        }
                     }
                 }
                 else
                 {
-                    builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name}");
-                    builder.AppendLine($"        {{");
-                    builder.AppendLine($"            get {{ return {field.DataType.ToString()}({field.ID}); }}");
-                    builder.AppendLine($"#if UNITY_EDITOR");
-                    builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
-                    builder.AppendLine($"#endif");
-                    builder.AppendLine($"        }}");
+                    if (field.IsArray)
+                    {
+                        builder.AppendLine($"        public IEnumerable<{field.DataType.ConvertString()}> {field.Name} => {field.DataType.ToString()}s({field.ID});");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"        public void Add{field.Name}({field.DataType.ConvertString()} value) => Add({field.ID}, value);");
+                        builder.AppendLine($"#endif");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"        public {field.DataType.ConvertString()} {field.Name}");
+                        builder.AppendLine($"        {{");
+                        builder.AppendLine($"            get {{ return {field.DataType.ToString()}({field.ID}); }}");
+                        builder.AppendLine($"#if UNITY_EDITOR");
+                        builder.AppendLine($"            set {{ Set({field.ID}, value); }}");
+                        builder.AppendLine($"#endif");
+                        builder.AppendLine($"        }}");
+                    }
                 }
                 builder.AppendLine("");
             }

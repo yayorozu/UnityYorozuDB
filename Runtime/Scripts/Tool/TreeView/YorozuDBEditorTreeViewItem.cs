@@ -18,7 +18,7 @@ namespace Yorozu.DB.TreeView
         private List<FieldInfo> _extendFieldInfos;
         private Editor _editor;
         internal float Height;
-
+        
         internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
         {
             _data = data;
@@ -31,15 +31,20 @@ namespace Yorozu.DB.TreeView
             }
         }
 
-        internal void Draw(Rect rect, int index)
+        internal bool Draw(Rect rect, int index)
         {
             var field = _data.Define.Fields[index];
             var isFix = _data.IsFixField(field.ID);
             using (new EditorGUI.DisabledScope(isFix))
             {
                 var container = _data.GetData(field.ID, id);
-                container.DrawField(rect, field, GUIContent.none, _enumData);
+                if (container.DrawField(rect, field, GUIContent.none, _enumData))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
 
         internal void DrawExtend(Rect rect, int index)
