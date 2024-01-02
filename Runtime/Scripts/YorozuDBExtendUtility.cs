@@ -23,7 +23,7 @@ namespace Yorozu.DB
             var fields = FindFields(scriptableObject);
             if (fields.Count <= 0)
                 return 0;
-            
+
             // 上に要素追加されると困るので全部見つけて最大値を要素数とする
             return fields.Max(f =>
             {
@@ -38,9 +38,9 @@ namespace Yorozu.DB
                 return list.Count;
             });
         }
-        
+
         private static Dictionary<string, List<FieldInfo>> _fieldCache = new Dictionary<string, List<FieldInfo>>();
-        
+
         internal static List<FieldInfo> FindFields(Type type)
         {
             var fullName = type.FullName;
@@ -55,11 +55,13 @@ namespace Yorozu.DB
 
                     targetFields.Add(field);
                 }
+
                 _fieldCache.Add(fullName, targetFields);
             }
 
             return _fieldCache[fullName];
         }
+
         /// <summary>
         /// 対象となるフィールドを探す
         /// </summary>
@@ -83,22 +85,24 @@ namespace Yorozu.DB
                 !fieldInfo.FieldType.IsSerializable
             )
                 return false;
- 
+
             if (fieldInfo.FieldType.IsArray)
                 return true;
 
-            if (fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>))
+            if (fieldInfo.FieldType.IsGenericType &&
+                fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>))
                 return true;
 
             return false;
         }
-        
+
         internal static Type GetArrayType(this Type type)
         {
             if (type.IsArray)
                 return type.GetElementType();
- 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+
+            if (type.IsGenericType &&
+                type.GetGenericTypeDefinition() == typeof(List<>))
                 return type.GetGenericArguments()[0];
             return null;
         }
@@ -110,7 +114,7 @@ namespace Yorozu.DB
         {
             if (scriptableObject == null)
                 return;
-            
+
             var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
             var fields = FindFields(scriptableObject);
 
@@ -126,9 +130,10 @@ namespace Yorozu.DB
                     list[prop.arraySize - 1] = list[copyIndex.Value];
                 }
             }
+
             editor.serializedObject.ApplyModifiedProperties();
         }
-        
+
         /// <summary>
         /// 特定Indexを削除
         /// </summary>
@@ -139,7 +144,7 @@ namespace Yorozu.DB
 
             var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
             var fields = FindFields(scriptableObject);
-            
+
             editor.serializedObject.UpdateIfRequiredOrScript();
             foreach (var field in fields)
             {
@@ -149,6 +154,7 @@ namespace Yorozu.DB
                     prop.DeleteArrayElementAtIndex(index);
                 }
             }
+
             editor.serializedObject.ApplyModifiedProperties();
         }
 
@@ -159,7 +165,7 @@ namespace Yorozu.DB
         {
             if (scriptableObject == null)
                 return;
-            
+
             var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
             var fields = FindFields(scriptableObject);
 
@@ -172,6 +178,7 @@ namespace Yorozu.DB
                     prop.InsertArrayElementAtIndex(i);
                 }
             }
+
             editor.serializedObject.ApplyModifiedProperties();
         }
 
@@ -182,7 +189,7 @@ namespace Yorozu.DB
         {
             if (scriptableObject == null)
                 return 0;
-            
+
             var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
             var fields = FindFields(scriptableObject);
 
@@ -195,7 +202,7 @@ namespace Yorozu.DB
                     continue;
                 if (row >= prop.arraySize)
                     continue;
-                
+
                 var elementProp = prop.GetArrayElementAtIndex(row);
                 elementProp.isExpanded = true;
                 max = Mathf.Max(EditorGUI.GetPropertyHeight(elementProp), max);
@@ -211,10 +218,10 @@ namespace Yorozu.DB
         {
             if (scriptableObject == null)
                 return;
-            
+
             var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
             var fields = FindFields(scriptableObject);
-            
+
             editor.serializedObject.UpdateIfRequiredOrScript();
             foreach (var field in fields)
             {
@@ -233,6 +240,7 @@ namespace Yorozu.DB
                     }
                 }
             }
+
             editor.serializedObject.ApplyModifiedProperties();
         }
     }

@@ -23,18 +23,19 @@ namespace Yorozu.DB
         {
             if (_data.ExtendFieldsObject == null)
                 return default;
-            
+
             return _data.ExtendFieldsObject as T;
         }
 
         private YorozuDBEnumDataObject _enumData => YorozuDB.EnumData;
+
         /// <summary>
         /// 何行目のデータか
         /// </summary>
         private int _row;
 
         protected int row => _row;
-        
+
         internal void SetUp(YorozuDBDataObject data, int row)
         {
             _data = data;
@@ -42,58 +43,72 @@ namespace Yorozu.DB
         }
 
         private DataContainer Data(int fieldId) => _data.GetData(fieldId, _row);
-        
+
         private int GetEnumValue(int enumDefineId, int key)
         {
             if (_enumData == null)
             {
                 throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not attach.");
             }
+
             var findDefine = _enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
             if (findDefine == null)
             {
                 Debug.LogError("Enum Data is not Define");
                 return 0;
             }
+
             var index = Mathf.Max(findDefine.KeyValues.FindIndex(kv => kv.Key == key), 0);
             return index;
         }
-        
+
         /// <summary>
         /// primitive
         /// </summary>
         /// <returns></returns>
         protected string String(int fieldId) => Data(fieldId).String;
+
         protected float Float(int fieldId) => Data(fieldId).Float;
         protected bool Bool(int fieldId) => Data(fieldId).Bool;
         protected int Int(int fieldId) => Data(fieldId).Int;
         protected int Enum(int fieldId, int enumDefineId) => GetEnumValue(enumDefineId, Int(fieldId));
-        
+
         protected IEnumerable<string> Strings(int fieldId) => Data(fieldId)._strings;
         protected IEnumerable<float> Floats(int fieldId) => Data(fieldId)._floats;
         protected IEnumerable<bool> Bools(int fieldId) => Data(fieldId)._bools;
         protected IEnumerable<int> Ints(int fieldId) => Data(fieldId)._ints;
-        protected IEnumerable<int> Enums(int fieldId, int enumDefineId) => Data(fieldId)._ints.Select(v => GetEnumValue(enumDefineId, v));
-        
+
+        protected IEnumerable<int> Enums(int fieldId, int enumDefineId) =>
+            Data(fieldId)._ints.Select(v => GetEnumValue(enumDefineId, v));
+
         /// <summary>
         /// UnityEngin.Object
         /// </summary>
         protected Sprite Sprite(int fieldId) => Data(fieldId).UnityObject as Sprite;
+
         protected GameObject GameObject(int fieldId) => Data(fieldId).UnityObject as GameObject;
         protected AudioClip AudioClip(int fieldId) => Data(fieldId).UnityObject as AudioClip;
         protected ScriptableObject ScriptableObject(int fieldId) => Data(fieldId).UnityObject as ScriptableObject;
         protected UnityEngine.Object UnityObject(int fieldId) => Data(fieldId).UnityObject;
-        
+
         protected IEnumerable<Sprite> Sprites(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as Sprite);
-        protected IEnumerable<GameObject> GameObjects(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as GameObject);
-        protected IEnumerable<AudioClip> AudioClips(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as AudioClip);
-        protected IEnumerable<ScriptableObject> ScriptableObjects(int fieldId) => Data(fieldId)._unityObjects.Select(v => v as ScriptableObject);
+
+        protected IEnumerable<GameObject> GameObjects(int fieldId) =>
+            Data(fieldId)._unityObjects.Select(v => v as GameObject);
+
+        protected IEnumerable<AudioClip> AudioClips(int fieldId) =>
+            Data(fieldId)._unityObjects.Select(v => v as AudioClip);
+
+        protected IEnumerable<ScriptableObject> ScriptableObjects(int fieldId) =>
+            Data(fieldId)._unityObjects.Select(v => v as ScriptableObject);
+
         protected IEnumerable<UnityEngine.Object> UnityObjects(int fieldId) => Data(fieldId)._unityObjects;
 
         /// <summary>
         /// TODO キャストしてるため、アクセス頻度が高いとGCが無駄にでるのでキャッシュする
         /// </summary>
         protected Vector2 Vector2(int fieldId) => Data(fieldId).Vector2;
+
         protected Vector3 Vector3(int fieldId) => Data(fieldId).Vector3;
         protected Vector2Int Vector2Int(int fieldId) => Data(fieldId).Vector2Int;
         protected Vector3Int Vector3Int(int fieldId) => Data(fieldId).Vector3Int;
@@ -104,7 +119,7 @@ namespace Yorozu.DB
         protected IEnumerable<Vector2Int> Vector2Ints(int fieldId) => Data(fieldId).Vector2Ints;
         protected IEnumerable<Vector3Int> Vector3Ints(int fieldId) => Data(fieldId).Vector3Ints;
         protected IEnumerable<Color> Colors(int fieldId) => Data(fieldId).Colors;
-        
+
         /// <summary>
         /// DB内部のデータを取得する
         /// </summary>
@@ -112,11 +127,11 @@ namespace Yorozu.DB
         {
             var type = typeof(T);
             var key = String(fieldId);
-            return type.GetInterface(nameof(IIntKey)) != null
-                ? YorozuDB.Find<T>(int.Parse(key))
-                : YorozuDB.Find<T>(key);
+            return type.GetInterface(nameof(IIntKey)) != null ?
+                YorozuDB.Find<T>(int.Parse(key)) :
+                YorozuDB.Find<T>(key);
         }
-        
+
         protected IEnumerable<T> MultiData<T>(int fieldId) where T : DataAbstract
         {
             var type = typeof(T);
@@ -131,15 +146,17 @@ namespace Yorozu.DB
                 return YorozuDB.FindMany<T>(keys.ToArray());
             }
         }
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// データ上書き
         /// </summary>
         protected void Set(int fieldId, string value, int index = 0) => Data(fieldId).Set(value, index);
+
         protected void Set(int fieldId, float value, int index = 0) => Data(fieldId).Set(value, index);
         protected void Set(int fieldId, bool value, int index = 0) => Data(fieldId).Set(value, index);
         protected void Set(int fieldId, int value, int index = 0) => Data(fieldId).Set(value, index);
+
         protected void Set(int fieldId, int enumDefineId, Enum value, int index = 0)
         {
             var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
@@ -173,9 +190,11 @@ namespace Yorozu.DB
         /// 追加
         /// </summary>
         protected void Add(int fieldId, string value) => Data(fieldId).Add(value);
+
         protected void Add(int fieldId, float value) => Data(fieldId).Add(value);
         protected void Add(int fieldId, bool value) => Data(fieldId).Add(value);
         protected void Add(int fieldId, int value) => Data(fieldId).Add(value);
+
         protected void Add(int fieldId, int enumDefineId, Enum value)
         {
             var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");

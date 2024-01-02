@@ -25,12 +25,12 @@ namespace Yorozu.DB
                 var path = EditorUtility.OpenFolderPanel("Select Export Folder", Application.dataPath, "");
                 if (string.IsNullOrEmpty(path))
                     return;
-                
+
                 // UnityPathじゃない
                 if (!path.Contains(Application.dataPath))
                     return;
 
-                savePath = path.Replace(Application.dataPath, "Assets"); 
+                savePath = path.Replace(Application.dataPath, "Assets");
                 var marker = ScriptableObject.CreateInstance<YorozuDBScriptExportMarker>();
                 var tagSavePath = Path.Combine(savePath, "Marker.asset");
                 AssetDatabase.CreateAsset(marker, tagSavePath);
@@ -44,10 +44,10 @@ namespace Yorozu.DB
             var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 
             CreateDefineScript(savePath, enumData);
-            
+
             // Export Enum files
             CreateEnumScript(enumData, savePath);
-            
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -64,7 +64,7 @@ namespace Yorozu.DB
             {
                 AssetDatabase.CreateFolder(savePath, "Define");
             }
-            
+
             // いじれるクラス
             var customPath = Path.Combine(savePath, "Custom");
             // ディレクトリ作成
@@ -72,7 +72,7 @@ namespace Yorozu.DB
             {
                 AssetDatabase.CreateFolder(savePath, "Custom");
             }
-            
+
             foreach (var data in assets)
             {
                 var exportPath = Path.Combine(definePath, $"{data.ClassName}.cs");
@@ -81,16 +81,16 @@ namespace Yorozu.DB
                 {
                     writer.WriteLine(DataScriptString(data, enumData));
                 }
-                
+
                 var customExportPath = Path.Combine(customPath, $"{data.ClassName}.cs");
                 if (System.IO.File.Exists(customExportPath))
                     continue;
-                
+
                 using (StreamWriter writer = new StreamWriter(customExportPath, false))
                 {
                     writer.WriteLine(CustomDataScriptString(data));
                 }
-            }    
+            }
         }
 
         /// <summary>
@@ -99,9 +99,9 @@ namespace Yorozu.DB
         private static string DataScriptString(YorozuDBDataDefineObject data, YorozuDBEnumDataObject enumData)
         {
             var builder = new StringBuilder();
-            builder.AppendLine("// -------------------- //"); 
-            builder.AppendLine("// Auto Generate Code.  //"); 
-            builder.AppendLine("// Do not edit!!!       //"); 
+            builder.AppendLine("// -------------------- //");
+            builder.AppendLine("// Auto Generate Code.  //");
+            builder.AppendLine("// Do not edit!!!       //");
             builder.AppendLine("// -------------------- //");
             builder.AppendLine("#pragma warning disable");
             builder.AppendLine("");
@@ -109,7 +109,7 @@ namespace Yorozu.DB
             builder.AppendLine("using UnityEngine;");
             builder.AppendLine("using System.Linq;");
             builder.AppendLine("");
-            
+
             builder.AppendLine("namespace Yorozu.DB");
             builder.AppendLine("{");
             builder.Append($"    public partial class {data.ClassName} : {nameof(DataAbstract)}");
@@ -120,12 +120,13 @@ namespace Yorozu.DB
             }
 
             builder.AppendLine("");
-            
+
             builder.AppendLine("    {");
 
             if (keyField != null)
             {
-                builder.AppendLine($"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
+                builder.AppendLine(
+                    $"        {keyField.DataType.ConvertString()} {GetInterfaceName(keyField.DataType)}.Key => ({keyField.DataType.ConvertString()}){keyField.Name};");
                 builder.AppendLine("");
             }
 
@@ -145,16 +146,19 @@ namespace Yorozu.DB
                     {
                         if (field.IsArray)
                         {
-                            builder.AppendLine($"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
+                            builder.AppendLine(
+                                $"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
                             builder.AppendLine($"#if UNITY_EDITOR");
-                            builder.AppendLine($"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, {field.EnumDefineId}, value);");
+                            builder.AppendLine(
+                                $"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, {field.EnumDefineId}, value);");
                             builder.AppendLine($"#endif");
                         }
                         else
                         {
                             builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
                             builder.AppendLine($"        {{");
-                            builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId}); }}");
+                            builder.AppendLine(
+                                $"            get {{ return (Yorozu.DB.{enumDefine.Name}) {field.DataType.ToString()}({field.ID}, {field.EnumDefineId}); }}");
                             builder.AppendLine($"#if UNITY_EDITOR");
                             builder.AppendLine($"            set {{ Set({field.ID}, {field.EnumDefineId}, value); }}");
                             builder.AppendLine($"#endif");
@@ -169,16 +173,19 @@ namespace Yorozu.DB
                     {
                         if (field.IsArray)
                         {
-                            builder.AppendLine($"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
+                            builder.AppendLine(
+                                $"        public IEnumerable<Yorozu.DB.{enumDefine.Name}> {field.Name} => {field.DataType.ToString()}s({field.ID}, {field.EnumDefineId}).Select(v => (Yorozu.DB.{enumDefine.Name})v);");
                             builder.AppendLine($"#if UNITY_EDITOR");
-                            builder.AppendLine($"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, (int)value);");
+                            builder.AppendLine(
+                                $"        public void Add{field.Name}(Yorozu.DB.{enumDefine.Name} value) => Add({field.ID}, (int)value);");
                             builder.AppendLine($"#endif");
                         }
                         else
                         {
                             builder.AppendLine($"        public Yorozu.DB.{enumDefine.Name} {field.Name}");
                             builder.AppendLine($"        {{");
-                            builder.AppendLine($"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
+                            builder.AppendLine(
+                                $"            get {{ return (Yorozu.DB.{enumDefine.Name}) {DataType.Int.ToString()}({field.ID}); }}");
                             builder.AppendLine($"#if UNITY_EDITOR");
                             builder.AppendLine($"            set {{ Set({field.ID}, (int)value); }}");
                             builder.AppendLine($"#endif");
@@ -191,16 +198,20 @@ namespace Yorozu.DB
                     var className = field.ReferenceDefine.ClassName;
                     if (field.IsArray)
                     {
-                        builder.AppendLine($"        public IEnumerable<{className}> {field.Name} => MultiData<{className}>({field.ID});");
+                        builder.AppendLine(
+                            $"        public IEnumerable<{className}> {field.Name} => MultiData<{className}>({field.ID});");
                         builder.AppendLine($"");
-                        builder.AppendLine($"        public IEnumerable<string> {field.Name}Keys => Strings({field.ID});");
+                        builder.AppendLine(
+                            $"        public IEnumerable<string> {field.Name}Keys => Strings({field.ID});");
                         builder.AppendLine($"#if UNITY_EDITOR");
-                        builder.AppendLine($"        public void Add{field.Name}Keys(string value) => Add({field.ID}, value);");
+                        builder.AppendLine(
+                            $"        public void Add{field.Name}Keys(string value) => Add({field.ID}, value);");
                         builder.AppendLine($"#endif");
                     }
                     else
                     {
-                        builder.AppendLine($"        public {className} {field.Name} => Data<{className}>({field.ID});");
+                        builder.AppendLine(
+                            $"        public {className} {field.Name} => Data<{className}>({field.ID});");
                         builder.AppendLine($"");
                         builder.AppendLine($"        public string {field.Name}Key");
                         builder.AppendLine($"        {{");
@@ -215,9 +226,11 @@ namespace Yorozu.DB
                 {
                     if (field.IsArray)
                     {
-                        builder.AppendLine($"        public IEnumerable<{field.DataType.ConvertString()}> {field.Name} => {field.DataType.ToString()}s({field.ID});");
+                        builder.AppendLine(
+                            $"        public IEnumerable<{field.DataType.ConvertString()}> {field.Name} => {field.DataType.ToString()}s({field.ID});");
                         builder.AppendLine($"#if UNITY_EDITOR");
-                        builder.AppendLine($"        public void Add{field.Name}({field.DataType.ConvertString()} value) => Add({field.ID}, value);");
+                        builder.AppendLine(
+                            $"        public void Add{field.Name}({field.DataType.ConvertString()} value) => Add({field.ID}, value);");
                         builder.AppendLine($"#endif");
                     }
                     else
@@ -231,27 +244,31 @@ namespace Yorozu.DB
                         builder.AppendLine($"        }}");
                     }
                 }
+
                 builder.AppendLine("");
             }
 
-            var extendType = data.ExtendFieldsType; 
+            var extendType = data.ExtendFieldsType;
             if (extendType != null)
             {
                 builder.AppendLine($"        // Extend Fields");
                 var fields = YorozuDBExtendUtility.FindFields(extendType);
                 foreach (var field in fields)
                 {
-                    builder.AppendLine($"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name}");
+                    builder.AppendLine(
+                        $"        public {field.FieldType.GetArrayType().ConvertGenerateString()} {field.Name}");
                     builder.AppendLine($"        {{");
-                    builder.AppendLine($"            get {{ return Extend<{extendType.FullName}>().{field.Name}[row]; }}");
+                    builder.AppendLine(
+                        $"            get {{ return Extend<{extendType.FullName}>().{field.Name}[row]; }}");
                     builder.AppendLine($"#if UNITY_EDITOR");
-                    builder.AppendLine($"            set {{ Extend<{extendType.FullName}>().{field.Name}[row] = value; }}");
+                    builder.AppendLine(
+                        $"            set {{ Extend<{extendType.FullName}>().{field.Name}[row] = value; }}");
                     builder.AppendLine($"#endif");
                     builder.AppendLine($"        }}");
                     builder.AppendLine("");
                 }
             }
-            
+
             builder.AppendLine("        public override string ToString()");
             builder.AppendLine("        {");
             builder.AppendLine("            var builder = new System.Text.StringBuilder();");
@@ -265,10 +282,12 @@ namespace Yorozu.DB
                     case DataType.AudioClip:
                     case DataType.ScriptableObject:
                     case DataType.UnityObject:
-                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{({field.Name} == null ? \"null\" : {field.Name}.ToString())}}\");");
+                        builder.AppendLine(
+                            $"            builder.AppendLine($\"{field.Name}: {{({field.Name} == null ? \"null\" : {field.Name}.ToString())}}\");");
                         break;
                     default:
-                        builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
+                        builder.AppendLine(
+                            $"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
                         break;
                 }
             }
@@ -278,7 +297,8 @@ namespace Yorozu.DB
                 var fields = YorozuDBExtendUtility.FindFields(extendType);
                 foreach (var field in fields)
                 {
-                    builder.AppendLine($"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");   
+                    builder.AppendLine(
+                        $"            builder.AppendLine($\"{field.Name}: {{{field.Name}.ToString()}}\");");
                 }
             }
 
@@ -286,7 +306,7 @@ namespace Yorozu.DB
             builder.AppendLine("        }");
             builder.AppendLine("    }");
             builder.AppendLine("}");
-            
+
             string GetInterfaceName(DataType type)
             {
                 switch (type)
@@ -300,10 +320,10 @@ namespace Yorozu.DB
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
             }
-            
+
             return builder.ToString();
         }
-        
+
         private static string CustomDataScriptString(YorozuDBDataDefineObject data)
         {
             var builder = new StringBuilder();
@@ -313,7 +333,7 @@ namespace Yorozu.DB
             builder.AppendLine("    {");
             builder.AppendLine("    }");
             builder.AppendLine("}");
-            
+
             return builder.ToString();
         }
 
@@ -324,7 +344,7 @@ namespace Yorozu.DB
         {
             if (enumData == null)
                 return;
-            
+
             var enumExportPath = Path.Combine(savePath, "Enum");
             // ディレクトリ作成
             if (!AssetDatabase.IsValidFolder(enumExportPath))
@@ -335,16 +355,17 @@ namespace Yorozu.DB
             foreach (var define in enumData.Defines)
             {
                 var filePath = Path.Combine(enumExportPath, $"{define.Name}.cs");
-                
+
                 var builder = new StringBuilder();
                 builder.AppendLine("");
-                
+
                 builder.AppendLine("namespace Yorozu.DB");
                 builder.AppendLine("{");
                 if (define.Flags)
                 {
-                    builder.AppendLine($"    [System.Flags]");    
+                    builder.AppendLine($"    [System.Flags]");
                 }
+
                 builder.AppendLine($"    public enum {define.Name}");
                 builder.AppendLine("    {");
                 for (var i = 0; i < define.KeyValues.Count; i++)
@@ -359,17 +380,18 @@ namespace Yorozu.DB
                         builder.AppendLine($"       {kv.Value},");
                     }
                 }
+
                 builder.AppendLine("    }");
                 builder.AppendLine("}");
-                
+
                 using (StreamWriter writer = new StreamWriter(filePath, false))
                 {
                     writer.WriteLine(builder.ToString());
                 }
             }
         }
-        
-        
+
+
         /// <summary>
         /// 文字列に変換
         /// </summary>
@@ -395,8 +417,8 @@ namespace Yorozu.DB
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
-        
-        
+
+
         /// <summary>
         /// 生成用の名前に変換
         /// </summary>
@@ -432,10 +454,10 @@ namespace Yorozu.DB
                 return "ulong";
             if (type == typeof(ushort))
                 return "ushort";
-            
+
             if (isFull)
                 return type.FullName.Replace("+", ".");
-            
+
             return type.Name.Replace("+", ".");
         }
     }

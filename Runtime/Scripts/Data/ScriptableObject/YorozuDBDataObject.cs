@@ -10,7 +10,7 @@ using Yorozu.DB.TreeView;
 #endif
 
 namespace Yorozu.DB
-{ 
+{
     /// <summary>
     /// データをまとめる
     /// </summary>
@@ -24,13 +24,13 @@ namespace Yorozu.DB
             /// </summary>
             [SerializeField]
             internal int ID;
-            
+
             [SerializeField]
             internal bool IsFix;
-            
+
             [SerializeField]
             internal DataContainer FixData;
-            
+
             [SerializeField]
             internal List<DataContainer> Data = new List<DataContainer>();
 
@@ -39,7 +39,7 @@ namespace Yorozu.DB
                 ID = fieldId;
                 FixData = new DataContainer(dataType);
             }
-            
+
 #if UNITY_EDITOR
             /// <summary>
             /// 入れ替え
@@ -61,9 +61,8 @@ namespace Yorozu.DB
                 Data.InsertRange(insertIndex, cache);
             }
 #endif
-            
         }
-        
+
         /// <summary>
         /// このデータの型情報
         /// </summary>
@@ -75,7 +74,7 @@ namespace Yorozu.DB
         /// </summary>
         [SerializeField]
         internal ScriptableObject ExtendFieldsObject;
-        
+
         [SerializeField]
         private List<Field> _fields = new List<Field>();
 
@@ -84,7 +83,7 @@ namespace Yorozu.DB
         /// </summary>
         [SerializeField]
         internal bool AutoIncrementKey;
-        
+
         /// <summary>
         /// データ数
         /// </summary>
@@ -92,7 +91,8 @@ namespace Yorozu.DB
         {
             get
             {
-                if (_fields == null || !_fields.Any())
+                if (_fields == null ||
+                    !_fields.Any())
                 {
 #if UNITY_EDITOR
                     // こっちの定義がない場合は拡張側を見る
@@ -106,7 +106,7 @@ namespace Yorozu.DB
                 return _fields[0].Data.Count;
             }
         }
-        
+
         /// <summary>
         /// ID からデータを取得
         /// </summary>
@@ -119,7 +119,7 @@ namespace Yorozu.DB
         }
 
 #if UNITY_EDITOR
-        
+
         /// <summary>
         /// 1行あたりに含まれる最大の数
         /// </summary>
@@ -127,11 +127,13 @@ namespace Yorozu.DB
         {
             get
             {
-                if (_fields == null || !_fields.Any())
+                if (_fields == null ||
+                    !_fields.Any())
                     return 1;
                 return _fields.Max(f =>
                 {
-                    if (f.Data == null || f.Data.Count <= 0)
+                    if (f.Data == null ||
+                        f.Data.Count <= 0)
                         return 1;
 
                     var find = Define.Fields.First(f2 => f2.ID == f.ID);
@@ -146,7 +148,7 @@ namespace Yorozu.DB
         }
 
         internal bool IsFixField(int fieldId) => _fields.First(f => f.ID == fieldId).IsFix;
-        
+
         /// <summary>
         /// 固定の設定を行えるように
         /// </summary>
@@ -179,7 +181,7 @@ namespace Yorozu.DB
                 }
             }
         }
-        
+
         /// <summary>
         /// フィールドの追加
         /// </summary>
@@ -203,7 +205,7 @@ namespace Yorozu.DB
             _fields.Add(addField);
             this.Dirty();
         }
-        
+
         /// <summary>
         /// 特定のフィールドを削除
         /// </summary>
@@ -235,21 +237,22 @@ namespace Yorozu.DB
             foreach (var field in _fields)
             {
                 var targetField = Define.Fields.First(f => f.ID == field.ID);
-                var addData = copyIndex.HasValue ? field.Data[copyIndex.Value].Copy() : targetField.DefaultValue.Copy(); 
+                var addData = copyIndex.HasValue ? field.Data[copyIndex.Value].Copy() : targetField.DefaultValue.Copy();
 
                 if (keyField != null &&
-                    keyField.ID == field.ID && 
+                    keyField.ID == field.ID &&
                     !copyIndex.HasValue &&
-                    AutoIncrementKey && 
+                    AutoIncrementKey &&
                     keyField.DataType == DataType.Int)
                 {
                     var maxId = 1;
-                    if (field.Data != null && field.Data.Count > 0)
+                    if (field.Data != null &&
+                        field.Data.Count > 0)
                         maxId = field.Data.Max(d => d.Int) + 1;
 
                     addData.Int = maxId;
                 }
-                
+
                 field.Data.Add(addData);
             }
 
@@ -258,6 +261,7 @@ namespace Yorozu.DB
             {
                 YorozuDBExtendUtility.AddFields(ExtendFieldsObject, copyIndex);
             }
+
             this.Dirty();
         }
 
@@ -271,6 +275,7 @@ namespace Yorozu.DB
             {
                 indexes.Add(i);
             }
+
             RemoveRows(indexes.OrderByDescending(v => v));
         }
 
@@ -286,7 +291,7 @@ namespace Yorozu.DB
                     g.Data.RemoveAt(index);
                 }
             }
-            
+
             YorozuDBExtendUtility.RemoveFields(ExtendFieldsObject, descIndexes);
             this.Dirty();
         }
@@ -301,6 +306,7 @@ namespace Yorozu.DB
                 var targetField = Define.Fields.First(f => f.ID == g.ID);
                 g.Data[index] = new DataContainer(targetField.DataType);
             }
+
             this.Dirty();
         }
 
@@ -311,30 +317,30 @@ namespace Yorozu.DB
         {
             foreach (var g in _fields)
             {
-                g.Insert(insertIndex, targetIndexes);   
+                g.Insert(insertIndex, targetIndexes);
             }
 
             // 拡張分も入れ替え
             YorozuDBExtendUtility.Insert(ExtendFieldsObject, insertIndex, targetIndexes);
             this.Dirty();
         }
-        
+
         /// <summary>
         /// TreeView用の木構造を作成
         /// </summary>
         internal TreeViewItem CreateTree(YorozuDBEnumDataObject enumData)
         {
             var root = new TreeViewItem(-1, -1, "root");
-            
+
             for (var i = 0; i < DataCount; i++)
             {
                 var item = new YorozuDBEditorTreeViewItem(i, this, enumData);
                 root.AddChild(item);
             }
-            
+
             return root;
         }
-        
+
         /// <summary>
         /// フィールドの値更新
         /// </summary>
@@ -348,15 +354,15 @@ namespace Yorozu.DB
             {
                 _fields[index].Data[i] = src.Copy();
             }
-            
+
             this.Dirty();
         }
-        
+
         internal void Duplicate(int index)
         {
             AddRow(index);
             // 入れ替え
-            Insert(index + 1, new int[]{DataCount - 1});
+            Insert(index + 1, new int[] {DataCount - 1});
         }
 #endif
     }
@@ -374,5 +380,4 @@ namespace Yorozu.DB
         }
     }
 #endif
-    
 }

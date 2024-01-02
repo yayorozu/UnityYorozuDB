@@ -8,6 +8,7 @@ namespace Yorozu.DB
     {
         [SerializeField]
         private YorozuDBEnumDataObject _enum;
+
         [SerializeField]
         private YorozuDBDataObject[] _data;
 
@@ -20,17 +21,19 @@ namespace Yorozu.DB
             else
             {
                 var enumData = Resources.LoadAll<YorozuDBEnumDataObject>("YorozuDB/Define/");
-                if (enumData != null && enumData.Length > 0)
+                if (enumData != null &&
+                    enumData.Length > 0)
                 {
                     YorozuDB.SetEnum(enumData[0]);
                 }
             }
 
             YorozuDB.SetData(_data);
-            
+
             // 指定のフォルダよりロード
             var resourcesData = Resources.LoadAll<YorozuDBDataObject>("YorozuDB/Data/");
-            if (resourcesData != null && resourcesData.Length > 0)
+            if (resourcesData != null &&
+                resourcesData.Length > 0)
             {
                 YorozuDB.SetData(resourcesData);
             }

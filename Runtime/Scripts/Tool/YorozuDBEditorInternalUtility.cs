@@ -19,7 +19,7 @@ namespace Yorozu.DB
                     .ToArray()
                 ;
         }
-        
+
         internal static YorozuDBDataObject[] LoadAllDataAsset(YorozuDBDataDefineObject searchDefine = null)
         {
             var findAssetsGuids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBDataObject)}");
@@ -49,36 +49,39 @@ namespace Yorozu.DB
         internal static bool CreateDefineAsset()
         {
             var defines = LoadAllDefineAsset();
-            var loadFrom = defines is {Length: > 0} ? 
+            var loadFrom = defines is {Length: > 0} ?
                 Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
                 "Assets/";
-            
-            var path = EditorUtility.SaveFilePanelInProject("Select", "Define", "asset", "Select Create Path", loadFrom);
-            if (string.IsNullOrEmpty(path)) 
+
+            var path = EditorUtility.SaveFilePanelInProject("Select", "Define", "asset", "Select Create Path",
+                loadFrom);
+            if (string.IsNullOrEmpty(path))
                 return false;
-            
+
             var instance = ScriptableObject.CreateInstance<YorozuDBDataDefineObject>();
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             return true;
         }
-        
+
         /// <summary>
         /// データアセットを作成
         /// </summary>
         internal static bool CreateDataAsset(YorozuDBDataDefineObject define, string defaultPath)
         {
-            var path = EditorUtility.SaveFilePanelInProject("Select", $"{define.ClassName}Data", "asset", "Select Create Path", defaultPath);
-            if (string.IsNullOrEmpty(path)) 
+            var path = EditorUtility.SaveFilePanelInProject("Select", $"{define.ClassName}Data", "asset",
+                "Select Create Path", defaultPath);
+            if (string.IsNullOrEmpty(path))
                 return false;
-            
+
             var instance = ScriptableObject.CreateInstance<YorozuDBDataObject>();
             instance.Define = define;
             foreach (var field in define.Fields)
             {
                 instance.AddField(field.ID);
             }
+
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -88,14 +91,14 @@ namespace Yorozu.DB
         internal static bool CreateEnumAsset()
         {
             var defines = LoadAllDefineAsset();
-            var loadFrom = defines is {Length: > 0} ? 
+            var loadFrom = defines is {Length: > 0} ?
                 Path.GetDirectoryName(AssetDatabase.GetAssetPath(defines[0])) :
                 "Assets/";
-            
+
             var path = EditorUtility.SaveFilePanelInProject("Select", "Enum", "asset", "Select Create Path", loadFrom);
-            if (string.IsNullOrEmpty(path)) 
+            if (string.IsNullOrEmpty(path))
                 return false;
-            
+
             var instance = ScriptableObject.CreateInstance<YorozuDBEnumDataObject>();
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
@@ -111,13 +114,13 @@ namespace Yorozu.DB
             editName = name.Trim();
             if (names.Any(d => d.Name == name))
                 return false;
-            
+
             if (string.IsNullOrEmpty(name))
                 return false;
 
             if (Regex.IsMatch(name, @"^[0-9]"))
                 return false;
-            
+
             // 小文字なら大文字にする
             if (Regex.IsMatch(name, @"^[a-z]"))
             {
@@ -125,22 +128,23 @@ namespace Yorozu.DB
                 array[0] = char.ToUpper(array[0]);
                 editName = new string(array);
             }
-            
+
             // 英数以外は許可しない
             return Regex.IsMatch(name, @"^[0-9a-zA-Z]+$");
         }
-        
+
         internal static (YorozuDBDataObject, int) FindData(YorozuDBDataDefineObject define, string key)
         {
             var data = LoadAllDataAsset(define);
             var keyField = define.KeyField;
             int intValue = 0;
-            if (keyField.DataType == DataType.Int && !int.TryParse(key, out intValue))
+            if (keyField.DataType == DataType.Int &&
+                !int.TryParse(key, out intValue))
             {
                 Debug.LogError("Target Class Key is int");
                 return (null, -1);
             }
-            
+
             foreach (var dataObject in data)
             {
                 for (int i = 0; i < dataObject.DataCount; i++)
@@ -155,6 +159,7 @@ namespace Yorozu.DB
                     }
                 }
             }
+
             Debug.LogError($"Key Not found. {key}");
             return (null, -1);
         }

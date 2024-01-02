@@ -104,7 +104,8 @@ namespace Yorozu.DB
             }
 
             var targetId = "";
-            if (dataType == DataType.Enum || dataType == DataType.Flags)
+            if (dataType == DataType.Enum ||
+                dataType == DataType.Flags)
             {
                 var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
                 var index = enumData.Defines.FindIndex(d => d.Name == targetName);
@@ -133,12 +134,12 @@ namespace Yorozu.DB
             {
                 asset.AddField(field.ID);
             }
-            
+
             this.Dirty();
 
             return fieldId;
         }
-        
+
         internal void UpdateDefaultValue(int fieldId, DataContainer src)
         {
             var assets = YorozuDBEditorInternalUtility.LoadAllDataAsset(this);
@@ -155,16 +156,16 @@ namespace Yorozu.DB
         {
             if (!YorozuDBEditorInternalUtility.NameValidator(Fields, newName, out newName))
                 return;
-            
+
             var index = Fields.FindIndex(f => f.ID == fieldId);
             if (index >= 0)
             {
                 Fields[index].Name = newName;
             }
-            
+
             this.Dirty();
         }
-        
+
         /// <summary>
         /// 特定のフィールドを削除
         /// </summary>
@@ -177,11 +178,12 @@ namespace Yorozu.DB
             {
                 asset.RemoveField(fieldId);
             }
+
             this.Dirty();
         }
 #endif
     }
-    
+
 #if UNITY_EDITOR
     [UnityEditor.CustomEditor(typeof(YorozuDBDataDefineObject))]
     internal class YorozuDBDataDefineObjectEditor : UnityEditor.Editor

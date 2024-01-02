@@ -22,7 +22,7 @@ namespace Yorozu.DB
             internal const float FlagsWidth = 50f;
             internal static GUILayoutOption AddButtonLabelWidth;
             internal static GUILayoutOption AddButtonWidth;
-            
+
             static Style()
             {
                 AddButtonLabelWidth = GUILayout.Width(74);
@@ -33,7 +33,7 @@ namespace Yorozu.DB
                 DeleteContent = EditorGUIUtility.TrIconContent("d_TreeEditor.Trash");
             }
         }
-        
+
         private List<ReorderableList> _list;
         private const float Width = 200;
         private Vector2 _scrollPosition;
@@ -42,16 +42,18 @@ namespace Yorozu.DB
 
         [NonSerialized]
         private int _editId = -1;
+
         [NonSerialized]
         private string _rename;
 
         private bool _repaint;
-        
+
         private static readonly string EditorField = "EditorField";
-        
+
         private void Initialize(bool force = false)
         {
-            if (!force && _list != null)
+            if (!force &&
+                _list != null)
                 return;
 
             _data = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
@@ -65,18 +67,19 @@ namespace Yorozu.DB
                 _list.Add(list);
             }
         }
-        
+
         internal override bool OnGUI()
         {
             Initialize();
-            
+
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUILayout.LabelField($"Enum Editor", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
-                
+
                 EditorGUILayout.LabelField("Enum Name", Style.AddButtonLabelWidth);
-                _temp = EditorGUILayout.TextField(GUIContent.none, _temp, EditorStyles.toolbarTextField, Style.AddButtonWidth);
+                _temp = EditorGUILayout.TextField(GUIContent.none, _temp, EditorStyles.toolbarTextField,
+                    Style.AddButtonWidth);
                 using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_temp)))
                 {
                     if (GUILayout.Button("Add Enum", EditorStyles.toolbarButton))
@@ -89,21 +92,22 @@ namespace Yorozu.DB
                     }
                 }
             }
-            
+
             // 領域確保
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
             // 領域を描画
             using (new GUI.ClipScope(rect))
             {
                 rect.x = rect.y = 0;
-                
+
                 var width = _list.Count * (Width + EditorGUIUtility.standardVerticalSpacing);
-                var height = rect.height - GUI.skin.horizontalScrollbar.fixedHeight; 
-                using (var scroll = new GUI.ScrollViewScope(rect, _scrollPosition, new Rect(0, -3, width, height), true, false))
+                var height = rect.height - GUI.skin.horizontalScrollbar.fixedHeight;
+                using (var scroll =
+                       new GUI.ScrollViewScope(rect, _scrollPosition, new Rect(0, -3, width, height), true, false))
                 {
                     _scrollPosition = scroll.scrollPosition;
                     rect.width = Width;
-                    
+
                     foreach (var list in _list)
                     {
                         list.DoList(rect);
@@ -117,9 +121,10 @@ namespace Yorozu.DB
                 _repaint = false;
                 return true;
             }
+
             return false;
         }
-        
+
         private ReorderableList CreateInstance(YorozuDBEnumDataObject.EnumDefine define)
         {
             return new ReorderableList(define.KeyValues, typeof(string), true, true, false, false)
@@ -132,7 +137,8 @@ namespace Yorozu.DB
                         GUI.SetNextControlName(EditorField);
                         _rename = GUI.TextField(rect, _rename);
                         var e = Event.current;
-                        if (e.keyCode == KeyCode.Return && _editId != -1)
+                        if (e.keyCode == KeyCode.Return &&
+                            _editId != -1)
                         {
                             _data.Rename(define.ID, _rename);
                             _editId = -1;
@@ -154,7 +160,7 @@ namespace Yorozu.DB
                             GUI.FocusControl(EditorField);
                         }
                     }
-                    
+
                     rect.x += rect.width;
                     rect.width = Style.FlagsWidth;
                     define.Flags = EditorGUI.ToggleLeft(rect, "Flags", define.Flags);
@@ -163,7 +169,8 @@ namespace Yorozu.DB
                     rect.width = Style.ButtonWidth;
                     if (GUI.Button(rect, Style.DeleteContent, Style.AddStyle))
                     {
-                        if (EditorUtility.DisplayDialog("Warning", $"Delete {define.Name} Enum Define?\nEnum field defined in the data is Deleted",
+                        if (EditorUtility.DisplayDialog("Warning",
+                                $"Delete {define.Name} Enum Define?\nEnum field defined in the data is Deleted",
                                 "YES",
                                 "NO"))
                         {
@@ -194,7 +201,7 @@ namespace Yorozu.DB
                             _data.Dirty();
                         }
                     }
-     
+
                     rect.x += rect.width + 2;
                     rect.width = Style.ButtonWidth;
                     if (GUI.Button(rect, Style.SubContent, Style.AddStyle))
@@ -202,8 +209,10 @@ namespace Yorozu.DB
                         _data.RemoveValue(define.ID, index);
                     }
                 },
-     
-                drawFooterCallback = rect => { },
+
+                drawFooterCallback = rect =>
+                {
+                },
                 footerHeight = 0f,
                 onReorderCallback = v =>
                 {

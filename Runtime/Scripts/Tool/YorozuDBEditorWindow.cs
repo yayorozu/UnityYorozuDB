@@ -7,8 +7,8 @@ namespace Yorozu.DB
 {
     internal class YorozuDBEditorWindow : EditorWindow
     {
-        internal const string MenuPath = "Tools/YorozuDB";
-        
+        internal const string MenuPath = "Tools/YorozuDB/DataEditor";
+
         [MenuItem(MenuPath)]
         private static void ShowWindow()
         {
@@ -17,13 +17,16 @@ namespace Yorozu.DB
         }
 
         private static readonly Color SPLITTER_COLOR = new Color(0.2f, 0.2f, 0.2f);
-        
+
         [SerializeField]
         private ListModule _list;
+
         [SerializeField]
         private DefineEditModule _editDefine;
+
         [SerializeField]
         private DataEditModule _editData;
+
         [SerializeField]
         private EnumEditModule _editEnum;
 
@@ -47,15 +50,16 @@ namespace Yorozu.DB
             {
                 _list = new ListModule();
             }
+
             // コンパイルでイベントは消える
             _list.SelectEvent += SelectDataEvent;
-            
-            if (_editDefine == null) 
+
+            if (_editDefine == null)
                 _editDefine = new DefineEditModule();
-            
-            if (_editData == null) 
+
+            if (_editData == null)
                 _editData = new DataEditModule();
-            
+
             if (_editEnum == null)
                 _editEnum = new EnumEditModule();
         }
@@ -72,7 +76,7 @@ namespace Yorozu.DB
         {
             if (_window == null)
                 return;
-            
+
             _window._list.SetSelection(instanceId);
             _window.SelectDataEvent(instanceId);
             _window._editData.SetSelection(row);
@@ -99,7 +103,7 @@ namespace Yorozu.DB
             {
                 _mode = Mode.Enum;
             }
-            
+
             Repaint();
         }
 
@@ -109,13 +113,13 @@ namespace Yorozu.DB
             {
                 using (new EditorGUILayout.VerticalScope(GUILayout.Width(200)))
                 {
-                    if (_list.OnGUI()) 
+                    if (_list.OnGUI())
                         Repaint();
                 }
-                
+
                 var rect = GUILayoutUtility.GetRect(2, 2, 0, 100000);
                 EditorGUI.DrawRect(rect, SPLITTER_COLOR);
-                
+
                 var module = GetRightModule();
                 if (module != null)
                 {

@@ -24,9 +24,9 @@ namespace Yorozu.DB
             internal static GUIContent Delete;
             internal static GUIContent Key;
             internal static GUIContent UnKey;
-            
+
             internal const float RemoveButtonWidth = 16f;
-            
+
             static Style()
             {
                 EnumWidth = GUILayout.Width(300);
@@ -37,21 +37,25 @@ namespace Yorozu.DB
                 DeleteStyle = "RL FooterButton";
             }
         }
-        
+
         [SerializeField]
         private YorozuDBDataDefineObject _data;
+
         [SerializeField]
         private YorozuDBEnumDataObject _enumData;
 
         [SerializeField]
         private string[] _enums;
+
         [SerializeField]
         private string[] _defineClasses;
 
         [NonSerialized]
         private string _name;
+
         [NonSerialized]
         private DataType _dataType;
+
         [NonSerialized]
         private string _targetName;
 
@@ -60,15 +64,15 @@ namespace Yorozu.DB
 
         [NonSerialized]
         private List<int> _addFieldIds = new List<int>();
-        
+
         private int _renameID = -1;
         private string _temp;
-        
+
         private static readonly string EditorField = "EditorField";
-        
+
         private ReorderableList _reorderableList;
         private ReorderableList _extendReorderableList;
-        
+
         internal void SetData(YorozuDBDataDefineObject data)
         {
             _data = data;
@@ -77,17 +81,16 @@ namespace Yorozu.DB
             _extendReorderableList = null;
             _addFieldIds.Clear();
             // 存在するScriptableObjectを取得
-
         }
 
         internal override bool OnGUI()
         {
             if (_data == null)
                 return false;
-            
+
             _reorderableList ??= CreateReorderableList(_data);
             _extendReorderableList ??= CreateExtendReorderableList(_data);
-            
+
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUILayout.LabelField($"Define Editor: 【{_data.name}】", EditorStyles.boldLabel);
@@ -104,7 +107,8 @@ namespace Yorozu.DB
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         _dataType = (DataType) EditorGUILayout.EnumPopup("DataType", _dataType);
-                        if (check.changed && (_dataType == DataType.Enum || _dataType == DataType.Flags))
+                        if (check.changed &&
+                            (_dataType == DataType.Enum || _dataType == DataType.Flags))
                         {
                             var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
                             if (enumData != null)
@@ -116,7 +120,8 @@ namespace Yorozu.DB
                                 _targetName = _enums.Length > 0 ? _enums[0] : "";
                             }
                         }
-                        else if (check.changed && _dataType == DataType.DBClass)
+                        else if (check.changed &&
+                                 _dataType == DataType.DBClass)
                         {
                             _defineClasses = YorozuDBEditorInternalUtility.LoadAllDefineAsset()
                                 .Where(d => d.KeyField != null)
@@ -126,11 +131,13 @@ namespace Yorozu.DB
                         }
                     }
                 }
-                
+
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     // enumなら候補を表示
-                    if ((_dataType == DataType.Enum || _dataType == DataType.Flags) && _enums != null && _enums.Length > 0)
+                    if ((_dataType == DataType.Enum || _dataType == DataType.Flags) &&
+                        _enums != null &&
+                        _enums.Length > 0)
                     {
                         var index = Array.IndexOf(_enums, _targetName);
                         using (var check = new EditorGUI.ChangeCheckScope())
@@ -153,19 +160,21 @@ namespace Yorozu.DB
                             {
                                 _targetName = _defineClasses[index];
                             }
-                        }  
+                        }
                     }
-                    
+
                     GUILayout.FlexibleSpace();
-                    
+
                     using (new EditorGUI.DisabledScope(
-                               string.IsNullOrEmpty(_name) || 
+                               string.IsNullOrEmpty(_name) ||
                                (_dataType == DataType.Enum && (_enums == null || _enums.Length <= 0)) ||
                                (_dataType == DataType.Enum && _enumData == null) ||
                                (_dataType == DataType.Flags && (_enums == null || _enums.Length <= 0)) ||
                                (_dataType == DataType.Flags && _enumData == null) ||
-                               (_dataType == DataType.DBClass && (_defineClasses == null || _defineClasses.Length <= 0) && string.IsNullOrEmpty(_targetName))
-                        ))
+                               (_dataType == DataType.DBClass &&
+                                (_defineClasses == null || _defineClasses.Length <= 0) &&
+                                string.IsNullOrEmpty(_targetName))
+                           ))
                     {
                         if (GUILayout.Button("Add", Style.ButtonWidth))
                         {
@@ -180,11 +189,13 @@ namespace Yorozu.DB
             }
 
             _reorderableList.DoLayoutList();
-            
+
             GUILayout.Space(20);
-            
+
             // 拡張フィールド
-            EditorGUILayout.LabelField("Extend Fields", string.IsNullOrEmpty(_data.ExtendFieldsTypeName) ? "None" : _data.ExtendFieldsTypeName, EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Extend Fields",
+                string.IsNullOrEmpty(_data.ExtendFieldsTypeName) ? "None" : _data.ExtendFieldsTypeName,
+                EditorStyles.boldLabel);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Set None"))
@@ -213,7 +224,6 @@ namespace Yorozu.DB
                         {
                             d.ExtendFieldsObject = null;
                         }
-
                     });
                 }
             }
@@ -231,6 +241,7 @@ namespace Yorozu.DB
                 _repaint = false;
                 return true;
             }
+
             return false;
         }
 
@@ -272,7 +283,7 @@ namespace Yorozu.DB
                     }
 
                     rect.x += rect.width;
-                    
+
                     rect.width = 130;
                     // リネーム状態だったら TextField を表示
                     if (_renameID == field.ID)
@@ -280,7 +291,8 @@ namespace Yorozu.DB
                         GUI.SetNextControlName(EditorField);
                         _temp = GUI.TextField(rect, _temp);
                         var e = Event.current;
-                        if (e.keyCode == KeyCode.Return && _renameID != -1)
+                        if (e.keyCode == KeyCode.Return &&
+                            _renameID != -1)
                         {
                             _data.RenameField(_renameID, _temp);
                             _renameID = -1;
@@ -300,50 +312,53 @@ namespace Yorozu.DB
                         if (GUI.Button(rect, field.Name, EditorStyles.label))
                         {
                             _renameID = field.ID;
-                        
+
                             _temp = field.Name;
                             GUI.FocusControl(EditorField);
                             _repaint = true;
                         }
                     }
-                    
+
                     rect.x += rect.width;
 
                     // 型情報
                     rect.width = 140;
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        if (_enumData != null && (field.DataType == DataType.Enum || field.DataType == DataType.Flags))
+                        if (_enumData != null &&
+                            (field.DataType == DataType.Enum || field.DataType == DataType.Flags))
                         {
                             var enumIndex = _enumData.Defines.FindIndex(d => d.ID == field.EnumDefineId);
                             if (enumIndex >= 0)
                             {
-                                EditorGUI.LabelField(rect, $"{field.DataType} ({_enumData.Defines[enumIndex].Name})", EditorStyles.popup);
+                                EditorGUI.LabelField(rect, $"{field.DataType} ({_enumData.Defines[enumIndex].Name})",
+                                    EditorStyles.popup);
                             }
                         }
                         else if (field.DataType == DataType.DBClass)
                         {
                             EditorGUI.LabelField(rect,
-                                field.ReferenceDefine != null
-                                    ? $"{field.DataType} ({field.ReferenceDefine.ClassName})"
-                                    : $"{field.DataType} (Not Exist)", EditorStyles.popup);
+                                field.ReferenceDefine != null ?
+                                    $"{field.DataType} ({field.ReferenceDefine.ClassName})" :
+                                    $"{field.DataType} (Not Exist)", EditorStyles.popup);
                         }
                         else
                         {
                             EditorGUI.LabelField(rect, field.DataType.ToString(), EditorStyles.popup);
                         }
                     }
-                    
+
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
-                    
+
                     // 配列とするか
                     rect.width = 50;
                     using (new EditorGUI.DisabledScope(isKey))
                     {
                         field.IsArray = EditorGUI.ToggleLeft(rect, "Array", field.IsArray);
                     }
+
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
-                    
+
                     rect.width = 200;
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
@@ -365,8 +380,9 @@ namespace Yorozu.DB
                     {
                         EditorGUI.LabelField(rect, "memo", EditorStyles.centeredGreyMiniLabel);
                     }
-                    
-                    rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth, rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);
+
+                    rect.x = Mathf.Max(x + width - Style.RemoveButtonWidth,
+                        rect.x + rect.width + EditorGUIUtility.standardVerticalSpacing);
 
                     rect.width = Style.RemoveButtonWidth;
                     if (GUI.Button(rect, Style.Delete, Style.DeleteStyle))
@@ -380,8 +396,10 @@ namespace Yorozu.DB
                         }
                     }
                 },
-     
-                drawFooterCallback = rect => { },
+
+                drawFooterCallback = rect =>
+                {
+                },
                 footerHeight = 0f,
             };
         }
@@ -391,11 +409,11 @@ namespace Yorozu.DB
             var type = data.ExtendFieldsType;
             if (type == null)
                 return new ReorderableList(new List<int>(), typeof(int));
-            
+
             var fields = YorozuDBExtendUtility.FindFields(type);
             if (fields.Count <= 0)
                 return new ReorderableList(new List<int>(), typeof(int));
-            
+
             return new ReorderableList(fields, typeof(DataField), true, true, false, false)
             {
                 headerHeight = 0f,
@@ -413,26 +431,30 @@ namespace Yorozu.DB
                     rect.y += 2;
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        EditorGUI.LabelField(rect, fields[index].FieldType.GetArrayType().ConvertGenerateString(false), EditorStyles.popup);
+                        EditorGUI.LabelField(rect, fields[index].FieldType.GetArrayType().ConvertGenerateString(false),
+                            EditorStyles.popup);
                     }
                 },
-     
-                drawFooterCallback = rect => { },
+
+                drawFooterCallback = rect =>
+                {
+                },
                 footerHeight = 0f,
             };
         }
     }
 
-    
+
     internal class TypeDropdown : AdvancedDropdown
     {
         private event Action<string> _select;
+
         public TypeDropdown(Rect rect, Action<string> action) : base(new AdvancedDropdownState())
         {
             _select = action;
             Show(rect);
         }
-        
+
         protected override AdvancedDropdownItem BuildRoot()
         {
             var root = new AdvancedDropdownItem("ScriptableObjectTypes");
@@ -441,6 +463,7 @@ namespace Yorozu.DB
                 var item = new AdvancedDropdownItem(typeName);
                 root.AddChild(item);
             }
+
             return root;
         }
 
@@ -453,20 +476,20 @@ namespace Yorozu.DB
         {
             return AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a => a.GetTypes())
-                    .Where(t => t.IsSubclassOf(typeof(ScriptableObject))
-                                && !t.IsSubclassOf(typeof(EditorWindow))
-                                && !t.IsSubclassOf(typeof(ScriptableSingleton<>))
-                                && !t.IsSubclassOf(typeof(UnityEditor.EditorTools.EditorTool))
-                                && !t.IsSubclassOf(typeof(Editor))
-                                && t != typeof(EditorWindow)
-                                && t != typeof(Editor)
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Yorozu.DB"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Packages.Rider"))
-                                && !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro"))
-                                && !t.IsAbstract
-                                && !t.IsGenericType
+                    .Where(t => t.IsSubclassOf(typeof(ScriptableObject)) &&
+                                !t.IsSubclassOf(typeof(EditorWindow)) &&
+                                !t.IsSubclassOf(typeof(ScriptableSingleton<>)) &&
+                                !t.IsSubclassOf(typeof(UnityEditor.EditorTools.EditorTool)) &&
+                                !t.IsSubclassOf(typeof(Editor)) &&
+                                t != typeof(EditorWindow) &&
+                                t != typeof(Editor) &&
+                                !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEditor")) &&
+                                !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("UnityEngine")) &&
+                                !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Yorozu.DB")) &&
+                                !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("Packages.Rider")) &&
+                                !(!string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("TMPro")) &&
+                                !t.IsAbstract &&
+                                !t.IsGenericType
                     )
                     .Select(t => t.FullName)
                     .OrderBy(t => t)

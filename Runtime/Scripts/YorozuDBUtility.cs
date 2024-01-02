@@ -9,11 +9,11 @@ namespace Yorozu.DB
     {
         string Name { get; }
     }
-    
+
     internal static class YorozuDBUtility
     {
         private static IEnumerable<Type> _types;
-        
+
         /// <summary>
         /// YorozuDBDataObject から中身を抜き出してクラスに変換
         /// 参照を隠蔽してあげればいいんじゃないかな
@@ -33,7 +33,7 @@ namespace Yorozu.DB
 
             return list;
         }
-        
+
         /// <summary>
         /// データの型情報を取得
         /// </summary>

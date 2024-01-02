@@ -17,43 +17,46 @@ namespace Yorozu.DB
         internal void Set(string value, int index) => _strings[index] = value;
         internal void Set(UnityEngine.Object value, int index) => _unityObjects[index] = value;
         internal void Set(object value, int index) => _strings[index] = JsonUtility.ToJson(value);
-        
+
         internal void Add(int value) => ArrayUtility.Add(ref _ints, value);
         internal void Add(float value) => ArrayUtility.Add(ref _floats, value);
         internal void Add(bool value) => ArrayUtility.Add(ref _bools, value);
         internal void Add(string value) => ArrayUtility.Add(ref _strings, value);
         internal void Add(UnityEngine.Object value) => ArrayUtility.Add(ref _unityObjects, value);
         internal void Add(object value) => ArrayUtility.Add(ref _strings, JsonUtility.ToJson(value));
-        
+
         private static class Style
         {
             internal static GUIContent OpenButton;
+
             internal static GUIContent[] Vector2IntContents = new GUIContent[]
             {
                 new GUIContent("x"),
                 new GUIContent("y"),
             };
-            
+
             internal static GUIContent[] Vector3IntContents = new GUIContent[]
             {
                 new GUIContent("x"),
                 new GUIContent("y"),
                 new GUIContent("z"),
             };
-            
+
             static Style()
             {
                 OpenButton = EditorGUIUtility.TrIconContent("d_UnityEditor.InspectorWindow", "Open Properties");
             }
         }
-        
-        public DataContainer(){}
+
+        public DataContainer()
+        {
+        }
 
         public DataContainer(DataType dataType)
         {
             this.Initialize(dataType);
         }
-        
+
         internal bool DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData)
         {
             if (!field.IsArray)
@@ -63,7 +66,7 @@ namespace Yorozu.DB
                 DrawField(rect, field, content, enumData, 0);
                 return false;
             }
-            
+
             var width = rect.width;
             rect.width = ArrayControlWidth;
             if (GUI.Button(rect, "+"))
@@ -71,6 +74,7 @@ namespace Yorozu.DB
                 this.AddElement(field.DataType);
                 return true;
             }
+
             rect.x += ArrayControlWidth;
             var startX = rect.x;
             rect.height = YorozuDBEditorDataTreeView.RowHeight;
@@ -79,7 +83,7 @@ namespace Yorozu.DB
             {
                 rect.x = startX;
                 rect.width = width - ArrayControlWidth * 2;
-                
+
                 DrawField(rect, field, content, enumData, i);
                 rect.x += rect.width;
                 rect.width = ArrayControlWidth;
@@ -89,13 +93,15 @@ namespace Yorozu.DB
                     GUI.FocusControl("");
                     return true;
                 }
+
                 rect.y += rect.height;
             }
-            
+
             return false;
         }
-        
-        private void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData, int index)
+
+        private void DrawField(Rect rect, DataField field, GUIContent content, YorozuDBEnumDataObject enumData,
+            int index)
         {
             this.CheckSize(field.DataType, index);
             switch (field.DataType)
@@ -117,13 +123,16 @@ namespace Yorozu.DB
                             {
                                 YorozuDBEditorWindow.ShowData(tuple.Item1.GetInstanceID(), tuple.Item2);
                             }
-                            
                         }
-                        if (check.changed && !string.IsNullOrEmpty(_strings[index]) && field.ReferenceDefine != null)
+
+                        if (check.changed &&
+                            !string.IsNullOrEmpty(_strings[index]) &&
+                            field.ReferenceDefine != null)
                         {
                             YorozuDBEditorInternalUtility.FindData(field.ReferenceDefine, _strings[index]);
                         }
                     }
+
                     break;
                 case DataType.Float:
                     _floats[index] = EditorGUI.FloatField(rect, content, _floats[index]);
@@ -138,16 +147,20 @@ namespace Yorozu.DB
                     // 18以上あるとUI変わってしまうので大きかったら小さくする
                     if (rect.height >= 18)
                         rect.height = 17.9f;
-                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(Sprite), false);
+                    _unityObjects[index] =
+                        EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(Sprite), false);
                     break;
                 case DataType.GameObject:
-                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(GameObject), false);
+                    _unityObjects[index] =
+                        EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(GameObject), false);
                     break;
                 case DataType.AudioClip:
-                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(AudioClip), false);
+                    _unityObjects[index] =
+                        EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(AudioClip), false);
                     break;
                 case DataType.UnityObject:
-                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(UnityEngine.Object), false);
+                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index],
+                        typeof(UnityEngine.Object), false);
                     break;
                 case DataType.Vector2:
                     var vector2 = GetFromString<Vector2>(_strings[index]);
@@ -159,6 +172,7 @@ namespace Yorozu.DB
                             SetToString(vector2, index);
                         }
                     }
+
                     break;
                 case DataType.Vector3:
                     var vector3 = GetFromString<Vector3>(_strings[index]);
@@ -168,10 +182,12 @@ namespace Yorozu.DB
                         if (check.changed)
                             SetToString(vector3, index);
                     }
+
                     break;
                 case DataType.ScriptableObject:
                     rect.width -= 22;
-                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index], typeof(UnityEngine.ScriptableObject), false);
+                    _unityObjects[index] = EditorGUI.ObjectField(rect, content, _unityObjects[index],
+                        typeof(UnityEngine.ScriptableObject), false);
                     rect.x += rect.width;
                     rect.width = 22;
                     using (new EditorGUI.DisabledScope(_unityObjects[index] == null))
@@ -182,13 +198,14 @@ namespace Yorozu.DB
                             EditorApplication.ExecuteMenuItem("Assets/Properties...");
                         }
                     }
+
                     break;
                 case DataType.Vector2Int:
                     if (string.IsNullOrEmpty(_strings[index]))
                     {
                         _strings[index] = JsonUtility.ToJson(new SerializableIntArray(2));
                     }
-                        
+
                     var v2Array = GetFromString<SerializableIntArray>(_strings[index]);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
@@ -198,13 +215,14 @@ namespace Yorozu.DB
                             SetToString(v2Array, index);
                         }
                     }
+
                     break;
                 case DataType.Vector3Int:
                     if (string.IsNullOrEmpty(_strings[index]))
                     {
                         _strings[index] = JsonUtility.ToJson(new SerializableIntArray(3));
                     }
-                        
+
                     var v3Array = GetFromString<SerializableIntArray>(_strings[index]);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
@@ -214,6 +232,7 @@ namespace Yorozu.DB
                             SetToString(v3Array, index);
                         }
                     }
+
                     break;
                 case DataType.Enum:
                 {
@@ -240,7 +259,9 @@ namespace Yorozu.DB
                 }
                     break;
                 case DataType.Color:
-                    var color = string.IsNullOrEmpty(_strings[index]) ? Color.white : GetFromString<Color>(_strings[index]);
+                    var color = string.IsNullOrEmpty(_strings[index]) ?
+                        Color.white :
+                        GetFromString<Color>(_strings[index]);
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         color = EditorGUI.ColorField(rect, content, color);
@@ -249,6 +270,7 @@ namespace Yorozu.DB
                             SetToString(color, index);
                         }
                     }
+
                     break;
                 case DataType.Flags:
                 {

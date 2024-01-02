@@ -16,13 +16,13 @@ namespace Yorozu.DB
         private static class Styles
         {
             internal static Texture2D TextureRefresh;
-            
+
             static Styles()
             {
                 TextureRefresh = EditorResources.Load<Texture2D>("d_Refresh");
             }
         }
-        
+
         internal event Action<int> SelectEvent;
 
         [SerializeField]
@@ -30,7 +30,7 @@ namespace Yorozu.DB
 
         private YorozuDBEditorDataListTreeView _treeView;
 
-        private bool _hasEnum; 
+        private bool _hasEnum;
 
         internal void Initialize()
         {
@@ -55,7 +55,7 @@ namespace Yorozu.DB
         internal override bool OnGUI()
         {
             Initialize();
-            
+
             // データ定義を作成
             using (new GUILayout.HorizontalScope())
             {
@@ -70,7 +70,7 @@ namespace Yorozu.DB
                 if (GUILayout.Button(Styles.TextureRefresh))
                 {
                     _treeView.Reload();
-                }                
+                }
             }
 
             if (!_hasEnum)
@@ -84,9 +84,9 @@ namespace Yorozu.DB
                     }
                 }
             }
-            
+
             EditorGUILayout.Space(1);
-            
+
             EditorGUILayout.LabelField("Define, Data, Enum", EditorStyles.boldLabel);
 
             var rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
@@ -98,13 +98,13 @@ namespace Yorozu.DB
             }
 
             EditorGUILayout.Space(1);
-            
+
             return false;
         }
 
         internal void SetSelection(int instanceId)
         {
-            _treeView.SetSelection(new List<int>(){instanceId});
+            _treeView.SetSelection(new List<int>() {instanceId});
         }
 
         /// <summary>
@@ -112,13 +112,13 @@ namespace Yorozu.DB
         /// </summary>
         private void CreateDataAsset(int parentId)
         {
-            var define= EditorUtility.InstanceIDToObject(parentId);
+            var define = EditorUtility.InstanceIDToObject(parentId);
             var path = AssetDatabase.GetAssetPath(define);
             var parentPath = System.IO.Path.GetDirectoryName(path);
             if (YorozuDBEditorInternalUtility.CreateDataAsset(define as YorozuDBDataDefineObject, parentPath))
             {
                 _treeView?.Reload();
-            }   
+            }
         }
 
         /// <summary>
@@ -132,17 +132,17 @@ namespace Yorozu.DB
             {
                 return;
             }
-            
+
             var deletes = ids.Select(EditorUtility.InstanceIDToObject)
                 .Where(o => o.GetType() != typeof(YorozuDBEnumDataObject));
-            
+
             foreach (var id in ids)
             {
                 var obj = EditorUtility.InstanceIDToObject(id);
                 // defineだったら依存しているやつを全部削除
-                if (obj.GetType() != typeof(YorozuDBDataDefineObject)) 
+                if (obj.GetType() != typeof(YorozuDBDataDefineObject))
                     continue;
-                
+
                 var dependencyAssets = YorozuDBEditorInternalUtility.LoadAllDataAsset(obj as YorozuDBDataDefineObject);
                 deletes = deletes.Concat(dependencyAssets);
             }

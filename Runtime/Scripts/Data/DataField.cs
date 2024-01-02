@@ -11,9 +11,9 @@ namespace Yorozu.DB
     {
         [SerializeField]
         internal string Name;
-        
+
         string IDBName.Name => Name;
-        
+
         [SerializeField]
         internal DataType DataType;
 
@@ -43,26 +43,27 @@ namespace Yorozu.DB
 
         [SerializeField]
         internal bool IsArray;
-        
+
         [SerializeField]
         internal YorozuDBDataDefineObject ReferenceDefine;
-        
+
         /// <summary>
         /// Keyとして有効かどうか
         /// </summary>
-        internal bool ValidKey() => (DataType == DataType.Int || DataType == DataType.String || DataType == DataType.Enum) && !IsArray;
+        internal bool ValidKey() =>
+            (DataType == DataType.Int || DataType == DataType.String || DataType == DataType.Enum) && !IsArray;
 
         [SerializeField]
         internal DataContainer DefaultValue;
 
 #if UNITY_EDITOR
-        
+
         public DataField(string typeId, string name, int fieldId, DataType dataType)
         {
             Name = name;
             ID = fieldId;
             DataType = dataType;
-            
+
             DefaultValue = new DataContainer(dataType);
             if (dataType is DataType.Enum or DataType.Flags)
             {

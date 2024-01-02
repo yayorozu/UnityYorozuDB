@@ -7,7 +7,7 @@ namespace Yorozu.DB
     {
         int Key { get; }
     }
-    
+
     public interface IStringKey
     {
         string Key { get; }

@@ -17,9 +17,10 @@ namespace Yorozu.DB
         /// TreeViewItemのクリック
         /// </summary>
         internal event Action<int> SelectItemEvent;
+
         internal event Action<IList<int>> DeleteItemsEvent;
         internal event Action<int> CreateDataEvent;
-        
+
         public YorozuDBEditorDataListTreeView(TreeViewState state) : base(state)
         {
             showAlternatingRowBackgrounds = true;
@@ -33,7 +34,7 @@ namespace Yorozu.DB
             var defineAssets = YorozuDBEditorInternalUtility.LoadAllDefineAsset();
             var dataAssets = YorozuDBEditorInternalUtility.LoadAllDataAsset();
             var root = new TreeViewItem(-1, -1, "root");
-            
+
             foreach (var asset in defineAssets)
             {
                 var define = new TreeViewItem(asset.GetInstanceID(), 0, asset.name);
@@ -44,41 +45,41 @@ namespace Yorozu.DB
                     var child = new TreeViewItem(data.GetInstanceID(), 1, data.name);
                     define.AddChild(child);
                 }
-             
+
                 root.AddChild(define);
             }
-            
+
             // Enum追加
             var enumData = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
             if (enumData != null)
             {
                 root.AddChild(new TreeViewItem(enumData.GetInstanceID(), 0, "Enum"));
             }
-            
+
             return root;
         }
-        
+
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
         {
             _rows.Clear();
-            
+
             if (!root.hasChildren)
                 return _rows;
 
             return base.BuildRows(root);
         }
 
-        
+
         protected override void ContextClickedItem(int id)
         {
             var ev = Event.current;
             ev.Use();
             var menu = new GenericMenu();
-            
+
             var obj = EditorUtility.InstanceIDToObject(id);
             if (obj.GetType() == typeof(YorozuDBDataDefineObject))
             {
-                menu.AddItem(new GUIContent("Create Data"), false, () => 
+                menu.AddItem(new GUIContent("Create Data"), false, () =>
                 {
                     CreateDataEvent?.Invoke(id);
                 });
@@ -91,7 +92,7 @@ namespace Yorozu.DB
                     DeleteItemsEvent?.Invoke(GetSelection());
                 });
             }
-    
+
             menu.ShowAsContext();
         }
 
@@ -109,10 +110,10 @@ namespace Yorozu.DB
 
             if (string.IsNullOrEmpty(args.newName))
                 return;
-                    
+
             if (args.newName == args.originalName)
                 return;
-            
+
             // 同じ名前のアセット内科
             var asset = EditorUtility.InstanceIDToObject(args.itemID);
             var assetPath = AssetDatabase.GetAssetPath(asset);
@@ -135,13 +136,13 @@ namespace Yorozu.DB
                     return;
                 }
             }
-            
+
             // ここまで来たら許可
             AssetDatabase.RenameAsset(assetPath, args.newName);
 
             var item = FindItem(args.itemID, rootItem);
             item.displayName = args.newName;
-            
+
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssets();
         }
@@ -158,7 +159,7 @@ namespace Yorozu.DB
 
         protected override void DoubleClickedItem(int id)
         {
-             Selection.activeInstanceID = id;
+            Selection.activeInstanceID = id;
         }
     }
 }

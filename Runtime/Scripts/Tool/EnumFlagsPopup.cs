@@ -16,14 +16,14 @@ namespace Yorozu.DB
         private readonly FlagsTreeView _treeView;
         internal event Action<int> FlagsChange;
         private float _height;
-		
+
         public EnumFlagsPopup(string[] enums, int value)
         {
             _treeView = new FlagsTreeView(new TreeViewState(), this, enums, value);
             _height = (enums.Length + 2) * EditorGUIUtility.singleLineHeight;
             GUIUtility.keyboardControl = _treeView.treeViewControlID;
         }
-		
+
         public override void OnGUI(Rect rect)
         {
             _treeView.OnGUI(rect);
@@ -39,14 +39,15 @@ namespace Yorozu.DB
         private class FlagsTreeView : UnityEditor.IMGUI.Controls.TreeView
         {
             private Texture2D _icon;
-            
+
             private readonly EnumFlagsPopup _enumFlagsPopup;
             private List<TreeViewItem> _child;
             private int _value;
             private int _all;
             private const int Nothing = -3;
 
-            public FlagsTreeView(TreeViewState state, EnumFlagsPopup enumFlagsPopup, string[] enums, int value) : base(state)
+            public FlagsTreeView(TreeViewState state, EnumFlagsPopup enumFlagsPopup, string[] enums, int value) :
+                base(state)
             {
                 showBorder = true;
                 showAlternatingRowBackgrounds = true;
@@ -61,7 +62,7 @@ namespace Yorozu.DB
                 };
                 for (var index = 0; index < enums.Length; index++)
                 {
-                    _child.Add(new TreeViewItem((int)Mathf.Pow(2, index), 0, enums[index]));
+                    _child.Add(new TreeViewItem((int) Mathf.Pow(2, index), 0, enums[index]));
                 }
 
                 Reload();
@@ -70,12 +71,12 @@ namespace Yorozu.DB
             protected override TreeViewItem BuildRoot()
             {
                 var root = new TreeViewItem(-1, -1, "root");
-                foreach (var item in _child) 
+                foreach (var item in _child)
                     root.AddChild(item);
 
                 return root;
             }
-            
+
             protected override void SingleClickedItem(int id)
             {
                 if (id == Nothing)
@@ -94,7 +95,7 @@ namespace Yorozu.DB
                     else
                         _value |= id;
                 }
-                
+
                 _enumFlagsPopup?.FlagsChange?.Invoke(_value);
                 SetSelection(new List<int>());
             }
@@ -109,7 +110,7 @@ namespace Yorozu.DB
                 rect.xMin += 2;
                 if (Valid(args.item.id))
                     GUI.DrawTexture(rect, _icon, ScaleMode.ScaleToFit);
-                
+
                 rect.xMin += rect.width;
                 rect.width = width - rect.width;
                 base.RowGUI(args);

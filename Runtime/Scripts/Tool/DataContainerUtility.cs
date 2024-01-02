@@ -5,7 +5,6 @@ namespace Yorozu.DB
 {
     internal static class DataContainerUtility
     {
-        
         /// <summary>
         /// 配列のサイズを変更する
         /// </summary>
@@ -44,7 +43,7 @@ namespace Yorozu.DB
                     throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null);
             }
         }
-        
+
         internal static void RemoveAt(this DataContainer self, DataType dataType, int index)
         {
             switch (dataType)
@@ -80,7 +79,7 @@ namespace Yorozu.DB
                     throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null);
             }
         }
-        
+
         internal static int GetSize(this DataContainer self, DataType dataType)
         {
             switch (dataType)
@@ -111,7 +110,7 @@ namespace Yorozu.DB
                     throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null);
             }
         }
-        
+
         internal static void Initialize(this DataContainer self, DataType dataType)
         {
             // 初期データを構築
@@ -120,7 +119,7 @@ namespace Yorozu.DB
                 case DataType.Int:
                 case DataType.Enum:
                 case DataType.Flags:
-                    self._ints = new []{0};
+                    self._ints = new[] {0};
                     break;
                 case DataType.String:
                 case DataType.Vector2:
@@ -129,20 +128,20 @@ namespace Yorozu.DB
                 case DataType.Vector3Int:
                 case DataType.Color:
                 case DataType.DBClass:
-                    self._strings = new []{""};
+                    self._strings = new[] {""};
                     break;
                 case DataType.Float:
-                    self._floats = new []{0f};
+                    self._floats = new[] {0f};
                     break;
                 case DataType.Bool:
-                    self._bools = new []{false};
+                    self._bools = new[] {false};
                     break;
                 case DataType.Sprite:
                 case DataType.GameObject:
                 case DataType.ScriptableObject:
                 case DataType.UnityObject:
                 case DataType.AudioClip:
-                    self._unityObjects = new []{default(UnityEngine.Object)};
+                    self._unityObjects = new[] {default(UnityEngine.Object)};
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -159,8 +158,9 @@ namespace Yorozu.DB
                 case DataType.Flags:
                     for (var i = self._ints.Length; i <= index; i++)
                     {
-                        ArrayUtility.Add(ref self._ints, 0);                        
+                        ArrayUtility.Add(ref self._ints, 0);
                     }
+
                     break;
                 case DataType.String:
                 case DataType.Vector2:
@@ -173,18 +173,21 @@ namespace Yorozu.DB
                     {
                         ArrayUtility.Add(ref self._strings, "");
                     }
+
                     break;
                 case DataType.Float:
                     for (var i = self._floats.Length; i <= index; i++)
                     {
-                        ArrayUtility.Add(ref self._floats, 0);                        
+                        ArrayUtility.Add(ref self._floats, 0);
                     }
+
                     break;
                 case DataType.Bool:
                     for (var i = self._bools.Length; i <= index; i++)
                     {
-                        ArrayUtility.Add(ref self._bools, false);                        
+                        ArrayUtility.Add(ref self._bools, false);
                     }
+
                     break;
                 case DataType.Sprite:
                 case DataType.GameObject:
@@ -193,13 +196,13 @@ namespace Yorozu.DB
                 case DataType.AudioClip:
                     for (var i = self._unityObjects.Length; i <= index; i++)
                     {
-                        ArrayUtility.Add(ref self._unityObjects, null);                        
+                        ArrayUtility.Add(ref self._unityObjects, null);
                     }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
     }
 }

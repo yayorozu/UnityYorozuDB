@@ -29,7 +29,7 @@ namespace Yorozu.DB
         private int _fieldCount;
         private bool _settingMode;
         private YorozuDBEnumDataObject _enum;
-        
+
         internal void SetData(object param)
         {
             _data = param as YorozuDBDataObject;
@@ -40,7 +40,7 @@ namespace Yorozu.DB
 
         internal void SetSelection(int row)
         {
-            _treeView.SetSelection(new List<int>(){row});
+            _treeView.SetSelection(new List<int>() {row});
         }
 
         internal override bool OnGUI()
@@ -53,13 +53,14 @@ namespace Yorozu.DB
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUILayout.LabelField($"Data Editor: 【{_data.name}】", EditorStyles.boldLabel);
-                
+
                 // 拡張設定ありでセットされてないならWarning表示
-                if (!string.IsNullOrEmpty(_data.Define.ExtendFieldsTypeName) && _data.ExtendFieldsObject == null)
+                if (!string.IsNullOrEmpty(_data.Define.ExtendFieldsTypeName) &&
+                    _data.ExtendFieldsObject == null)
                 {
                     EditorGUILayout.LabelField($"Extend Data is none", EditorStyles.label);
                 }
-                
+
                 GUILayout.FlexibleSpace();
 
                 // Mode Change
@@ -68,7 +69,7 @@ namespace Yorozu.DB
                     _settingMode = !_settingMode;
                     _treeView.Reload();
                 }
-                
+
                 GUILayout.Space(10);
 
                 using (new EditorGUI.DisabledScope(_fieldCount <= 0))
@@ -101,11 +102,12 @@ namespace Yorozu.DB
             {
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("ExtendObject", _data.ExtendFieldsObject, _data.Define.ExtendFieldsType, false);
+                    _data.ExtendFieldsObject = (ScriptableObject) EditorGUILayout.ObjectField("ExtendObject",
+                        _data.ExtendFieldsObject, _data.Define.ExtendFieldsType, false);
                     if (check.changed)
                     {
                         _data.Dirty();
-                        Reload();   
+                        Reload();
                     }
                 }
             }
@@ -115,7 +117,7 @@ namespace Yorozu.DB
             {
                 _data.AutoIncrementKey = EditorGUILayout.Toggle("Auto Increment Id", _data.AutoIncrementKey);
             }
-            
+
             _data.DrawFixFields(_enum);
         }
 
@@ -139,7 +141,7 @@ namespace Yorozu.DB
             var multiColumnHeader = new YorozuDBEditorMultiColumnHeader(_columnHeaderState);
             multiColumnHeader.DeleteEvent += DeleteColumn;
             multiColumnHeader.ChangeWidthEvent += ColumnChangeWidth;
-            
+
             multiColumnHeader.ResizeToFit();
 
             _treeView = new YorozuDBEditorDataTreeView(_state, multiColumnHeader, _data);
@@ -149,13 +151,13 @@ namespace Yorozu.DB
             _treeView.AutoIdEvent += SetAutoId;
             _treeView.SameIdEvent += SetSameId;
             _treeView.DuplicateEvent += Duplicate;
-            
-            var fields =YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
+
+            var fields = YorozuDBExtendUtility.FindFields(_data.ExtendFieldsObject);
             _fieldCount = _data.Define.Fields.Count + fields.Count;
-            
+
             // 足りない分の補充
             YorozuDBExtendUtility.FitFieldsSize(_data.ExtendFieldsObject, _data.DataCount);
-            
+
             _enum = YorozuDBEditorInternalUtility.LoadEnumDataAsset();
 
             _Initialized = true;
@@ -176,6 +178,7 @@ namespace Yorozu.DB
                         _data.Define.ExtendFieldWidths[widthIndex].Width = width;
                     }
                 }
+
                 return;
             }
 
@@ -193,13 +196,14 @@ namespace Yorozu.DB
             var keyField = _data.Define.KeyField;
             if (keyField == null)
                 return;
-            
+
             var minIndex = indexes.Min();
             var incId = Mathf.Max(_data.GetData(keyField.ID, minIndex).Int, 1);
             foreach (var index in indexes)
             {
-                _data.GetData(keyField.ID, index).Int = incId++; 
+                _data.GetData(keyField.ID, index).Int = incId++;
             }
+
             _data.Dirty();
             Reload();
         }
@@ -212,13 +216,14 @@ namespace Yorozu.DB
             var keyField = _data.Define.KeyField;
             if (keyField == null)
                 return;
-            
+
             var minIndex = indexes.Min();
             var replaceId = _data.GetData(keyField.ID, minIndex).Int;
             foreach (var index in indexes)
             {
-                _data.GetData(keyField.ID, index).Int = replaceId; 
+                _data.GetData(keyField.ID, index).Int = replaceId;
             }
+
             _data.Dirty();
             Reload();
         }
@@ -254,7 +259,8 @@ namespace Yorozu.DB
         /// </summary>
         private void DeleteColumn(MultiColumnHeaderState.Column column)
         {
-            if (EditorUtility.DisplayDialog("Warning", $"Delete {column.headerContent.text} Field?\nFields of related data will be Deleted.",
+            if (EditorUtility.DisplayDialog("Warning",
+                    $"Delete {column.headerContent.text} Field?\nFields of related data will be Deleted.",
                     "YES",
                     "NO"))
             {

@@ -33,10 +33,10 @@ namespace Yorozu.DB
             /// </summary>
             [SerializeField]
             internal int ID;
-            
+
             [SerializeField]
             internal List<KeyValue> KeyValues = new List<KeyValue>();
-            
+
             /// <summary>
             /// 説明
             /// </summary>
@@ -59,6 +59,7 @@ namespace Yorozu.DB
         {
             [SerializeField]
             internal int Key;
+
             [SerializeField]
             internal string Value;
         }
@@ -70,7 +71,7 @@ namespace Yorozu.DB
         internal List<EnumDefine> Defines = new List<EnumDefine>();
 
 #if UNITY_EDITOR
-        
+
         /// <summary>
         /// 追加 
         /// </summary>
@@ -78,9 +79,9 @@ namespace Yorozu.DB
         {
             if (!YorozuDBEditorInternalUtility.NameValidator(Defines, name, out name))
                 return;
-            
+
             var id = !Defines.Any() ? 1 : Defines.Max(v => v.ID) + 1;
-            
+
             Defines.Add(new EnumDefine(name, id));
             this.Dirty();
         }
@@ -92,7 +93,7 @@ namespace Yorozu.DB
         {
             if (!YorozuDBEditorInternalUtility.NameValidator(Defines, newName, out newName))
                 return;
-            
+
             var index = Defines.FindIndex(d => d.ID == defineId);
             if (index >= 0)
             {
@@ -119,25 +120,25 @@ namespace Yorozu.DB
                     d.RemoveField(fieldId);
                 }
             }
-            
+
             if (Defines.RemoveAll(v => v.ID == enumDefineId) > 0)
             {
                 this.Dirty();
             }
         }
-        
+
         internal void AddValue(int defineId, string value)
         {
             var index = Defines.FindIndex(d => d.ID == defineId);
             if (index < 0)
                 return;
-            
+
             var key = 1;
             if (Defines[index].KeyValues.Any())
             {
                 key = Defines[index].KeyValues.Max(v => v.Key) + 1;
             }
-                
+
             Defines[index].KeyValues.Add(new KeyValue()
             {
                 Key = key,
@@ -145,13 +146,13 @@ namespace Yorozu.DB
             });
             this.Dirty();
         }
-        
+
         internal void RemoveValue(int defineId, int removeIndex)
         {
             var index = Defines.FindIndex(d => d.ID == defineId);
             if (index < 0)
                 return;
-            
+
             Defines[index].KeyValues.RemoveAt(removeIndex);
             this.Dirty();
         }
@@ -161,6 +162,7 @@ namespace Yorozu.DB
         /// </summary>
         [NonSerialized]
         private Dictionary<int, string[]> _valuesDictionary = new Dictionary<int, string[]>();
+
         [NonSerialized]
         private Dictionary<int, int[]> _keysDictionary = new Dictionary<int, int[]>();
 
@@ -169,7 +171,7 @@ namespace Yorozu.DB
             _valuesDictionary.Clear();
             _keysDictionary.Clear();
         }
-        
+
         internal string[] GetEnums(int id)
         {
             if (!_valuesDictionary.ContainsKey(id))
@@ -184,31 +186,32 @@ namespace Yorozu.DB
                         .Where(v => !string.IsNullOrEmpty(v.Value))
                         .Select(v => v.Value)
                         .ToArray();
-                    
+
                     keys = Defines[index].KeyValues
                         .Where(v => !string.IsNullOrEmpty(v.Value))
                         .Select(v => v.Key)
                         .ToArray();
                 }
-                
+
                 _valuesDictionary.Add(id, values);
                 _keysDictionary.Add(id, keys);
             }
-            
+
             return _valuesDictionary[id];
         }
 
         private static StringBuilder _builder = new StringBuilder();
+
         internal string GetEnumFlagName(int id, int value)
         {
             if (value == 0)
                 return "None";
-            
+
             var enums = GetEnums(id);
             var all = (int) Mathf.Pow(2, enums.Length) - 1;
             if (value == all)
                 return "All";
-            
+
             _builder.Clear();
             for (var i = 0; i < enums.Length; i++)
             {
@@ -242,7 +245,7 @@ namespace Yorozu.DB
         }
 #endif
     }
-    
+
 #if UNITY_EDITOR
     [UnityEditor.CustomEditor(typeof(YorozuDBEnumDataObject))]
     internal class YorozuDBEnumDataObjectEditor : UnityEditor.Editor
@@ -251,7 +254,7 @@ namespace Yorozu.DB
         {
             if (GUILayout.Button("Open Editor"))
             {
-                UnityEditor.EditorApplication.ExecuteMenuItem(YorozuDBEditorWindow.MenuPath); 
+                UnityEditor.EditorApplication.ExecuteMenuItem(YorozuDBEditorWindow.MenuPath);
             }
         }
     }

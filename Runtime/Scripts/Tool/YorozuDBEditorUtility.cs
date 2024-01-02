@@ -18,9 +18,9 @@ namespace Yorozu.DB
         {
             var dataCount = data.DataCount;
             data.AddRow();
-            var instance = Activator.CreateInstance(typeof(T)) as DataAbstract;            
+            var instance = Activator.CreateInstance(typeof(T)) as DataAbstract;
             instance.SetUp(data, dataCount);
-            
+
             return instance as T;
         }
 
@@ -28,12 +28,12 @@ namespace Yorozu.DB
         {
             data.Clear();
         }
-        
+
         public static YorozuDBDataObject LoadDataObject(string path)
         {
             return AssetDatabase.LoadAssetAtPath<YorozuDBDataObject>(path);
         }
-        
+
         public static void Dirty(this ScriptableObject asset)
         {
             EditorUtility.SetDirty(asset);

@@ -18,8 +18,9 @@ namespace Yorozu.DB.TreeView
         private List<FieldInfo> _extendFieldInfos;
         private Editor _editor;
         internal float Height;
-        
-        internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id, 0, (id).ToString())
+
+        internal YorozuDBEditorTreeViewItem(int id, YorozuDBDataObject data, YorozuDBEnumDataObject enumData) : base(id,
+            0, (id).ToString())
         {
             _data = data;
             _enumData = enumData;
@@ -54,7 +55,7 @@ namespace Yorozu.DB.TreeView
             var elementProp = prop.GetArrayElementAtIndex(id);
             if (!elementProp.isExpanded)
                 elementProp.isExpanded = true;
-			
+
             EditorGUI.PropertyField(rect, elementProp, GUIContent.none, true);
             _editor.serializedObject.ApplyModifiedProperties();
         }

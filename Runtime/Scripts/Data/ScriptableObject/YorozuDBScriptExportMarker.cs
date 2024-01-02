@@ -10,7 +10,7 @@ namespace Yorozu.DB
     internal class YorozuDBScriptExportMarker : ScriptableObject
     {
     }
-    
+
 #if UNITY_EDITOR
     [UnityEditor.CustomEditor(typeof(YorozuDBScriptExportMarker))]
     internal class YorozuDBScriptExportMarkerEditor : UnityEditor.Editor
@@ -21,10 +21,10 @@ namespace Yorozu.DB
                           "Export the script to the location where this file is located";
 
             EditorGUILayout.HelpBox(message, MessageType.Info);
-            
+
             if (GUILayout.Button("Open Editor"))
             {
-                UnityEditor.EditorApplication.ExecuteMenuItem(YorozuDBEditorWindow.MenuPath); 
+                UnityEditor.EditorApplication.ExecuteMenuItem(YorozuDBEditorWindow.MenuPath);
             }
         }
     }

@@ -12,10 +12,12 @@ namespace Yorozu.DB
         Sprite,
         GameObject,
         ScriptableObject,
+
         /// <summary>
         /// その他の UnityEngine.Object
         /// </summary>
         UnityObject,
+
         /// <summary>
         /// YorozuDBEnumDataObject で定義した Enum を利用する
         /// </summary>
@@ -27,6 +29,7 @@ namespace Yorozu.DB
         Color,
         AudioClip,
         Flags,
+
         /// <summary>
         /// YorozuDB内で定義してあるKeyのあるクラス
         /// </summary>
