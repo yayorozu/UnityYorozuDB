@@ -27,8 +27,25 @@ namespace Yorozu.DB
             return _data.ExtendFieldsObject as T;
         }
 
-        private YorozuDBEnumDataObject _enumData => YorozuDB.EnumData;
-
+        private YorozuDBEnumDataObject _enumData
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (YorozuDB.EnumData == null)
+                {
+                    var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}", new[] {"Assets"});
+                    if (guids.Length > 0)
+                    {
+                        var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                        YorozuDB.SetEnum(AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path));
+                    }
+                }
+#endif
+                return YorozuDB.EnumData;
+            }
+        }
+        
         /// <summary>
         /// 何行目のデータか
         /// </summary>
@@ -159,20 +176,17 @@ namespace Yorozu.DB
 
         protected void Set(int fieldId, int enumDefineId, Enum value, int index = 0)
         {
-            var guids = AssetDatabase.FindAssets($"t:{nameof(YorozuDBEnumDataObject)}");
-            if (guids.Length <= 0)
-                throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not attach.");
+            if (_enumData == null)
+                throw new Exception($"{nameof(YorozuDBEnumDataObject)} is not find.");
 
-            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            var enumData = AssetDatabase.LoadAssetAtPath<YorozuDBEnumDataObject>(path);
-            var findDefine = enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
+            var findDefine = _enumData.Defines.FirstOrDefault(d => d.ID == enumDefineId);
             if (findDefine == null)
             {
                 Debug.LogError("Enum Data is not Define");
                 return;
             }
 
-            var key = enumData.GetEnumKey(enumDefineId, value.ToString());
+            var key = _enumData.GetEnumKey(enumDefineId, value.ToString());
             if (key.HasValue)
             {
                 Set(fieldId, key.Value, index);

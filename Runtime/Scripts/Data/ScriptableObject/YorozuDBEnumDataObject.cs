@@ -172,31 +172,35 @@ namespace Yorozu.DB
             _keysDictionary.Clear();
         }
 
+        private void CacheDictionary(int id)
+        {
+            if (_valuesDictionary.ContainsKey(id))
+                return;
+            
+            var values = Array.Empty<string>();
+            var keys = Array.Empty<int>();
+            var index = Defines.FindIndex(d => d.ID == id);
+            if (index >= 0)
+            {
+                // 同じタイミングで両方作る
+                values = Defines[index].KeyValues
+                    .Where(v => !string.IsNullOrEmpty(v.Value))
+                    .Select(v => v.Value)
+                    .ToArray();
+                    
+                keys = Defines[index].KeyValues
+                    .Where(v => !string.IsNullOrEmpty(v.Value))
+                    .Select(v => v.Key)
+                    .ToArray();
+            }
+                
+            _valuesDictionary.Add(id, values);
+            _keysDictionary.Add(id, keys);
+        }
+        
         internal string[] GetEnums(int id)
         {
-            if (!_valuesDictionary.ContainsKey(id))
-            {
-                var values = Array.Empty<string>();
-                var keys = Array.Empty<int>();
-                var index = Defines.FindIndex(d => d.ID == id);
-                if (index >= 0)
-                {
-                    // 同じタイミングで両方作る
-                    values = Defines[index].KeyValues
-                        .Where(v => !string.IsNullOrEmpty(v.Value))
-                        .Select(v => v.Value)
-                        .ToArray();
-
-                    keys = Defines[index].KeyValues
-                        .Where(v => !string.IsNullOrEmpty(v.Value))
-                        .Select(v => v.Key)
-                        .ToArray();
-                }
-
-                _valuesDictionary.Add(id, values);
-                _keysDictionary.Add(id, keys);
-            }
-
+            CacheDictionary(id);
             return _valuesDictionary[id];
         }
 
@@ -237,6 +241,7 @@ namespace Yorozu.DB
 
         internal int? GetEnumKey(int id, string value)
         {
+            CacheDictionary(id);
             if (!_valuesDictionary.ContainsKey(id))
                 return null;
 
