@@ -33,14 +33,15 @@ namespace Yorozu.DB
 
             [SerializeField]
             internal List<DataContainer> Data = new List<DataContainer>();
-
+            
+#if UNITY_EDITOR
+            
             internal Field(int fieldId, DataType dataType)
             {
                 ID = fieldId;
                 FixData = new DataContainer(dataType);
             }
-
-#if UNITY_EDITOR
+            
             /// <summary>
             /// 入れ替え
             /// </summary>

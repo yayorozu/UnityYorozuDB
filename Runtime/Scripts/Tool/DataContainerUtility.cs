@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using UnityEditor;
 
@@ -206,3 +208,5 @@ namespace Yorozu.DB
         }
     }
 }
+
+#endif
