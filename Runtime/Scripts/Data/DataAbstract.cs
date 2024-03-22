@@ -154,13 +154,17 @@ namespace Yorozu.DB
             var type = typeof(T);
             if (type.GetInterface(nameof(IIntKey)) != null)
             {
-                var keys = Ints(fieldId);
-                return YorozuDB.FindMany<T>(keys.ToArray());
+                var keys = Strings(fieldId).Select(int.Parse);
+                var findData = YorozuDB.FindMany<T>(keys.ToArray());
+                // 同じKeyの場合はデータが一つになるので再度紐づける
+                return keys.Select(v => findData.FirstOrDefault(d => (d as IIntKey).Key == v));
             }
             else
             {
                 var keys = Strings(fieldId);
-                return YorozuDB.FindMany<T>(keys.ToArray());
+                var findData = YorozuDB.FindMany<T>(keys.ToArray());
+                // 同じKeyの場合はデータが一つになるので再度紐づける
+                return keys.Select(v => findData.FirstOrDefault(d => (d as IStringKey).Key == v));
             }
         }
 
